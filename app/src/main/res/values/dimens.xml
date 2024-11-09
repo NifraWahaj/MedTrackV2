@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Login Page -->
+    <dimen name="loginButtonWidth">300dp</dimen>
+    <dimen name="loginButtonheight">55dp</dimen>
+    <dimen name="loginButtonMarginTop">-300dp</dimen>
+    <dimen name="loginButtonMarginBottom">10dp</dimen>
+
+    <dimen name="LogoImageWidth">200dp</dimen>
+    <dimen name="LogoImageHeight">100dp</dimen>
+    <dimen name="LogoImageMarginTop">-500dp</dimen>
+
+    <dimen name="tvWelcomeToMedTrackMarginTop">25dp</dimen>
+    <dimen name="tvWelcomeToMedTrackTextSize">26sp</dimen>
+
+
+    <dimen name="etHeight">50dp</dimen>
+    <dimen name="etTextSize">18sp</dimen>
+    <dimen name="etMarginTop">18dp</dimen>
+
+
+    <dimen name="tvDontHaveAnAccountMarginTop">-100dp</dimen>
+    <dimen name="tvDontHaveAnAccountMarginBottom">2dp</dimen>
+
+
+    <dimen name="tvDontHaveAnAccountSignUpMarginStart">2dp</dimen>
+    <dimen name="tvDontHaveAnAccountSignUpMarginTop">-100dp</dimen>
+    <dimen name="tvDontHaveAnAccountSignUpMarginEnd">3dp</dimen>
+
+
+    <dimen name="headingOne">20sp</dimen>
+    <dimen name="marginLeft">30sp</dimen>
+
+
+
+</resources>

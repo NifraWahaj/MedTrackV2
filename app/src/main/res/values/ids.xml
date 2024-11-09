@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="btnSignUp" type="id">@id/btnSignUp</item>
+    <item name="etPassword" type="id">@id/etPassword</item>
+    <item name="tvDontHaveAnAccountSignUp" type="id">@id/tvDontHaveAnAccountSignUp</item>
+    <item name="idSignUpToContinue" type="id">@id/idSignUpToContinue</item>
+    <item name="etEmail" type="id">@id/etEmail</item>
+    <item name="tvDontHaveAnAccount" type="id">@id/tvDontHaveAnAccount</item>
+    <item name="tvWelcomeToMedTrack" type="id">@id/tvWelcomeToMedTrack</item>
+
+</resources>
