@@ -1,0 +1,42 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:gravity="center_vertical">
+
+    <!-- Icon -->
+    <ImageView
+        android:id="@+id/medIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_inhaler"
+        android:contentDescription=""/>
+
+    <!-- Medication Name and Reminder in a vertical layout -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:paddingStart="8dp">
+
+        <!-- Medication Name -->
+        <TextView
+            android:id="@+id/medName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Medication Name"
+            android:textStyle="bold"
+            android:textSize="16sp"/>
+
+        <!-- Next Reminder -->
+        <TextView
+            android:id="@+id/medReminder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Next Reminder: Tomorrow"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"/>
+    </LinearLayout>
+</LinearLayout>

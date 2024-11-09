@@ -13,26 +13,25 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-
-        switch (position)
-        {
+        switch (position) {
             case 0:
-                return new HomeFragment();
+                return new NotificationFragment();
             case 1:
                 return new MedFragment();
             case 2:
-                //       return new NotificationFragment();
+                return new HomeFragment();
             case 3:
-                //       return new CommunityFragment();
+                return new CommunityFragment();
+            case 4:
+                return new ProfileFragment();
             default:
-           //     return new ProfileFragment();
+                throw new IllegalArgumentException("Invalid position: " + position);
         }
-        return new HomeFragment(); // TODO: idk if this is right
-
     }
+
 
     @Override
     public int getItemCount() {
-        return 35;
+        return 5;
     }
 }

@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     int count=0;
     boolean flag = false;
 
-    FloatingActionButton fab_add;
+ //   FloatingActionButton fab_add;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +45,13 @@ public class MainActivity extends AppCompatActivity {
         vp2 = findViewById(R.id.viewpager2);
         vp2.setAdapter(adapter);
         tabLayout = findViewById(R.id.tabLayout);
-        fab_add = findViewById(R.id.fab_add);
+    //    fab_add = findViewById(R.id.fab_add);
 
-        fab_add.setOnClickListener(new View.OnClickListener() {
+      /*
+          fab_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               /* AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+             AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                 dialog.setTitle("Product");
                 View v = LayoutInflater.from(MainActivity.this)
                         .inflate(R.layout.add_new_product_dialog_design, null, false);
@@ -81,10 +82,10 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 });
-*/
+
 
             }
-        });
+        });*/
 
 
         TabLayoutMediator tabLayoutMediator =
@@ -92,32 +93,32 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
                         /*
-                         * 0     HomeFragment
-                         * 1     MedFragment
-                         * 2     NotificationFragment
-                         * 3     CommunityFragment
-                         * default ProfileFragment
+                            case 0:NotificationFragment();
+                            case 1:MedFragment();
+                            case 2:HomeFragment();
+                            case 3:CommunityFragment();
+                            case 4:ProfileFragment();
                          * */
                         switch (position) {
                             case 0:
-                                tab.setText("Home");
-                                tab.setIcon(R.drawable.ic_home);
+                                tab.setText("Notification");
+                                tab.setIcon(R.drawable.ic_notifications);
                                 break;
                             case 1:
                                 tab.setText("Medication");
                                 tab.setIcon(R.drawable.ic_pills);
                                 break;
                             case 2:
+                                tab.setText("Home");
+                                tab.setIcon(R.drawable.ic_home);
+                                break;
+                            case 3:
                                 tab.setText("Community");
                                 tab.setIcon(R.drawable.ic_community);
                                 break;
-                            case 3:
+                            case 4:
                                 tab.setText("Profile");
                                 tab.setIcon(R.drawable.ic_profile);
-                                break;
-                            case 4: // Explicitly assign Notification here
-                                tab.setText("Notification");
-                                tab.setIcon(R.drawable.ic_notifications);
                                 break;
                             default:
                                 // Optionally, add a default case for error handling/logging
