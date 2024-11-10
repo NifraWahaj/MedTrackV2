@@ -1,14 +1,101 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MedStep3TwoDosesFragment">
+    android:orientation="vertical"
+    android:padding="16dp">
 
-    <!-- TODO: Update blank fragment layout -->
+    <!-- First Intake Section -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="First Intake"
+        android:textStyle="bold" />
 
-</FrameLayout>
+    <!-- First Intake Time -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Time" />
+
+    <Button
+        android:id="@+id/buttonPickTimeFirstIntake"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Time" />
+
+    <!-- First Intake Dosage Quantity -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Quantity" />
+
+    <EditText
+        android:id="@+id/editTextQuantityFirstIntake"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Quantity (e.g., 1, 2)"
+        android:inputType="number" />
+
+    <!-- First Intake Unit Spinner -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Unit" />
+
+    <Spinner
+        android:id="@+id/spinnerUnitFirstIntake"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Second Intake Section -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Second Intake"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp" />
+
+    <!-- Second Intake Time -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Time" />
+
+    <Button
+        android:id="@+id/buttonPickTimeSecondIntake"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Time" />
+
+    <!-- Second Intake Dosage Quantity -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Quantity" />
+
+    <EditText
+        android:id="@+id/editTextQuantitySecondIntake"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Quantity (e.g., 1, 2)"
+        android:inputType="number" />
+
+    <!-- Second Intake Unit Spinner -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Unit" />
+
+    <Spinner
+        android:id="@+id/spinnerUnitSecondIntake"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Next Button -->
+    <Button
+        android:id="@+id/nextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Next"
+        android:layout_marginTop="16dp" />
+</LinearLayout>

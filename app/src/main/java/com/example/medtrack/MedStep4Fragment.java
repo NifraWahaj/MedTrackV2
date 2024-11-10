@@ -26,13 +26,23 @@ public class MedStep4Fragment extends Fragment {
         nextButton = view.findViewById(R.id.nextButton);
 
         nextButton.setOnClickListener(v -> {
-            int currentInventory = Integer.parseInt(currentInventoryEditText.getText().toString());
-            int threshold = Integer.parseInt(thresholdEditText.getText().toString());
+            try {
+                int currentInventory = Integer.parseInt(currentInventoryEditText.getText().toString());
+                int threshold = Integer.parseInt(thresholdEditText.getText().toString());
 
-            ((AddMedActivity) getActivity()).setRefillAmount(currentInventory);
-            ((AddMedActivity) getActivity()).setRefillThreshold(threshold);
+                AddMedActivity activity = (AddMedActivity) getActivity();
+                if (activity != null) {
+                    activity.setRefillAmount(currentInventory);
+                    activity.setRefillThreshold(threshold);
 
-            ((AddMedActivity) getActivity()).goToNextStep();
+                    // Save medication data to Firebase after final step
+                    activity.saveMedicationToFirebase();
+                }
+            } catch (NumberFormatException e) {
+                // Handle incorrect input format
+                thresholdEditText.setError("Please enter a valid number");
+                currentInventoryEditText.setError("Please enter a valid number");
+            }
         });
 
         return view;

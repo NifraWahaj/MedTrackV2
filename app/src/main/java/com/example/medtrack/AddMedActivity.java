@@ -8,15 +8,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
+
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
 
 public class AddMedActivity extends AppCompatActivity {
 
@@ -32,6 +31,25 @@ public class AddMedActivity extends AppCompatActivity {
     private int refillAmount;
     private int refillThreshold;
 
+    private String medicationFrequency;
+    private String firstIntakeDetails;
+    private String secondIntakeDetails;
+
+    // Getter and Setter for medicationFrequency
+    public void setMedicationFrequency(String medicationFrequency) {
+        this.medicationFrequency = medicationFrequency;
+        updateFragmentsBasedOnFrequency();
+    }
+
+    // Setters for intake details
+    public void setFirstIntakeDetails(String time, String dosage) {
+        this.firstIntakeDetails = "Time: " + time + ", Dosage: " + dosage;
+    }
+
+    public void setSecondIntakeDetails(String time, String dosage) {
+        this.secondIntakeDetails = "Time: " + time + ", Dosage: " + dosage;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,19 +57,41 @@ public class AddMedActivity extends AppCompatActivity {
 
         // Setup ViewPager2
         viewPager = findViewById(R.id.viewPager);
-        setupFragments(); // Create a list of fragments for the sequence
+        setupFragments(); // Create a list of initial fragments
         adapter = new MedPagerAdapter(this);
         viewPager.setAdapter(adapter);
     }
 
+    // Setup fragments for the ViewPager
     private void setupFragments() {
-        // Add initial fragments here
+        fragmentList.clear();
         fragmentList.add(new MedStep1Fragment());  // Step 1: Medication Name and Unit
         fragmentList.add(new MedStep2Fragment());  // Step 2: Frequency
-        fragmentList.add(new MedStep3Fragment());  // Step 3: Reminder Time
-        fragmentList.add(new MedStep4Fragment());  // Step 4: Refill Reminder
     }
 
+    // Update fragments based on the selected frequency
+    public void updateFragmentsBasedOnFrequency() {
+        // Clear existing fragments from step 3 onwards
+        if (fragmentList.size() > 2) {
+            fragmentList.subList(2, fragmentList.size()).clear();
+        }
+
+        // Add Step 3 based on the user's frequency choice
+        if ("Twice daily".equalsIgnoreCase(medicationFrequency)) {
+            fragmentList.add(new MedStep3TwoDosesFragment());  // Step 3 for Two Doses
+        } else {
+            fragmentList.add(new MedStep3Fragment());  // Step 3 for Single Dose
+        }
+
+        // Add Step 4 (Refill Reminder Step)
+        MedStep4Fragment finalStepFragment = new MedStep4Fragment();
+        finalStepFragment.setRetainInstance(true);
+        fragmentList.add(finalStepFragment);
+
+        adapter.notifyDataSetChanged(); // Notify adapter about the updated fragment list
+    }
+
+    // Adapter for handling fragments in the ViewPager2
     private class MedPagerAdapter extends FragmentStateAdapter {
         public MedPagerAdapter(@NonNull AppCompatActivity fragmentActivity) {
             super(fragmentActivity);
@@ -72,9 +112,8 @@ public class AddMedActivity extends AppCompatActivity {
     // Method to navigate to the next step
     public void goToNextStep() {
         if (viewPager.getCurrentItem() < fragmentList.size() - 1) {
+            // Go to the next fragment in the ViewPager
             viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
-        } else {
-            saveMedicationToFirebase(); // If it's the last step, save the data to Firebase
         }
     }
 
@@ -104,7 +143,7 @@ public class AddMedActivity extends AppCompatActivity {
     }
 
     // Method to save medication data to Firebase
-    private void saveMedicationToFirebase() {
+    public void saveMedicationToFirebase() {
         // Get the current user
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {
@@ -140,5 +179,4 @@ public class AddMedActivity extends AppCompatActivity {
                     Toast.makeText(AddMedActivity.this, "Failed to save medication", Toast.LENGTH_SHORT).show();
                 });
     }
-
 }

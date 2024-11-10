@@ -32,10 +32,14 @@ public class MedStep2Fragment extends Fragment {
                 String frequency = selectedRadioButton.getText().toString();
 
                 // Save data to activity
-                ((AddMedActivity) getActivity()).setFrequency(frequency);
+                AddMedActivity activity = (AddMedActivity) getActivity();
+                if (activity != null) {
+                    activity.setFrequency(frequency);
+                    activity.updateFragmentsBasedOnFrequency(); // Ensure the fragment list is updated
 
-                // Move to next step
-                ((AddMedActivity) getActivity()).goToNextStep();
+                    // Move to next step after the user clicks Next
+                    activity.goToNextStep();
+                }
             }
         });
 

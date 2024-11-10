@@ -1,64 +1,107 @@
 package com.example.medtrack;
 
+import android.app.TimePickerDialog;
 import android.os.Bundle;
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TimePicker;
+import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link MedStep3TwoDosesFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.Calendar;
+
 public class MedStep3TwoDosesFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private Button buttonPickTimeFirstIntake, buttonPickTimeSecondIntake, nextButton;
+    private EditText editTextQuantityFirstIntake, editTextQuantitySecondIntake;
+    private Spinner spinnerUnitFirstIntake, spinnerUnitSecondIntake;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public MedStep3TwoDosesFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MedStep3TwoDosesFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static MedStep3TwoDosesFragment newInstance(String param1, String param2) {
-        MedStep3TwoDosesFragment fragment = new MedStep3TwoDosesFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_med_step3_two_doses, container, false);
+
+        // Bind UI elements
+        buttonPickTimeFirstIntake = view.findViewById(R.id.buttonPickTimeFirstIntake);
+        buttonPickTimeSecondIntake = view.findViewById(R.id.buttonPickTimeSecondIntake);
+        editTextQuantityFirstIntake = view.findViewById(R.id.editTextQuantityFirstIntake);
+        editTextQuantitySecondIntake = view.findViewById(R.id.editTextQuantitySecondIntake);
+        spinnerUnitFirstIntake = view.findViewById(R.id.spinnerUnitFirstIntake);
+        spinnerUnitSecondIntake = view.findViewById(R.id.spinnerUnitSecondIntake);
+        nextButton = view.findViewById(R.id.nextButton);
+
+        // Populate the Spinners with the list of units
+        String[] units = {
+                "Tablet(s)", "Capsule(s)", "mL (milliliters)", "tsp (teaspoon)",
+                "Drop(s)", "Puff(s)", "mg (milligrams)", "Application(s)"
+        };
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, units);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerUnitFirstIntake.setAdapter(adapter);
+        spinnerUnitSecondIntake.setAdapter(adapter);
+
+        // Set up time picker for First Intake
+        buttonPickTimeFirstIntake.setOnClickListener(v -> {
+            showTimePicker(buttonPickTimeFirstIntake);
+        });
+
+        // Set up time picker for Second Intake
+        buttonPickTimeSecondIntake.setOnClickListener(v -> {
+            showTimePicker(buttonPickTimeSecondIntake);
+        });
+
+        // Handle Next button click
+        nextButton.setOnClickListener(v -> {
+            String firstTime = buttonPickTimeFirstIntake.getText().toString();
+            String firstQuantityStr = editTextQuantityFirstIntake.getText().toString();
+            String firstUnit = spinnerUnitFirstIntake.getSelectedItem().toString();
+
+            String secondTime = buttonPickTimeSecondIntake.getText().toString();
+            String secondQuantityStr = editTextQuantitySecondIntake.getText().toString();
+            String secondUnit = spinnerUnitSecondIntake.getSelectedItem().toString();
+
+            if (firstTime.equals("Select Time") || firstQuantityStr.isEmpty() || secondTime.equals("Select Time") || secondQuantityStr.isEmpty()) {
+                Toast.makeText(getActivity(), "Please fill in all fields for both intakes.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            int firstQuantity, secondQuantity;
+            try {
+                firstQuantity = Integer.parseInt(firstQuantityStr);
+                secondQuantity = Integer.parseInt(secondQuantityStr);
+            } catch (NumberFormatException e) {
+                Toast.makeText(getActivity(), "Please enter valid quantities.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Save data to activity
+            ((AddMedActivity) getActivity()).setFirstIntakeDetails(firstTime, firstQuantity + " " + firstUnit);
+            ((AddMedActivity) getActivity()).setSecondIntakeDetails(secondTime, secondQuantity + " " + secondUnit);
+
+            // Move to next step
+            ((AddMedActivity) getActivity()).goToNextStep();
+        });
+
+        return view;
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_med_step3_two_doses, container, false);
+    private void showTimePicker(Button button) {
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(), (view, hourOfDay, minute1) -> {
+            String time = String.format("%02d:%02d %s", (hourOfDay % 12 == 0) ? 12 : hourOfDay % 12, minute1, hourOfDay < 12 ? "am" : "pm");
+            button.setText(time);
+        }, hour, minute, false);
+        timePickerDialog.show();
     }
 }
