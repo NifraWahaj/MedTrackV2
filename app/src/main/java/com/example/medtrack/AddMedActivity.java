@@ -1,24 +1,144 @@
 package com.example.medtrack;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
+import java.util.List;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 
 public class AddMedActivity extends AppCompatActivity {
+
+    private ViewPager2 viewPager;
+    private MedPagerAdapter adapter;
+    private List<Fragment> fragmentList = new ArrayList<>();
+
+    // Variables to store medication details
+    private String medicationName;
+    private String medicationUnit;
+    private String frequency;
+    private String reminderTime;
+    private int refillAmount;
+    private int refillThreshold;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_add_med);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
+        // Setup ViewPager2
+        viewPager = findViewById(R.id.viewPager);
+        setupFragments(); // Create a list of fragments for the sequence
+        adapter = new MedPagerAdapter(this);
+        viewPager.setAdapter(adapter);
     }
+
+    private void setupFragments() {
+        // Add initial fragments here
+        fragmentList.add(new MedStep1Fragment());  // Step 1: Medication Name and Unit
+        fragmentList.add(new MedStep2Fragment());  // Step 2: Frequency
+        fragmentList.add(new MedStep3Fragment());  // Step 3: Reminder Time
+        fragmentList.add(new MedStep4Fragment());  // Step 4: Refill Reminder
+    }
+
+    private class MedPagerAdapter extends FragmentStateAdapter {
+        public MedPagerAdapter(@NonNull AppCompatActivity fragmentActivity) {
+            super(fragmentActivity);
+        }
+
+        @NonNull
+        @Override
+        public Fragment createFragment(int position) {
+            return fragmentList.get(position);
+        }
+
+        @Override
+        public int getItemCount() {
+            return fragmentList.size();
+        }
+    }
+
+    // Method to navigate to the next step
+    public void goToNextStep() {
+        if (viewPager.getCurrentItem() < fragmentList.size() - 1) {
+            viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
+        } else {
+            saveMedicationToFirebase(); // If it's the last step, save the data to Firebase
+        }
+    }
+
+    // Setter methods for data collection
+    public void setMedicationName(String name) {
+        this.medicationName = name;
+    }
+
+    public void setMedicationUnit(String unit) {
+        this.medicationUnit = unit;
+    }
+
+    public void setFrequency(String frequency) {
+        this.frequency = frequency;
+    }
+
+    public void setReminderTime(String time) {
+        this.reminderTime = time;
+    }
+
+    public void setRefillAmount(int amount) {
+        this.refillAmount = amount;
+    }
+
+    public void setRefillThreshold(int threshold) {
+        this.refillThreshold = threshold;
+    }
+
+    // Method to save medication data to Firebase
+    private void saveMedicationToFirebase() {
+        // Get the current user
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            // User is not authenticated, handle the error
+            Toast.makeText(this, "Error: User is not authenticated. Please log in first.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Create a Firebase reference
+        FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
+        DatabaseReference medsRef = database.getReference("medications");
+
+        // Create a medication object to save
+        Medication medication = new Medication(
+                medicationName,
+                medicationUnit,
+                frequency,
+                reminderTime,
+                refillAmount,
+                refillThreshold
+        );
+
+        // Save the medication object to Firebase
+        String userId = currentUser.getUid();
+        medsRef.child(userId).push().setValue(medication)
+                .addOnSuccessListener(aVoid -> {
+                    // Show a success message
+                    Toast.makeText(AddMedActivity.this, "Medication saved successfully", Toast.LENGTH_SHORT).show();
+                    finish(); // Close the activity after saving
+                })
+                .addOnFailureListener(e -> {
+                    // Show an error message
+                    Toast.makeText(AddMedActivity.this, "Failed to save medication", Toast.LENGTH_SHORT).show();
+                });
+    }
+
 }

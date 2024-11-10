@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "474761412792",
+    "firebase_url": "https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "medtrack-68ec9",
     "storage_bucket": "medtrack-68ec9.firebasestorage.app"
   },
@@ -8,25 +9,6 @@
     {
       "client_info": {
         "mobilesdk_app_id": "1:474761412792:android:d8926a74094ba06216344d",
-        "android_client_info": {
-          "package_name": "com.example.MedTrack"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDLuJXWS_FHzTWBAsVI5i6udPppY_t5b1s"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:474761412792:android:035cacc5ef2847f616344d",
         "android_client_info": {
           "package_name": "com.example.medtrack"
         }

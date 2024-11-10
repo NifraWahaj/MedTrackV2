@@ -1,0 +1,33 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Do you want to get reminders to refill your inventory?"
+        android:textSize="18sp" />
+
+    <EditText
+        android:id="@+id/editTextCurrentInventory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Current Inventory"
+        tools:ignore="TouchTargetSizeCheck" />
+
+    <EditText
+        android:id="@+id/editTextThreshold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Threshold for Refill"
+        tools:ignore="TouchTargetSizeCheck" />
+
+    <Button
+        android:id="@+id/nextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save" />
+</LinearLayout>
