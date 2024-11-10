@@ -37,8 +37,14 @@ public class CalendarFragment extends Fragment {
         // Get the calendar dates
         List<String> dateList = getNextSevenDays();
 
-        // Set the adapter
-        CalendarAdapter adapter = new CalendarAdapter(getContext(), dateList);
+        // Set the adapter with a callback listener
+        CalendarAdapter adapter = new CalendarAdapter(getContext(), dateList, new CalendarAdapter.OnDateSelectedListener() {
+            @Override
+            public void onDateSelected(String selectedDate) {
+                // Update the selected date TextView when a date is selected
+                textViewSelectedDate.setText(selectedDate);
+            }
+        });
         calendarRecyclerView.setAdapter(adapter);
 
         return view;

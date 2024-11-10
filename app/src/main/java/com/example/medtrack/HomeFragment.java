@@ -37,33 +37,42 @@ public class HomeFragment extends Fragment {
         layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         calendarRecyclerView.setLayoutManager(layoutManager);
 
-        // Get the calendar dates (4 days before to 4 days after today)
+        // Get the calendar dates (5 days before to 5 days after today)
         List<String> dateList = getSurroundingDays();
 
-        // Set the adapter
-        CalendarAdapter adapter = new CalendarAdapter(getContext(), dateList);
+        // Set the adapter with a callback listener
+        CalendarAdapter adapter = new CalendarAdapter(getContext(), dateList, new CalendarAdapter.OnDateSelectedListener() {
+            @Override
+            public void onDateSelected(String selectedDate) {
+                // Update the selected date TextView when a date is selected
+                textViewSelectedDate.setText(selectedDate);
+            }
+        });
         calendarRecyclerView.setAdapter(adapter);
 
-        // Scroll to today's position
+        // Scroll to today's position in the middle (position 5)
         calendarRecyclerView.post(() -> {
-            int todayPosition = 4; // Since we want to show 4 days before and 4 days after
+            int todayPosition = 5; // Since we want to start at today, which is the 6th element (index 5)
             layoutManager.scrollToPositionWithOffset(todayPosition, calendarRecyclerView.getWidth() / 2);
         });
+
+        // Set initial selected date as today
+        textViewSelectedDate.setText(dateList.get(5));
 
         return view;
     }
 
-    // Function to get the surrounding days (4 days before and 4 days after today)
+    // Function to get the surrounding days (5 days before and 5 days after today)
     private List<String> getSurroundingDays() {
         List<String> dateList = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM", Locale.getDefault());
 
-        // Move to 4 days before today
-        calendar.add(Calendar.DAY_OF_YEAR, -4);
+        // Move to 5 days before today
+        calendar.add(Calendar.DAY_OF_YEAR, -5);
 
-        // Collect dates from 4 days before to 4 days after today
-        for (int i = 0; i < 9; i++) {
+        // Collect dates from 5 days before to 5 days after today
+        for (int i = 0; i < 11; i++) {
             dateList.add(dateFormat.format(calendar.getTime()));
             calendar.add(Calendar.DAY_OF_YEAR, 1);
         }

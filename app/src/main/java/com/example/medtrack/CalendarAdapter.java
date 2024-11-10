@@ -1,6 +1,5 @@
 package com.example.medtrack;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,11 +14,18 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
     private final List<String> dateList;
     private final Context context;
-    private int selectedPosition = -1; // To highlight the selected date
+    private int selectedPosition = 4; // Start with today as selected (position 4)
+    private final OnDateSelectedListener dateSelectedListener;
 
-    public CalendarAdapter(Context context, List<String> dateList) {
+    // Callback interface to communicate selected date
+    public interface OnDateSelectedListener {
+        void onDateSelected(String selectedDate);
+    }
+
+    public CalendarAdapter(Context context, List<String> dateList, OnDateSelectedListener listener) {
         this.context = context;
         this.dateList = dateList;
+        this.dateSelectedListener = listener;
     }
 
     @NonNull
@@ -30,18 +36,33 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CalendarViewHolder holder, @SuppressLint("RecyclerView") int position) {
-        String date = dateList.get(position);
-        holder.textViewDate.setText(date);
+    public void onBindViewHolder(@NonNull CalendarViewHolder holder, int position) {
+        String dateInfo = dateList.get(position);
+        String[] splitInfo = dateInfo.split(", ");
+        String dayName = splitInfo[0];  // e.g., Mon, Tue
+        String date = splitInfo[1];      // e.g., 12 Sept
 
-        // Highlight the selected date
-        holder.itemView.setBackgroundResource(
-                selectedPosition == position ? R.drawable.selected_date_background : android.R.color.transparent
-        );
+        holder.textViewDayName.setText(dayName);
+        holder.textViewDateNumber.setText(date.split(" ")[0]); // Extracting just the number
+
+        // Highlight selected date
+        if (selectedPosition == position) {
+            holder.textViewDateNumber.setBackgroundResource(R.drawable.bg_circle_date);
+            holder.textViewDateNumber.setTextColor(context.getResources().getColor(android.R.color.white));
+        } else {
+            holder.textViewDateNumber.setBackgroundResource(android.R.color.transparent);
+            holder.textViewDateNumber.setTextColor(context.getResources().getColor(android.R.color.black));
+        }
 
         holder.itemView.setOnClickListener(v -> {
+            int oldPosition = selectedPosition;
             selectedPosition = position;
-            notifyDataSetChanged(); // Refresh the list to update the background
+
+            // Notify HomeFragment of the newly selected date
+            dateSelectedListener.onDateSelected(dateInfo);
+
+            notifyItemChanged(oldPosition);
+            notifyItemChanged(selectedPosition);
         });
     }
 
@@ -51,11 +72,12 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     }
 
     public static class CalendarViewHolder extends RecyclerView.ViewHolder {
-        TextView textViewDate;
+        TextView textViewDayName, textViewDateNumber;
 
         public CalendarViewHolder(@NonNull View itemView) {
             super(itemView);
-            textViewDate = itemView.findViewById(R.id.textViewDate);
+            textViewDayName = itemView.findViewById(R.id.textViewDayName);
+            textViewDateNumber = itemView.findViewById(R.id.textViewDateNumber);
         }
     }
 }

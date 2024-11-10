@@ -6,20 +6,34 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/calendarRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="150dp"
+        android:layout_marginTop="30dp"
         android:orientation="horizontal"
-        android:layout_marginTop="20dp"
+        android:background="@color/blueDark"
         android:layout_alignParentTop="true"/>
 
-    <!-- Main Content Area -->
+    <!-- Main Content Area (Selected Date Info) -->
     <TextView
         android:id="@+id/textViewSelectedDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/calendarRecyclerView"
         android:layout_centerHorizontal="true"
-        android:text="Today, 12 Sept"
+        android:text=""
         android:textSize="18sp"
         android:textStyle="bold"
         android:layout_marginTop="16dp"/>
+
+    <!-- Floating Action Button to add a new medication -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddMedication"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_add"
+        android:contentDescription="Add Medication"
+        android:backgroundTint="@color/blueMain"
+        android:tint="@android:color/white"/>
 </RelativeLayout>
