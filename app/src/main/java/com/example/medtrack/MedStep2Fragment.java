@@ -34,10 +34,10 @@ public class MedStep2Fragment extends Fragment {
                 // Save data to activity
                 AddMedActivity activity = (AddMedActivity) getActivity();
                 if (activity != null) {
-                    activity.setFrequency(frequency);
-                    activity.updateFragmentsBasedOnFrequency(); // Ensure the fragment list is updated
+                    activity.setMedicationFrequency(frequency);  // Set the frequency here
+                    activity.updateFragmentsBasedOnFrequency();  // Ensure the fragment list is updated
 
-                    // Move to next step after the user clicks Next
+                    // Move to next step
                     activity.goToNextStep();
                 }
             }

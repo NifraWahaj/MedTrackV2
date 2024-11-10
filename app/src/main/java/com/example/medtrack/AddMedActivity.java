@@ -1,6 +1,7 @@
 package com.example.medtrack;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,8 @@ import java.util.List;
 
 public class AddMedActivity extends AppCompatActivity {
 
+    private static final String TAG = "AddMedActivity";
+
     private ViewPager2 viewPager;
     private MedPagerAdapter adapter;
     private List<Fragment> fragmentList = new ArrayList<>();
@@ -31,14 +34,14 @@ public class AddMedActivity extends AppCompatActivity {
     private int refillAmount;
     private int refillThreshold;
 
-    private String medicationFrequency;
+    private String medicationFrequency;  // This should be properly set by MedStep2Fragment
     private String firstIntakeDetails;
     private String secondIntakeDetails;
 
     // Getter and Setter for medicationFrequency
     public void setMedicationFrequency(String medicationFrequency) {
+        Log.d(TAG, "Setting medication frequency: " + medicationFrequency);
         this.medicationFrequency = medicationFrequency;
-        updateFragmentsBasedOnFrequency();
     }
 
     // Setters for intake details
@@ -71,6 +74,13 @@ public class AddMedActivity extends AppCompatActivity {
 
     // Update fragments based on the selected frequency
     public void updateFragmentsBasedOnFrequency() {
+        if (medicationFrequency == null) {
+            Log.e(TAG, "Medication frequency is null, cannot update fragments properly.");
+            return;
+        }
+
+        Log.d(TAG, "Updating fragments based on frequency: " + medicationFrequency);
+
         // Clear existing fragments from step 3 onwards
         if (fragmentList.size() > 2) {
             fragmentList.subList(2, fragmentList.size()).clear();
@@ -78,17 +88,21 @@ public class AddMedActivity extends AppCompatActivity {
 
         // Add Step 3 based on the user's frequency choice
         if ("Twice daily".equalsIgnoreCase(medicationFrequency)) {
+            Log.d(TAG, "Adding MedStep3TwoDosesFragment for twice daily frequency");
             fragmentList.add(new MedStep3TwoDosesFragment());  // Step 3 for Two Doses
         } else {
+            Log.d(TAG, "Adding MedStep3Fragment for once daily frequency");
             fragmentList.add(new MedStep3Fragment());  // Step 3 for Single Dose
         }
 
         // Add Step 4 (Refill Reminder Step)
+        Log.d(TAG, "Adding MedStep4Fragment");
         MedStep4Fragment finalStepFragment = new MedStep4Fragment();
         finalStepFragment.setRetainInstance(true);
         fragmentList.add(finalStepFragment);
 
-        adapter.notifyDataSetChanged(); // Notify adapter about the updated fragment list
+        // Notify adapter about the updated fragment list
+        adapter.notifyDataSetChanged();
     }
 
     // Adapter for handling fragments in the ViewPager2
@@ -100,6 +114,7 @@ public class AddMedActivity extends AppCompatActivity {
         @NonNull
         @Override
         public Fragment createFragment(int position) {
+            Log.d(TAG, "Creating fragment for position: " + position);
             return fragmentList.get(position);
         }
 
@@ -157,17 +172,38 @@ public class AddMedActivity extends AppCompatActivity {
         DatabaseReference medsRef = database.getReference("medications");
 
         // Create a medication object to save
-        Medication medication = new Medication(
-                medicationName,
-                medicationUnit,
-                frequency,
-                reminderTime,
-                refillAmount,
-                refillThreshold
-        );
+        Medication medication;
+
+        if ("Twice daily".equalsIgnoreCase(medicationFrequency)) {
+            // Create medication object with twice daily details
+            medication = new Medication(
+                    medicationName,
+                    medicationUnit,
+                    medicationFrequency,
+                    firstIntakeDetails,
+                    secondIntakeDetails,
+                    refillAmount,
+                    refillThreshold
+            );
+        } else {
+            // Create medication object with single dose details
+            medication = new Medication(
+                    medicationName,
+                    medicationUnit,
+                    frequency,
+                    reminderTime,
+                    refillAmount,
+                    refillThreshold
+            );
+        }
 
         // Save the medication object to Firebase
         String userId = currentUser.getUid();
+        Log.d("Medication", "Name: " + medicationName);
+        Log.d("Medication", "Frequency: " + medicationFrequency);
+        Log.d("Medication", "First Intake: " + firstIntakeDetails);
+        Log.d("Medication", "Second Intake: " + secondIntakeDetails);
+
         medsRef.child(userId).push().setValue(medication)
                 .addOnSuccessListener(aVoid -> {
                     // Show a success message
@@ -179,4 +215,5 @@ public class AddMedActivity extends AppCompatActivity {
                     Toast.makeText(AddMedActivity.this, "Failed to save medication", Toast.LENGTH_SHORT).show();
                 });
     }
+
 }
