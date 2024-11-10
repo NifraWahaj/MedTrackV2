@@ -12,10 +12,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:tabGravity="fill"
         app:tabIndicatorHeight="3dp"
         app:tabMode="fixed"
-        app:tabGravity="fill"
-        />
+        tools:ignore="SpeakableTextPresentCheck" />
 
 
     <androidx.viewpager2.widget.ViewPager2

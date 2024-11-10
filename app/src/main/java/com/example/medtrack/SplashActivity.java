@@ -38,6 +38,6 @@ public class SplashActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }
-        }, 4000);
+        }, 2000);// changed from 4000 to 2000 temp
     }
 }
