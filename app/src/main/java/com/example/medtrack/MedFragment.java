@@ -46,7 +46,7 @@ public class MedFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_med, container, false);
+        View view = inflater.inflate(R.layout.fragment_med, container, false);
 
         // Find the FAB and set its click listener
         FloatingActionButton fab = view.findViewById(R.id.fab);

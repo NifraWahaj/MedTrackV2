@@ -4,27 +4,14 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Medication Name Input -->
+    <!-- Medication Name -->
     <EditText
         android:id="@+id/editTextMedicationName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Medication Name" />
 
-    <!-- Medication Quantity Input -->
-    <EditText
-        android:id="@+id/editTextQuantity"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Quantity (e.g., 1, 2)"
-        android:inputType="number" />
-
-    <!-- Medication Unit Dropdown -->
-    <Spinner
-        android:id="@+id/spinnerUnit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp" />
+    <!-- Remove Unit/Dose from Here -->
 
     <!-- Next Button -->
     <Button

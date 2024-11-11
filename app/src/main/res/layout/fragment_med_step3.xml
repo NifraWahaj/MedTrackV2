@@ -4,25 +4,28 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="When would you like to be reminded?"
-        android:textSize="18sp" />
-
-    <TextView
-        android:id="@+id/textViewReminderTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Select Time"
-        android:layout_marginTop="16dp" />
-
+    <!-- Reminder Time Selection -->
     <Button
         android:id="@+id/buttonPickTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pick Time" />
+        android:text="Select Time" />
 
+    <!-- Quantity of Intake -->
+    <EditText
+        android:id="@+id/editTextQuantity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter quantity"
+        android:inputType="number" />
+
+    <!-- Unit Selection -->
+    <Spinner
+        android:id="@+id/spinnerUnit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Next Button -->
     <Button
         android:id="@+id/nextButton"
         android:layout_width="wrap_content"

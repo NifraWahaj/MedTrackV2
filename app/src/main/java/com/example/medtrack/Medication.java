@@ -1,5 +1,7 @@
 package com.example.medtrack;
 
+import java.util.List;
+
 public class Medication {
     private String name;
     private String unit;
@@ -9,6 +11,11 @@ public class Medication {
     private String secondIntakeDetails; // For Twice Daily
     private int refillAmount;
     private int refillThreshold;
+    public String startTime;
+    public String endTime;
+    public int intervalHours;
+    public List<String> intervalTimes; // For storing all interval times in a day
+
 
     // Default constructor required for calls to DataSnapshot.getValue(Medication.class)
     public Medication() {
@@ -33,6 +40,19 @@ public class Medication {
         this.secondIntakeDetails = secondIntakeDetails;
         this.refillAmount = refillAmount;
         this.refillThreshold = refillThreshold;
+    }
+    public Medication(String name, String unit, int refillAmount, int refillThreshold, String frequency,
+                      String reminderTime, String startTime, String endTime, int intervalHours, List<String> intervalTimes) {
+        this.name = name;
+        this.unit = unit;
+        this.refillAmount = refillAmount;
+        this.refillThreshold = refillThreshold;
+        this.frequency = frequency;
+        this.reminderTime = reminderTime;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.intervalHours = intervalHours;
+        this.intervalTimes = intervalTimes;
     }
 
     // Getters and setters for all fields

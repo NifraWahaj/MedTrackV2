@@ -48,6 +48,15 @@ dependencies {
     implementation ("com.google.firebase:firebase-database:21.0.0")
     implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
 
+    // Retrofit dependency for networking
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0") // Use the latest stable version
+    implementation ("com.squareup.retrofit2:converter-gson:2.5.0") // Gson converter for Retrofit
+
+    // Gson dependency for JSON serialization/deserialization
+    implementation ("com.google.code.gson:gson:2.6.2") // Use the version you prefer or the latest
+
+
+
 }
 
 

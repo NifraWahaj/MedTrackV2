@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Which options work for your medication schedule?"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
+
+    <RadioGroup
+        android:id="@+id/radioGroupScheduleOptions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/rbInterval"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Interval (e.g., every X hours, every X days)" />
+
+        <RadioButton
+            android:id="@+id/rbMultipleTimesDaily"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Multiple times daily (e.g., 3 or more times a day)" />
+
+        <RadioButton
+            android:id="@+id/rbSpecificDaysOfWeek"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Specific days of the week (e.g., Mon, Wed, Fri)" />
+
+        <RadioButton
+            android:id="@+id/rbCyclicMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cyclic mode (e.g., 21 days intake, 7 days pause)" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/nextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Next"
+        android:layout_marginTop="24dp" />
+</LinearLayout>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+    <item
+        android:title="@string/choose_headings"
+        android:icon="@mipmap/ic_launcher"
+        app:showAsAction="never">
+        <menu>
+
+        <item
+        android:icon="@drawable/h1"
+     android:id="@+id/heading1"
+        android:title="@string/major_heading"/>
+    <item
+        android:icon="@drawable/h2"
+        android:id="@+id/heading2"
+        android:title="@string/heading"/>
+    <item
+        android:icon="@drawable/h3"
+
+        android:id="@+id/heading3"
+        android:title="@string/sub_heading"/>
+    <item
+        android:icon="@drawable/h4"
+
+        android:id="@+id/heading4"
+        android:title="@string/minor_heading"/>
+    <item
+        android:icon="@drawable/normal"
+
+        android:id="@+id/simple"
+        android:title="@string/simple_text"/>
+</menu>
+    </item>
+</menu>

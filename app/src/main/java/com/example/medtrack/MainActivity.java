@@ -44,11 +44,11 @@ public class MainActivity extends AppCompatActivity {
             public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
                 switch (position) {
                     case 0:
-                        tab.setText("Notification");
+                        tab.setText("Alerts");
                         tab.setIcon(R.drawable.ic_notifications);
                         break;
                     case 1:
-                        tab.setText("Medication");
+                        tab.setText("Meds");
                         tab.setIcon(R.drawable.ic_pills);
                         break;
                     case 2:
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
                         tab.setIcon(R.drawable.ic_home);
                         break;
                     case 3:
-                        tab.setText("Community");
+                        tab.setText("Forums");
                         tab.setIcon(R.drawable.ic_community);
                         break;
                     case 4:
@@ -69,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         tabLayoutMediator.attach();
+
+        // Set the default item to Home (index 2)
+        vp2.setCurrentItem(2, false);
 
         vp2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
