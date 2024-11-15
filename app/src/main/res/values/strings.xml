@@ -51,5 +51,7 @@
     <string name="sub_heading">Sub Heading</string>
     <string name="heading">Heading</string>
     <string name="choose_headings">Choose Headings</string>
+    <string name="blog_title">Blog Title</string>
+    <string name="blog_description">BLog description</string>
 
 </resources>

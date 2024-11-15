@@ -5,16 +5,24 @@
     android:layout_height="match_parent"
     tools:context=".CommunityFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <!-- RecyclerView to display the list of items -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewCommunity"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="fragment community" />
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="64dp"
+        android:layout_gravity="center"
+        android:padding="8dp"
+        tools:listitem="@layout/single_item_community" />
 
+    <!-- Button at the bottom of the screen -->
     <Button
         android:id="@+id/buttonCommunity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button" />
+        android:text="Button"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="16dp" />
 
 </FrameLayout>

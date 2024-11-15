@@ -1,6 +1,9 @@
 package com.example.medtrack;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -13,6 +16,10 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+
         adapter = new ViewPagerAdapter(this);
         vp2 = findViewById(R.id.viewpager2);
         vp2.setAdapter(adapter);
@@ -46,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
                     case 0:
                         tab.setText("Alerts");
                         tab.setIcon(R.drawable.ic_notifications);
+
                         break;
                     case 1:
                         tab.setText("Meds");
@@ -77,6 +86,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
+                if(position==0 || position==1 || position==2 || position==4){
+                    findViewById(R.id.main_container).setVisibility(View.GONE);
+                }
+                else if (position == 3) { // Ensure the container is visible on the Community tab
+                    findViewById(R.id.main_container).setVisibility(View.VISIBLE);
+                }
+                // Clear the main container's content if necessary
+                if ( findViewById(R.id.main_container) instanceof ViewGroup) {
+                    ((ViewGroup) findViewById(R.id.main_container)).removeAllViews();
+                }
+
                 TabLayout.Tab selectedTab = tabLayout.getTabAt(position);
                 BadgeDrawable badgeDrawable = selectedTab.getBadge();
                 if (badgeDrawable != null) {
@@ -90,4 +110,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 }

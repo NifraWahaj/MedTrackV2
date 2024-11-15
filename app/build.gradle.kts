@@ -54,6 +54,7 @@ dependencies {
 
     // Gson dependency for JSON serialization/deserialization
     implementation ("com.google.code.gson:gson:2.6.2") // Use the version you prefer or the latest
+    implementation ("androidx.cardview:cardview:1.0.0")
 
 
 

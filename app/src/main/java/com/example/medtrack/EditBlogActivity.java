@@ -38,7 +38,9 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
@@ -55,9 +57,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 public class EditBlogActivity extends AppCompatActivity {
     private static final int PICK_IMAGE = 1;
     private static final int SAVE_STATE_INTERVAL = 500;  // 500ms interval for saving state
@@ -65,7 +73,7 @@ public class EditBlogActivity extends AppCompatActivity {
     private EditText etBlogContent,etTitle;
     private SpannableStringBuilder spannableStringBuilder;
     private UndoManager undoManager;
-
+    private ImageButton btnpost;
     private boolean isBoldActive = false;
     private boolean isItalicActive = false;
     private boolean isUnderLine = false;
@@ -90,6 +98,7 @@ public class EditBlogActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_blog);
 
+        btnpost= findViewById(R.id.btnPost);
         etBlogContent = findViewById(R.id.etBlogContent);
         etTitle= findViewById(R.id.etBlogTitle);
         spannableStringBuilder = new SpannableStringBuilder(etBlogContent.getText());
@@ -168,6 +177,8 @@ public class EditBlogActivity extends AppCompatActivity {
     }
 
     private void setupButtons() {
+
+        btnpost.setOnClickListener(v-> saveFormattedText());
         findViewById(R.id.btnBold).setOnClickListener(v -> toggleBold());
         findViewById(R.id.btnItalic).setOnClickListener(v -> toggleItalic());
         findViewById(R.id.btnUnderline).setOnClickListener(v -> {
@@ -182,8 +193,7 @@ public class EditBlogActivity extends AppCompatActivity {
         findViewById(R.id.btnBulletList).setOnClickListener(v -> toggleBulletList());
         findViewById(R.id.btnAddLink).setOnClickListener(v->{
             showLinkDialog();
-            saveFormattedText();
-            restoreFormattedText();
+
         });
 
         findViewById(R.id.btnDiv).setOnClickListener(v -> {
@@ -727,7 +737,58 @@ public class EditBlogActivity extends AppCompatActivity {
             return nextText;
         }
     }
+
     private void saveFormattedText() {
+        Spannable spannableText = etBlogContent.getText();
+        List<FormattedText> formattedTexts = new ArrayList<>();
+
+        for (int i = 0; i < spannableText.length(); i++) {
+            FormattedText formattedText = new FormattedText();
+            int start = i;
+            int end = i + 1;
+
+            ImageSpan[] imageSpans = spannableText.getSpans(start, end, ImageSpan.class);
+            if (imageSpans.length > 0) {
+                Bitmap bitmap = ((BitmapDrawable) imageSpans[0].getDrawable()).getBitmap();
+                String imageBase64 = bitmapToBase64(bitmap);
+                formattedText.setImageBase64(imageBase64);
+            } else {
+                formattedText.setText(String.valueOf(spannableText.charAt(i)));
+            }
+
+            StyleSpan[] styleSpans = spannableText.getSpans(start, end, StyleSpan.class);
+            for (StyleSpan span : styleSpans) {
+                if (span.getStyle() == Typeface.BOLD) formattedText.setBold(true);
+                if (span.getStyle() == Typeface.ITALIC) formattedText.setItalic(true);
+            }
+
+            StrikethroughSpan[] strikethroughSpans = spannableText.getSpans(start, end, StrikethroughSpan.class);
+            if (strikethroughSpans.length > 0) formattedText.setStrikethrough(true);
+
+            RelativeSizeSpan[] sizeSpans = spannableText.getSpans(start, end, RelativeSizeSpan.class);
+            for (RelativeSizeSpan sizeSpan : sizeSpans) formattedText.setRelativeSize(sizeSpan.getSizeChange());
+
+            formattedText.setAlignment(etBlogContent.getGravity());
+            formattedTexts.add(formattedText);
+        }
+        String title = etTitle.getText().toString(); // Assuming you have an EditText for title
+
+        Gson gson = new Gson();
+        String json = gson.toJson(formattedTexts);
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
+        DatabaseReference blogsref = database.getReference("blogs");        Map<String, Object> blogData = new HashMap<>();
+        blogData.put("title", title);
+        blogData.put("content", json);
+
+        blogsref.push().setValue(blogData)
+                .addOnSuccessListener(aVoid -> Toast.makeText(this, "Blog saved to Firebase!", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to save blog", Toast.LENGTH_SHORT).show());
+    }
+
+
+
+ /*   private void saveFormattedText() {
         Spannable spannableText = etBlogContent.getText();
         List<FormattedText> formattedTexts = new ArrayList<>();
 
@@ -852,7 +913,7 @@ public class EditBlogActivity extends AppCompatActivity {
         int alignment = formattedTexts.get(0).getAlignment();
         etBlogContent.setGravity(alignment);
         etTitle.setText("done");
-    }
+    }*/
 
 
 }
