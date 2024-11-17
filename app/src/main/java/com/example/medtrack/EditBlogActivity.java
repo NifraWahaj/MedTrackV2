@@ -780,7 +780,7 @@ public class EditBlogActivity extends AppCompatActivity {
         DatabaseReference blogsref = database.getReference("blogs");        Map<String, Object> blogData = new HashMap<>();
         blogData.put("title", title);
         blogData.put("content", json);
-
+        blogData.put("isApproved",false);
         blogsref.push().setValue(blogData)
                 .addOnSuccessListener(aVoid -> Toast.makeText(this, "Blog saved to Firebase!", Toast.LENGTH_SHORT).show())
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to save blog", Toast.LENGTH_SHORT).show());

@@ -4,11 +4,21 @@ public class Blog {
     private String id;
     private String title;
     private String content;
+    private boolean isApproved;
 
-    public Blog(String id, String title, String content) {
+    public Blog(String id, String title, String content,boolean isApproved) {
         this.id = id;
         this.title = title;
         this.content = content;
+        this.isApproved=isApproved;
+    }
+
+    public boolean isApproved() {
+        return isApproved;
+    }
+
+    public void setApproved(boolean approved) {
+        isApproved = approved;
     }
 
     public Blog() {

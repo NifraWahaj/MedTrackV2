@@ -53,5 +53,6 @@
     <string name="choose_headings">Choose Headings</string>
     <string name="blog_title">Blog Title</string>
     <string name="blog_description">BLog description</string>
+    <string name="write_blog">Write Blog</string>
 
 </resources>

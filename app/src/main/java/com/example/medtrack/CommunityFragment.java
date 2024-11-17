@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,109 +25,129 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-
  public class CommunityFragment extends Fragment implements BlogAdapter.OnBlogClickListener {
 
      private RecyclerView recyclerView;
      private BlogAdapter blogAdapter;
      private List<Blog> blogList = new ArrayList<>();
-private Button buttonCommunity;
+     private List<Blog> filteredBlogList = new ArrayList<>();
+     private Button btnCommunity, btnSearch;
+     private EditText etSearch;
+     private LinearLayout linearLayoutCommunity;
      public CommunityFragment() {
          // Required empty public constructor
-     }
-     @Override
-     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-         super.onViewCreated(view, savedInstanceState);
-
-         // Set up back stack change listener to monitor fragment transactions
-         //The OnBackStackChangedListener listens for changes in the back stack.
-         //When the back stack count reaches 0, it means no other fragments are covering CommunityFragment,
-         // so it restores the visibility of RecyclerView and Button.
-         getParentFragmentManager().addOnBackStackChangedListener(() -> {
-             if (getParentFragmentManager().getBackStackEntryCount() == 0) {
-                 // No fragments in back stack, so restore visibility of RecyclerView and Button
-                 recyclerView.setVisibility(View.VISIBLE);
-                 buttonCommunity.setVisibility(View.VISIBLE);
-             }
-         });
      }
 
      @Override
      public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
          View view = inflater.inflate(R.layout.fragment_community, container, false);
 
+         linearLayoutCommunity=view.findViewById(R.id.linearLayoutCommunity);
          recyclerView = view.findViewById(R.id.recyclerViewCommunity);
          recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
          // Initialize the BlogAdapter and pass the OnBlogClickListener
-         blogAdapter = new BlogAdapter(getContext(), blogList, this);
+         blogAdapter = new BlogAdapter(getContext(), filteredBlogList, this);
          recyclerView.setAdapter(blogAdapter);
 
-           buttonCommunity = view.findViewById(R.id.buttonCommunity);
-         buttonCommunity.setOnClickListener(v -> {
+         btnCommunity = view.findViewById(R.id.buttonCommunity);
+         btnSearch = view.findViewById(R.id.btnSearch);
+         etSearch = view.findViewById(R.id.etSearch);
+
+         btnCommunity.setOnClickListener(v -> {
              Intent i = new Intent(getActivity(), EditBlogActivity.class);
              startActivity(i);
          });
 
-         fetchBlogsFromFirebase();  // Fetch data from Firebase
+         // Search Button onClick
+         btnSearch.setOnClickListener(v -> {
+             String query = etSearch.getText().toString().trim();
+             filterBlogs(query);
+         });
 
+         fetchBlogsFromFirebase();  // Fetch data from Firebase
+         // Add OnBackStackChangedListener to handle view visibility when returning from other fragments
+         getParentFragmentManager().addOnBackStackChangedListener(() -> {
+             if (getParentFragmentManager().getBackStackEntryCount() == 0) {
+                 // No fragments in back stack, so restore visibility of RecyclerView and Button
+                 recyclerView.setVisibility(View.VISIBLE);
+                 btnCommunity.setVisibility(View.VISIBLE);
+                 etSearch.setVisibility(View.VISIBLE);
+                 btnSearch.setVisibility(View.VISIBLE);
+                 linearLayoutCommunity.setVisibility(View.VISIBLE);
+             }
+         });
          return view;
      }
 
+     // Fetch blogs from Firebase
+     private void fetchBlogsFromFirebase() {
+         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("blogs");
+         databaseReference.addValueEventListener(new ValueEventListener() {
+             @Override
+             public void onDataChange(DataSnapshot dataSnapshot) {
+                 blogList.clear(); // Clear the previous data
+                 Log.d("CommunityFragment", "Number of blogs: " + dataSnapshot.getChildrenCount());
 
-    private void fetchBlogsFromFirebase() {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("blogs");
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                blogList.clear(); // Clear the previous data
+                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                     String id = snapshot.getKey();
+                     String title = snapshot.child("title").getValue(String.class);
+                     String content = snapshot.child("content").getValue(String.class);
+                     boolean isApproved = snapshot.child("isApproved").getValue(Boolean.class); // Use Boolean.class for a boolean value
+                     Log.d("CommunityFragment", "Blog Title: " + title);
+                     Log.d("CommunityFragment", "Blog Content: " + content);
+                    if(isApproved==true) {
+                        Blog blog = new Blog(id, title, content, isApproved);
+                        blogList.add(blog);
+                    }
+                 }
 
-                // Log the number of children in the 'blogs' node
-                Log.d("CommunityFragment", "Number of blogs: " + dataSnapshot.getChildrenCount());
+                 // Initially, show all blogs in the RecyclerView
+                 filteredBlogList.addAll(blogList);
+                 blogAdapter.notifyDataSetChanged();
+             }
 
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    String id = snapshot.getKey();  // Get the unique key (id) for each blog
+             @Override
+             public void onCancelled(DatabaseError databaseError) {
+                 Log.e("CommunityFragment", "Database error: " + databaseError.getMessage());
+             }
+         });
+     }
 
-                    String title = snapshot.child("title").getValue(String.class);
-                    String content = snapshot.child("content").getValue(String.class);
-
-                    // Log the title and content for each blog
-                    Log.d("CommunityFragment", "Blog Title: " + title);
-                    Log.d("CommunityFragment", "Blog Content: " + content);
-
-                    Blog blog = new Blog(id,title, content);
-                    blogList.add(blog);
-                }
-
-                // Notify the adapter that data has changed
-                blogAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Log database error
-                Log.e("CommunityFragment", "Database error: " + databaseError.getMessage());
-            }
-        });
-    }
+     // Filter blogs based on search query
+     private void filterBlogs(String query) {
+         filteredBlogList.clear();  // Clear the filtered list
+         if (query.isEmpty()) {
+             // If no search query, show all blogs
+             filteredBlogList.addAll(blogList);
+         } else {
+             for (Blog blog : blogList) {
+                 if (blog.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                     filteredBlogList.add(blog);  // Add blogs that match the query
+                 }
+             }
+         }
+         blogAdapter.notifyDataSetChanged();  // Update RecyclerView with filtered blogs
+     }
 
      @Override
      public void onBlogClick(Blog blog) {
-         // Handle the blog click and start the new fragment
          BlogContentFragment fragment = new BlogContentFragment();
 
-         // Pass the blog data to the new fragment
          Bundle bundle = new Bundle();
-         bundle.putString("blogId", blog.getId());  // Use "blogId" instead of "blogTitle" or "blogContent"
-
+         bundle.putString("blogId", blog.getId());
          bundle.putString("blogTitle", blog.getTitle());
          bundle.putString("blogContent", blog.getContent());
          fragment.setArguments(bundle);
-         Toast.makeText(getContext(),"Inside onblogclick ",Toast.LENGTH_SHORT).show();
-        recyclerView.setVisibility(View.GONE);
-         buttonCommunity.setVisibility(View.GONE);
-         // Start the new fragment transaction
-          try {
+
+         Toast.makeText(getContext(), "Inside onBlogClick", Toast.LENGTH_SHORT).show();
+         recyclerView.setVisibility(View.GONE);
+         btnCommunity.setVisibility(View.GONE);
+         etSearch.setVisibility(View.GONE);
+         btnSearch.setVisibility(View.GONE);
+         linearLayoutCommunity.setVisibility(View.GONE);
+
+         try {
              Log.d("CommunityFragment", "Attempting to replace fragment...");
              getParentFragmentManager().beginTransaction()
                      .replace(R.id.main_container, fragment)
@@ -136,25 +158,6 @@ private Button buttonCommunity;
          }
      }
 
-     @Override
-     public void onResume() {
-         super.onResume();
-
-         // Check if the fragment is in the back stack and restore visibility
-         if (getParentFragmentManager().getBackStackEntryCount() > 0) {
-             // Handle restoring RecyclerView visibility if needed
-             recyclerView.setVisibility(View.VISIBLE);
-             buttonCommunity.setVisibility(View.VISIBLE);
-         }
-     }
-
-     @Override
-     public void onPause() {
-         super.onPause();
-         // Hide the RecyclerView and Button when the fragment pauses (when another fragment is displayed)
-         recyclerView.setVisibility(View.GONE);
-         buttonCommunity.setVisibility(View.GONE);
-     }
 
 
 
