@@ -99,9 +99,9 @@ public class MedStep3TwoDosesFragment extends Fragment {
         int minute = calendar.get(Calendar.MINUTE);
 
         TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(), (view, hourOfDay, minute1) -> {
-            String time = String.format("%02d:%02d %s", (hourOfDay % 12 == 0) ? 12 : hourOfDay % 12, minute1, hourOfDay < 12 ? "am" : "pm");
+            String time = String.format("%02d:%02d", hourOfDay, minute1);
             button.setText(time);
-        }, hour, minute, false);
+        }, hour, minute, true);
         timePickerDialog.show();
     }
 }

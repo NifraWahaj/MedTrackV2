@@ -1,17 +1,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp">
+    <!-- fragment_med_step1 -->
 
-    <!-- Medication Name -->
+    <!-- Medication Name Input -->
     <EditText
         android:id="@+id/editTextMedicationName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Medication Name" />
-
-    <!-- Remove Unit/Dose from Here -->
+        android:hint="Medication Name"
+        tools:ignore="TouchTargetSizeCheck" />
 
     <!-- Next Button -->
     <Button

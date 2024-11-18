@@ -3,29 +3,49 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp">
+    <!-- fragment_med_step3 -->
 
-    <!-- Reminder Time Selection -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="When would you like to be reminded?"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/textViewReminderTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Time"
+        android:layout_marginTop="16dp" />
+
     <Button
         android:id="@+id/buttonPickTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select Time" />
+        android:text="Pick Time" />
 
-    <!-- Quantity of Intake -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Quantity" />
+
     <EditText
         android:id="@+id/editTextQuantity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter quantity"
+        android:hint="Quantity (e.g., 1, 2)"
         android:inputType="number" />
 
-    <!-- Unit Selection -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Unit" />
+
     <Spinner
         android:id="@+id/spinnerUnit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <!-- Next Button -->
     <Button
         android:id="@+id/nextButton"
         android:layout_width="wrap_content"

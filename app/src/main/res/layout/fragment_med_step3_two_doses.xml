@@ -3,6 +3,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp">
+    <!-- fragment_med_step3_two_doses -->
 
     <!-- First Intake Section -->
     <TextView

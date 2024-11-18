@@ -12,25 +12,29 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.util.Calendar;
 
+
 public class MedStep3Fragment extends Fragment {
 
+    private TextView reminderTimeTextView;
+    private EditText editTextQuantity;
+    private Spinner unitSpinner;
     private Button pickTimeButton;
     private Button nextButton;
-    private EditText quantityEditText;
-    private Spinner unitSpinner;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_med_step3, container, false);
 
+        reminderTimeTextView = view.findViewById(R.id.textViewReminderTime);
         pickTimeButton = view.findViewById(R.id.buttonPickTime);
-        quantityEditText = view.findViewById(R.id.editTextQuantity);
+        editTextQuantity = view.findViewById(R.id.editTextQuantity);
         unitSpinner = view.findViewById(R.id.spinnerUnit);
         nextButton = view.findViewById(R.id.nextButton);
 
@@ -44,25 +48,24 @@ public class MedStep3Fragment extends Fragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         unitSpinner.setAdapter(adapter);
 
-        // Set up time picker for Reminder Time
         pickTimeButton.setOnClickListener(v -> {
             Calendar calendar = Calendar.getInstance();
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
             int minute = calendar.get(Calendar.MINUTE);
 
-            TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(), (view1, hourOfDay, minute1) -> {
+            TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(), (TimePicker view1, int hourOfDay, int minute1) -> {
                 String time = String.format("%02d:%02d", hourOfDay, minute1);
-                pickTimeButton.setText(time);
+                reminderTimeTextView.setText(time);
             }, hour, minute, true);
             timePickerDialog.show();
         });
 
-        // Handle Next button click
         nextButton.setOnClickListener(v -> {
-            String time = pickTimeButton.getText().toString();
-            String quantityStr = quantityEditText.getText().toString();
+            String time = reminderTimeTextView.getText().toString();
+            String quantityStr = editTextQuantity.getText().toString().trim();
             String unit = unitSpinner.getSelectedItem().toString();
 
+            // Validate the inputs
             if (time.equals("Select Time") || quantityStr.isEmpty()) {
                 Toast.makeText(getActivity(), "Please fill in all fields.", Toast.LENGTH_SHORT).show();
                 return;
@@ -76,14 +79,10 @@ public class MedStep3Fragment extends Fragment {
                 return;
             }
 
-            // Save data to activity in a consistent format
-            String reminderDetails = "Time: " + time + ", Dosage: " + quantity + " " + unit;
-            ((AddMedActivity) getActivity()).setReminderTime(reminderDetails);
-
-            // Move to next step
+            // Save data to activity
+            ((AddMedActivity) getActivity()).setReminderTime(time + ", Dosage: " + quantity + " " + unit);
             ((AddMedActivity) getActivity()).goToNextStep();
         });
-
 
         return view;
     }
