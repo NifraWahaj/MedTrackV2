@@ -1,47 +1,96 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
-    <!-- fragment_med_step2 -->
+    android:gravity="center_horizontal"
+    android:padding="32dp"
+    android:background="@color/bg_main">
 
+    <!-- Logo -->
+    <ImageView
+        android:id="@+id/logoImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/logo"
+        android:layout_marginBottom="32dp"
+        android:contentDescription="@string/logo" />
+
+    <!-- Question Text -->
     <TextView
+        android:id="@+id/questionText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="How often do you take this medication?"
-        android:textSize="18sp" />
+        android:text="@string/how_often_do_you_take_this_medication"
+        android:textSize="@dimen/addmedfrag_QuestiontextSize"
+        android:paddingBottom="20dp"
+        android:textAlignment="textStart"
+        android:layout_gravity="start"
+        android:layout_marginBottom="24dp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/fontColormAIN" />
 
+    <!-- Radio Group for Frequency Options -->
     <RadioGroup
         android:id="@+id/radioGroupFrequency"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- Once Daily Radio Button -->
         <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/radioOnceDaily"
-            android:text="Once daily" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="@string/once_daily"
+            android:textSize="16sp"
+            android:padding="16dp"
+            android:buttonTint="@color/fontColormAIN"
+            android:textColor="@color/fontColormAIN"
+            android:background="@drawable/radio_rounded_bg"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Twice Daily Radio Button -->
+        <RadioButton
             android:id="@+id/radioTwiceDaily"
-            android:text="Twice daily" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="@string/twice_daily"
+            android:textSize="16sp"
+            android:padding="16dp"
+            android:buttonTint="@color/fontColormAIN"
+            android:textColor="@color/fontColormAIN"
+            android:background="@drawable/radio_rounded_bg"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Interval Radio Button -->
+        <RadioButton
             android:id="@+id/radioInterval"
-            android:text="Interval (e.g., every X hours, every X days)" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="@string/interval_e_g_every_x_hours"
+            android:textSize="16sp"
+            android:padding="16dp"
+            android:buttonTint="@color/fontColormAIN"
+            android:textColor="@color/fontColormAIN"
+            android:background="@drawable/radio_rounded_bg"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Specific Days Radio Button -->
+        <RadioButton
             android:id="@+id/radioSpecificDays"
-            android:text="Specific days of the week (e.g., Mon, Wed, Fri)" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/specific_days_e_g_mon_wed_fri"
+            android:textSize="16sp"
+            android:padding="16dp"
+            android:buttonTint="@color/fontColormAIN"
+            android:textColor="@color/fontColormAIN"
+            android:background="@drawable/radio_rounded_bg"
+            android:layout_marginBottom="8dp" />
     </RadioGroup>
 
+    <!-- Days of the Week Selection Layout -->
     <LinearLayout
         android:id="@+id/daysSelectionLayout"
         android:layout_width="match_parent"
@@ -50,68 +99,116 @@
         android:visibility="gone"
         android:gravity="center"
         android:layout_marginTop="16dp">
-        <!-- Days of the week selection -->
+
+        <!-- Days of the week TextViews for selection -->
         <TextView
             android:id="@+id/dayMonday"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Mon"
+            android:layout_weight="1"
+            android:text="@string/mon"
+            android:textSize="11sp"
             android:padding="8dp"
-            android:background="@android:color/darker_gray"
-            android:layout_margin="4dp" />
+            android:background="@drawable/day_unselected"
+            android:layout_margin="4dp"
+            android:textColor="@color/fontColormAIN"
+            android:gravity="center" />
+
         <TextView
             android:id="@+id/dayTuesday"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Tue"
+            android:layout_weight="1"
+            android:text="@string/tue"
+            android:textSize="11sp"
             android:padding="8dp"
-            android:background="@android:color/darker_gray"
-            android:layout_margin="4dp" />
+            android:background="@drawable/day_unselected"
+            android:layout_margin="4dp"
+            android:textColor="@color/fontColormAIN"
+            android:gravity="center" />
+
         <TextView
             android:id="@+id/dayWednesday"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Wed"
+            android:layout_weight="1"
+            android:text="@string/wed"
+            android:textSize="11sp"
             android:padding="8dp"
-            android:background="@android:color/darker_gray"
-            android:layout_margin="4dp" />
+            android:background="@drawable/day_unselected"
+            android:layout_margin="4dp"
+            android:textColor="@color/fontColormAIN"
+            android:gravity="center" />
+
         <TextView
             android:id="@+id/dayThursday"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Thu"
+            android:layout_weight="1"
+            android:text="@string/thu"
+            android:textSize="11sp"
             android:padding="8dp"
-            android:background="@android:color/darker_gray"
-            android:layout_margin="4dp" />
+            android:background="@drawable/day_unselected"
+            android:layout_margin="4dp"
+            android:textColor="@color/fontColormAIN"
+            android:gravity="center" />
+
         <TextView
             android:id="@+id/dayFriday"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Fri"
+            android:layout_weight="1"
+            android:text="@string/fri"
+            android:textSize="11sp"
             android:padding="8dp"
-            android:background="@android:color/darker_gray"
-            android:layout_margin="4dp" />
+            android:background="@drawable/day_unselected"
+            android:layout_margin="4dp"
+            android:textColor="@color/fontColormAIN"
+            android:gravity="center" />
+
         <TextView
             android:id="@+id/daySaturday"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Sat"
+            android:layout_weight="1"
+            android:text="@string/sat"
+            android:textSize="11sp"
             android:padding="8dp"
-            android:background="@android:color/darker_gray"
-            android:layout_margin="4dp" />
+            android:background="@drawable/day_unselected"
+            android:layout_margin="4dp"
+            android:textColor="@color/fontColormAIN"
+            android:gravity="center" />
+
         <TextView
             android:id="@+id/daySunday"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Sun"
+            android:layout_weight="1"
+            android:text="@string/sun"
+            android:textSize="11sp"
             android:padding="8dp"
-            android:background="@android:color/darker_gray"
-            android:layout_margin="4dp" />
+            android:background="@drawable/day_unselected"
+            android:layout_margin="4dp"
+            android:textColor="@color/fontColormAIN"
+            android:gravity="center" />
     </LinearLayout>
 
+    <!-- Spacer to push the "Next" button to the bottom -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Next Button with Rounded Corners -->
     <Button
         android:id="@+id/nextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Next" />
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="@string/next"
+        android:background="@drawable/button_rounded"
+        android:textColor="#FFFFFF"
+        android:paddingVertical="12dp"
+        android:elevation="4dp"
+        android:layout_marginBottom="32dp" />
+
 </LinearLayout>

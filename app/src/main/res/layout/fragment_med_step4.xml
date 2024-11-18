@@ -3,32 +3,100 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
-    <!-- fragment_med_step4 -->
+    android:gravity="center_horizontal"
+    android:padding="32dp"
+    android:background="@color/bg_main">
 
+    <!-- Logo -->
+    <ImageView
+        android:id="@+id/logoImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/logo"
+        android:layout_marginBottom="32dp"
+        android:contentDescription="@string/logo" />
+
+    <!-- Question Text -->
     <TextView
+        android:id="@+id/questionText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Do you want to get reminders to refill your inventory?"
-        android:textSize="18sp" />
+        android:text="@string/do_you_want_to_get_reminders_to_refill_your_inventory"
+        android:textSize="@dimen/addmedfrag_QuestiontextSize"
+        android:textAlignment="textStart"
+        android:layout_gravity="start"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/fontColormAIN" />
 
-    <EditText
-        android:id="@+id/editTextCurrentInventory"
+    <!-- Current Inventory EditText with Bottom Line -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Current Inventory"
-        tools:ignore="TouchTargetSizeCheck" />
+        android:orientation="vertical"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="20dp">
 
-    <EditText
-        android:id="@+id/editTextThreshold"
+        <EditText
+            android:id="@+id/editTextCurrentInventory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/current_inventory"
+            android:padding="10dp"
+            android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
+            android:background="@android:color/transparent"
+            android:textColor="@color/fontColormAIN"
+            android:textColorHint="@color/greytext"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/blueMain" />
+    </LinearLayout>
+
+    <!-- Threshold for Refill EditText with Bottom Line -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Threshold for Refill"
-        tools:ignore="TouchTargetSizeCheck" />
+        android:orientation="vertical"
+        android:layout_marginBottom="32dp">
 
+        <EditText
+            android:id="@+id/editTextThreshold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/threshold_for_refill"
+            android:padding="10dp"
+            android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
+            android:layout_marginTop="10dp"
+            android:background="@android:color/transparent"
+            android:textColor="@color/fontColormAIN"
+            android:textColorHint="@color/greytext"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/blueMain" />
+    </LinearLayout>
+
+    <!-- Spacer to push the "Save" button to the bottom -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Save Button with Rounded Corners -->
     <Button
         android:id="@+id/nextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save" />
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="@string/save"
+        android:background="@drawable/button_rounded"
+        android:textColor="#FFFFFF"
+        android:paddingVertical="12dp"
+        android:elevation="4dp"
+        android:layout_marginBottom="32dp" />
+
 </LinearLayout>

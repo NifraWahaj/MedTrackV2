@@ -50,13 +50,14 @@ public class MedStep2Fragment extends Fragment {
                 String day = ((TextView) v).getText().toString();
                 if (selectedDays.contains(day)) {
                     selectedDays.remove(day);
-                    dayView.setBackgroundColor(Color.GRAY);  // Deselect color
+                    dayView.setBackgroundResource(R.drawable.day_unselected);  // Deselect color
                 } else {
                     selectedDays.add(day);
-                    dayView.setBackgroundColor(Color.BLUE);  // Select color
+                    dayView.setBackgroundResource(R.drawable.day_selected);  // Select color
                 }
             });
         }
+
 
         nextButton.setOnClickListener(v -> {
             int selectedId = frequencyRadioGroup.getCheckedRadioButtonId();
@@ -68,7 +69,7 @@ public class MedStep2Fragment extends Fragment {
                 if (activity != null) {
                     activity.setMedicationFrequency(frequency);
 
-                    if (frequency.equals("Specific days of the week (e.g., Mon, Wed, Fri)")) {
+                    if (frequency.equals("Specific days (e.g., Mon, Wed, Fri)")) {
                         if (selectedDays.isEmpty()) {
                             Toast.makeText(getActivity(), "Please select at least one day.", Toast.LENGTH_SHORT).show();
                             return;

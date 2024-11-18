@@ -54,5 +54,29 @@
     <string name="blog_title">Blog Title</string>
     <string name="blog_description">BLog description</string>
     <string name="write_blog">Write Blog</string>
+    <string name="which_medication_would_you_like_to_set_the_reminder_for">Which medication would you like to set the reminder for?</string>
+    <string name="med_name">Name</string>
+    <string name="med_next">Next</string>
+    <string name="how_often_do_you_take_this_medication">How often do you take this medication?</string>
+    <string name="once_daily">Once daily</string>
+    <string name="twice_daily">Twice daily</string>
+    <string name="interval_e_g_every_x_hours">Interval (e.g., every X hours)</string>
+    <string name="specific_days_e_g_mon_wed_fri">Specific days (e.g., Mon, Wed, Fri)</string>
+    <string name="mon">Mon</string>
+    <string name="tue">Tue</string>
+    <string name="wed">Wed</string>
+    <string name="thu">Thu</string>
+    <string name="fri">Fri</string>
+    <string name="sat">Sat</string>
+    <string name="sun">Sun</string>
+    <string name="next">Next</string>
+    <string name="when_would_you_like_to_be_reminded">When would you like to be reminded?</string>
+    <string name="select_time">Select Time</string>
+    <string name="select">Select</string>
+    <string name="quantity">Quantity</string>
+    <string name="current_inventory">Current Inventory</string>
+    <string name="do_you_want_to_get_reminders_to_refill_your_inventory">Do you want to get reminders to refill your inventory?</string>
+    <string name="threshold_for_refill">Threshold for Refill</string>
+    <string name="save">Save</string>
 
 </resources>
