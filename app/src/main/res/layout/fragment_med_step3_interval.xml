@@ -1,0 +1,78 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <!-- fragment_med_step3_interval -->
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="When would you like to be reminded?"
+        android:textSize="18sp" />
+
+    <!-- Interval Input -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Intake every" />
+
+    <EditText
+        android:id="@+id/editTextInterval"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter interval (hours)"
+        android:inputType="number" />
+
+    <!-- Start Time -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Starting at" />
+
+    <Button
+        android:id="@+id/buttonPickStartTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Start Time" />
+
+    <!-- End Time -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ending at" />
+
+    <Button
+        android:id="@+id/buttonPickEndTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select End Time" />
+
+    <!-- Dose Quantity Input -->
+    <EditText
+        android:id="@+id/editTextDoseQuantity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Dose Quantity"
+        android:inputType="number" />
+
+    <!-- Dose -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Dose" />
+
+    <Spinner
+        android:id="@+id/spinnerDose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Next Button -->
+    <Button
+        android:id="@+id/nextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Next"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

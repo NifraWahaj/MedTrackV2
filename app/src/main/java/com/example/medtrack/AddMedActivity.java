@@ -48,11 +48,11 @@ public class AddMedActivity extends AppCompatActivity {
 
     // Setters for intake details
     public void setFirstIntakeDetails(String time, String dosage) {
-        this.firstIntakeDetails = "Time: " + time + ", Dosage: " + dosage;
+        this.firstIntakeDetails =  time + ", Dosage: " + dosage;
     }
 
     public void setSecondIntakeDetails(String time, String dosage) {
-        this.secondIntakeDetails = "Time: " + time + ", Dosage: " + dosage;
+        this.secondIntakeDetails = time + ", Dosage: " + dosage;
     }
 
     @Override
@@ -92,6 +92,9 @@ public class AddMedActivity extends AppCompatActivity {
         if ("Twice daily".equalsIgnoreCase(medicationFrequency)) {
             Log.d(TAG, "Adding MedStep3TwoDosesFragment for twice daily frequency");
             fragmentList.add(new MedStep3TwoDosesFragment());  // Step 3 for Two Doses
+        } else if ("Interval (e.g., every X hours, every X days)".equalsIgnoreCase(medicationFrequency)) {
+            Log.d(TAG, "Adding MedStep3IntervalFragment for interval frequency");
+            fragmentList.add(new MedStep3IntervalFragment());  // Step 3 for Interval Doses
         } else {
             Log.d(TAG, "Adding MedStep3Fragment for once daily frequency");
             fragmentList.add(new MedStep3Fragment());  // Step 3 for Single Dose
@@ -106,6 +109,7 @@ public class AddMedActivity extends AppCompatActivity {
         // Notify adapter about the updated fragment list
         adapter.notifyDataSetChanged();
     }
+
 
     // Adapter for handling fragments in the ViewPager2
     private class MedPagerAdapter extends FragmentStateAdapter {
