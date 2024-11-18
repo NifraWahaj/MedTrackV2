@@ -15,12 +15,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.gson.Gson;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
 
 public class AddMedActivity extends AppCompatActivity {
     private static final String TAG = "AddMedActivity";
@@ -40,15 +42,18 @@ public class AddMedActivity extends AppCompatActivity {
     private String firstIntakeDetails;
     private String secondIntakeDetails;
 
+    // List to store selected days for "Specific days of the week" option
+    private List<String> selectedDays = new ArrayList<>();
+
     // Getter and Setter for medicationFrequency
     public void setMedicationFrequency(String medicationFrequency) {
         Log.d(TAG, "Setting medication frequency: " + medicationFrequency);
         this.medicationFrequency = medicationFrequency;
     }
 
-    // Setters for intake details
+    // Setter methods for intake details
     public void setFirstIntakeDetails(String time, String dosage) {
-        this.firstIntakeDetails =  time + ", Dosage: " + dosage;
+        this.firstIntakeDetails = time + ", Dosage: " + dosage;
     }
 
     public void setSecondIntakeDetails(String time, String dosage) {
@@ -95,6 +100,9 @@ public class AddMedActivity extends AppCompatActivity {
         } else if ("Interval (e.g., every X hours, every X days)".equalsIgnoreCase(medicationFrequency)) {
             Log.d(TAG, "Adding MedStep3IntervalFragment for interval frequency");
             fragmentList.add(new MedStep3IntervalFragment());  // Step 3 for Interval Doses
+        } else if ("Specific days of the week (e.g., Mon, Wed, Fri)".equalsIgnoreCase(medicationFrequency)) {
+            Log.d(TAG, "Adding MedStep3SpecificDaysFragment for specific days frequency");
+            fragmentList.add(new MedStep3SpecificDaysFragment());  // Step 3 for Specific Days
         } else {
             Log.d(TAG, "Adding MedStep3Fragment for once daily frequency");
             fragmentList.add(new MedStep3Fragment());  // Step 3 for Single Dose
@@ -109,7 +117,6 @@ public class AddMedActivity extends AppCompatActivity {
         // Notify adapter about the updated fragment list
         adapter.notifyDataSetChanged();
     }
-
 
     // Adapter for handling fragments in the ViewPager2
     private class MedPagerAdapter extends FragmentStateAdapter {
@@ -159,6 +166,14 @@ public class AddMedActivity extends AppCompatActivity {
         this.refillThreshold = threshold;
     }
 
+    public void setSelectedDays(List<String> days) {
+        this.selectedDays = days;
+    }
+
+    public List<String> getSelectedDays() {
+        return selectedDays;
+    }
+
     // Method to save medication data to Firebase
     public void saveMedicationToFirebase() {
         // Get the current user
@@ -186,8 +201,22 @@ public class AddMedActivity extends AppCompatActivity {
                     refillAmount,
                     refillThreshold
             );
+        } else if ("Specific days of the week (e.g., Mon, Wed, Fri)".equalsIgnoreCase(medicationFrequency)) {
+            // Convert selectedDays list to a single string
+            String selectedDaysString = String.join(", ", selectedDays);
+
+            // Create medication object with specific days details using the new constructor
+            medication = new Medication(
+                    medicationName,
+                    medicationFrequency,
+                    reminderTime,
+                    selectedDaysString,
+                    refillAmount,
+                    refillThreshold,
+                    true // The dummy boolean field to distinguish this constructor
+            );
         } else {
-            // Create medication object with single dose details
+            // Create medication object with single dose or interval details
             medication = new Medication(
                     medicationName,
                     medicationFrequency,
@@ -199,11 +228,10 @@ public class AddMedActivity extends AppCompatActivity {
 
         // Save the medication object to Firebase
         String userId = currentUser.getUid();
-        Log.d("Medication", "Name: " + medicationName);
-        Log.d("Medication", "Frequency: " + medicationFrequency);
-        Log.d("Medication", "Reminder Time: " + reminderTime);
-        Log.d("Medication", "First Intake: " + firstIntakeDetails);
-        Log.d("Medication", "Second Intake: " + secondIntakeDetails);
+        Log.d(TAG, "Saving Medication with Name: " + medicationName);
+        Log.d(TAG, "Frequency: " + medicationFrequency);
+        Log.d(TAG, "Reminder Time: " + reminderTime);
+        Log.d(TAG, "Selected Days: " + selectedDays);
 
         medsRef.child(userId).push().setValue(medication)
                 .addOnSuccessListener(aVoid -> {
@@ -216,4 +244,7 @@ public class AddMedActivity extends AppCompatActivity {
                     Toast.makeText(AddMedActivity.this, "Failed to save medication", Toast.LENGTH_SHORT).show();
                 });
     }
+
+
+
 }
