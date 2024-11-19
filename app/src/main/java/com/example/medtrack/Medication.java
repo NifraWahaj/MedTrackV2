@@ -1,58 +1,47 @@
 package com.example.medtrack;
 
-import java.util.List;
-
 public class Medication {
     private String name;
-    private String unit;
     private String frequency;
-    private String reminderTime; // For single dose
+    private String reminderTime; // For single dose or interval
     private String firstIntakeDetails; // For Twice Daily
     private String secondIntakeDetails; // For Twice Daily
+    private String selectedDays; // Use String for Specific Days Frequency
+
     private int refillAmount;
     private int refillThreshold;
-    public String startTime;
-    public String endTime;
-    public int intervalHours;
-    public List<String> intervalTimes; // For storing all interval times in a day
-
 
     // Default constructor required for calls to DataSnapshot.getValue(Medication.class)
     public Medication() {
     }
 
-    // For single dose medication
-    public Medication(String name, String unit, String frequency, String reminderTime, int refillAmount, int refillThreshold) {
+    // Constructor for twice daily frequency
+    public Medication(String name, String frequency, String firstIntakeDetails, String secondIntakeDetails, int refillAmount, int refillThreshold) {
         this.name = name;
-        this.unit = unit;
-        this.frequency = frequency;
-        this.reminderTime = reminderTime;
-        this.refillAmount = refillAmount;
-        this.refillThreshold = refillThreshold;
-    }
-
-    // For twice daily medication
-    public Medication(String name, String unit, String frequency, String firstIntakeDetails, String secondIntakeDetails, int refillAmount, int refillThreshold) {
-        this.name = name;
-        this.unit = unit;
         this.frequency = frequency;
         this.firstIntakeDetails = firstIntakeDetails;
         this.secondIntakeDetails = secondIntakeDetails;
         this.refillAmount = refillAmount;
         this.refillThreshold = refillThreshold;
     }
-    public Medication(String name, String unit, int refillAmount, int refillThreshold, String frequency,
-                      String reminderTime, String startTime, String endTime, int intervalHours, List<String> intervalTimes) {
+
+    // Constructor for once daily or interval without specific days
+    public Medication(String name, String frequency, String reminderTime, int refillAmount, int refillThreshold) {
         this.name = name;
-        this.unit = unit;
-        this.refillAmount = refillAmount;
-        this.refillThreshold = refillThreshold;
         this.frequency = frequency;
         this.reminderTime = reminderTime;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.intervalHours = intervalHours;
-        this.intervalTimes = intervalTimes;
+        this.refillAmount = refillAmount;
+        this.refillThreshold = refillThreshold;
+    }
+
+    // Constructor for specific days with selected days, with an additional dummy field for distinction
+    public Medication(String name, String frequency, String reminderTime, String selectedDays, int refillAmount, int refillThreshold, boolean isSpecificDays) {
+        this.name = name;
+        this.frequency = frequency;
+        this.reminderTime = reminderTime;
+        this.selectedDays = selectedDays != null ? selectedDays : ""; // Prevent null value
+        this.refillAmount = refillAmount;
+        this.refillThreshold = refillThreshold;
     }
 
     // Getters and setters for all fields
@@ -62,14 +51,6 @@ public class Medication {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
     }
 
     public String getFrequency() {
@@ -102,6 +83,14 @@ public class Medication {
 
     public void setSecondIntakeDetails(String secondIntakeDetails) {
         this.secondIntakeDetails = secondIntakeDetails;
+    }
+
+    public String getSelectedDays() {
+        return selectedDays;
+    }
+
+    public void setSelectedDays(String selectedDays) {
+        this.selectedDays = selectedDays;
     }
 
     public int getRefillAmount() {

@@ -2,9 +2,11 @@ package com.example.medtrack;
 
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,57 +15,60 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.util.Calendar;
+import java.util.List;
 
 
-public class MedStep3Fragment extends Fragment {
+public class MedStep3SpecificDaysFragment extends Fragment {
 
-    private TextView reminderTimeTextView;
+    private TextView selectedDaysTextView;
+    private Button buttonPickTime, nextButton;
     private EditText editTextQuantity;
-    private Spinner unitSpinner;
-    private Button pickTimeButton;
-    private Button nextButton;
+    private Spinner doseSpinner;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_med_step3, container, false);
+        View view = inflater.inflate(R.layout.fragment_med_step3_specific_days, container, false);
 
-        reminderTimeTextView = view.findViewById(R.id.textViewReminderTime);
-        pickTimeButton = view.findViewById(R.id.buttonPickTime);
+        selectedDaysTextView = view.findViewById(R.id.textViewSelectedDays);
+        buttonPickTime = view.findViewById(R.id.buttonPickTime);
         editTextQuantity = view.findViewById(R.id.editTextQuantity);
-        unitSpinner = view.findViewById(R.id.spinnerUnit);
+        doseSpinner = view.findViewById(R.id.spinnerDose);
         nextButton = view.findViewById(R.id.nextButton);
 
-        // Populate the Spinner with the list of units
-        String[] units = {
-                "Tablet(s)", "Capsule(s)", "mL (milliliters)", "tsp (teaspoon)",
-                "Drop(s)", "Puff(s)", "mg (milligrams)", "Application(s)"
-        };
+        // Retrieve and display selected days from AddMedActivity
+        AddMedActivity activity = (AddMedActivity) getActivity();
+        if (activity != null) {
+            List<String> selectedDays = activity.getSelectedDays();
+            selectedDaysTextView.setText("Intake on " + String.join(", ", selectedDays));
+        }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, units);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        unitSpinner.setAdapter(adapter);
+        // Set up Spinner with dose units
+        String[] doses = {"Tablet(s)", "Capsule(s)", "mL (milliliters)", "Drop(s)", "Puff(s)", "mg (milligrams)", "tsp (teaspoon)", "Application(s)"};
+        ArrayAdapter<String> doseAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, doses);
+        doseAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        doseSpinner.setAdapter(doseAdapter);
 
-        pickTimeButton.setOnClickListener(v -> {
+        // Set up Time Picker for the intake time
+        buttonPickTime.setOnClickListener(v -> {
             Calendar calendar = Calendar.getInstance();
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
             int minute = calendar.get(Calendar.MINUTE);
 
-            TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(), (TimePicker view1, int hourOfDay, int minute1) -> {
+            TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(), (view1, hourOfDay, minute1) -> {
                 String time = String.format("%02d:%02d", hourOfDay, minute1);
-                reminderTimeTextView.setText(time);
+                buttonPickTime.setText(time);
             }, hour, minute, true);
             timePickerDialog.show();
         });
 
         nextButton.setOnClickListener(v -> {
-            String time = reminderTimeTextView.getText().toString();
+            String time = buttonPickTime.getText().toString();
             String quantityStr = editTextQuantity.getText().toString().trim();
-            String unit = unitSpinner.getSelectedItem().toString();
+            String unit = doseSpinner.getSelectedItem().toString();
 
             // Validate the inputs
             if (time.equals("Select Time") || quantityStr.isEmpty()) {
@@ -80,8 +85,9 @@ public class MedStep3Fragment extends Fragment {
             }
 
             // Save data to activity
-            ((AddMedActivity) getActivity()).setReminderTime(time + ", Dosage: " + quantity + " " + unit);
-            ((AddMedActivity) getActivity()).goToNextStep();
+            String reminderDetails = "Time: " + time + ", Dosage: " + quantity + " " + unit;
+            activity.setReminderTime(reminderDetails);
+            activity.goToNextStep();
         });
 
         return view;

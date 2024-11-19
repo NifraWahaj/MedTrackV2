@@ -1,0 +1,165 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="32dp"
+    android:background="@color/bg_main">
+
+    <!-- Logo -->
+    <ImageView
+        android:id="@+id/logoImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/logo"
+        android:layout_marginBottom="32dp"
+        android:contentDescription="Logo" />
+
+    <!-- Question Text -->
+    <TextView
+        android:id="@+id/questionText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="When would you like to be reminded?"
+        android:textSize="@dimen/addmedfrag_QuestiontextSize"
+        android:textAlignment="textStart"
+        android:layout_gravity="start"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/fontColormAIN" />
+
+    <!-- Interval Input Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Intake every"
+            android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
+            android:textColor="@color/fontColormAIN"
+            android:layout_marginEnd="16dp" />
+
+        <EditText
+            android:id="@+id/editTextInterval"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Enter interval (hours)"
+            android:inputType="number"
+            android:background="@android:color/transparent"
+            android:textColor="@color/fontColormAIN"
+            android:textColorHint="@color/fontColormAIN"
+            android:paddingBottom="4dp" />
+    </LinearLayout>
+
+    <!-- Start Time Section with Button Right-Aligned -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Starting at"
+            android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
+            android:textColor="@color/fontColormAIN" />
+
+        <Button
+            android:id="@+id/buttonPickStartTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select Start Time"
+            android:backgroundTint="@color/blueMain"
+            android:textColor="#FFFFFF"
+            android:paddingHorizontal="24dp"
+            android:elevation="4dp" />
+    </LinearLayout>
+
+    <!-- End Time Section with Button Right-Aligned -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Ending at"
+            android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
+            android:textColor="@color/fontColormAIN" />
+
+        <Button
+            android:id="@+id/buttonPickEndTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select End Time"
+            android:backgroundTint="@color/blueMain"
+            android:textColor="#FFFFFF"
+            android:paddingHorizontal="24dp"
+            android:elevation="4dp" />
+    </LinearLayout>
+
+    <!-- Dose Quantity Input Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <EditText
+            android:id="@+id/editTextDoseQuantity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Dose Quantity"
+            android:inputType="number"
+            android:background="@android:color/transparent"
+            android:textColor="@color/fontColormAIN"
+            android:textColorHint="@color/fontColormAIN"
+            android:paddingBottom="4dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/blueMain" />
+    </LinearLayout>
+
+    <!-- Dose Spinner -->
+    <Spinner
+        android:id="@+id/spinnerDose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/blueMain" />
+
+    <!-- Spacer to push the "Next" button to the bottom -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Next Button with Rounded Corners -->
+    <Button
+        android:id="@+id/nextButton"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Next"
+        android:background="@drawable/button_rounded"
+        android:textColor="#FFFFFF"
+        android:paddingVertical="12dp"
+        android:elevation="4dp"
+        android:layout_marginBottom="32dp" />
+
+</LinearLayout>
+

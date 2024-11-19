@@ -1,34 +1,124 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:gravity="center_horizontal"
+    android:padding="32dp"
+    android:background="@color/bg_main">
 
-    <!-- Reminder Time Selection -->
-    <Button
-        android:id="@+id/buttonPickTime"
+    <!-- Logo -->
+    <ImageView
+        android:id="@+id/logoImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/logo"
+        android:layout_marginBottom="32dp"
+        android:contentDescription="@string/logo" />
+
+    <!-- Question Text -->
+    <TextView
+        android:id="@+id/questionText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select Time" />
+        android:text="@string/when_would_you_like_to_be_reminded"
+        android:textSize="@dimen/addmedfrag_QuestiontextSize"
+        android:textAlignment="textStart"
+        android:layout_gravity="start"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/fontColormAIN" />
 
-    <!-- Quantity of Intake -->
-    <EditText
-        android:id="@+id/editTextQuantity"
+    <!-- Time Selection Layout: Text and Button in One Line -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter quantity"
-        android:inputType="number" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingTop="20dp"
+        android:layout_marginBottom="24dp">
 
-    <!-- Unit Selection -->
-    <Spinner
-        android:id="@+id/spinnerUnit"
+        <TextView
+            android:id="@+id/textViewReminderTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
+            android:layout_weight="1"
+            android:text="@string/select_time"
+            android:textColor="@color/fontColormAIN"
+            android:paddingEnd="16dp" />
+
+        <Button
+            android:id="@+id/buttonPickTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select"
+            android:backgroundTint="@color/blueMain"
+            android:textColor="#FFFFFF"
+            android:paddingHorizontal="24dp"
+            android:elevation="4dp" />
+    </LinearLayout>
+
+    <!-- Quantity and Unit Spinner in One Line -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="32dp">
 
-    <!-- Next Button -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:layout_marginEnd="16dp">
+
+            <!-- Quantity EditText -->
+            <EditText
+                android:id="@+id/editTextQuantity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/quantity"
+                android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
+                android:inputType="number"
+                android:background="@android:color/transparent"
+                android:textColorHint="@color/greytext"
+                tools:ignore="TouchTargetSizeCheck" />
+
+            <!-- Bottom Line for Quantity EditText -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/blueMain" />
+        </LinearLayout>
+
+        <!-- Unit Spinner -->
+        <Spinner
+            android:id="@+id/spinnerUnit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/blueMain"
+            android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
+            tools:ignore="TouchTargetSizeCheck" />
+    </LinearLayout>
+
+    <!-- Spacer to push the "Next" button to the bottom -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Next Button with Rounded Corners -->
     <Button
         android:id="@+id/nextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Next" />
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="@string/next"
+        android:background="@drawable/button_rounded"
+        android:textColor="#FFFFFF"
+        android:paddingVertical="12dp"
+        android:elevation="4dp"
+        android:layout_marginBottom="32dp" />
+
 </LinearLayout>
