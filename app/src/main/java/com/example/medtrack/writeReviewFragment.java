@@ -56,9 +56,8 @@ public class writeReviewFragment extends Fragment {
         // Handle back button click to navigate back to BlogContentFragment
 
         backButton.setOnClickListener(v -> {
-            getParentFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
-           // getParentFragmentManager().popBackStack("WRITE_REVIEW_FRAGMENT", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            getParentFragmentManager().popBackStack("WRITE_REVIEW_FRAGMENT", FragmentManager.POP_BACK_STACK_INCLUSIVE);
             return;
 
 
