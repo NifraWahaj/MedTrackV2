@@ -1,64 +1,110 @@
 package com.example.medtrack;
 
+import android.graphics.PorterDuff;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RatingBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link RatingsReviewsListFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class RatingsReviewsListFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public RatingsReviewsListFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment RatingsReviewsListFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static RatingsReviewsListFragment newInstance(String param1, String param2) {
-        RatingsReviewsListFragment fragment = new RatingsReviewsListFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    private RecyclerView recyclerView;
+    private RatingReviewAdapter adapter;
+    private List<Review> reviewList;
+    private TextView tvRating,tvReviews;
+    private RatingBar reviewRatingBar;
+     @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_ratings_reviews_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_ratings_reviews_list, container, false);
+
+        // Initialize RecyclerView
+        recyclerView = view.findViewById(R.id.recyclerViewReviews);
+         tvRating=view.findViewById(R.id.tvRating);
+         tvReviews=view.findViewById(R.id.tvReviews);
+         reviewRatingBar=view.findViewById(R.id.reviewRatingBar);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+         LayerDrawable stars = (LayerDrawable) reviewRatingBar.getProgressDrawable();
+
+// Change the color of the filled stars
+         stars.getDrawable(2).setColorFilter(ContextCompat.getColor(getContext(), R.color.ratingColor), PorterDuff.Mode.SRC_ATOP);
+        // Initialize list and adapter
+        reviewList = new ArrayList<>();
+        adapter = new RatingReviewAdapter(getContext(),reviewList);
+        recyclerView.setAdapter(adapter);
+
+        // Fetch reviews from Firebase
+        fetchReviewsFromFirebase();
+
+        return view;
     }
+
+    private void fetchReviewsFromFirebase() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
+        DatabaseReference reviewsRef = database.getReference("reviews");
+
+        reviewsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                reviewList.clear(); // Clear the list to avoid duplicates
+
+                for (DataSnapshot reviewSnapshot : snapshot.getChildren()) {
+                    String blogTitle = reviewSnapshot.child("BlogTitle").getValue(String.class);
+                    String blogId = reviewSnapshot.child("BlogId").getValue(String.class);
+                    float rating = reviewSnapshot.child("rating").getValue(Float.class);
+                    String reviewText = reviewSnapshot.child("review").getValue(String.class);
+                    String userEmail = reviewSnapshot.child("userEmail").getValue(String.class);
+                    String userName = reviewSnapshot.child("name").getValue(String.class);
+
+                    // Add each review to the list
+                    reviewList.add(new Review(userName, rating, reviewText, blogTitle, userEmail));
+                }
+                tvReviews.setText(reviewList.size()+ " Reviews");
+                calculateRatingsAverage();
+                adapter.notifyDataSetChanged(); // Notify adapter of data changes
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Failed to fetch reviews: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void calculateRatingsAverage() {
+        if (reviewList == null || reviewList.isEmpty()) {
+            reviewRatingBar.setRating(0.0f);
+            return ;
+            // Return  if there are no reviews
+        }
+
+        float sum = 0.0f;
+        for (Review review : reviewList) {
+            sum += review.getRating();
+        }
+           sum=sum / reviewList.size();
+        tvRating.setText(sum+ " Ratings");
+
+        reviewRatingBar.setRating(sum);
+
+    }
+
 }

@@ -56,7 +56,7 @@
     <string name="write_blog">Write Blog</string>
 
     <string name="rate_this_blog">Rate this blog</string>
-     <string name="write_a_review">Write a review</string>
+    <string name="write_a_review">Write a review</string>
     <string name="ratings_and_reviews">Ratings and reviews</string>
     <string name="write_your_review_here">Write your review here...</string>
     <string name="submit">Submit</string>
@@ -66,7 +66,7 @@
 
 
     <string name="which_medication_would_you_like_to_set_the_reminder_for">Which medication would you like to set the reminder for?</string>
-     <string name="med_name">Name</string>
+    <string name="med_name">Name</string>
     <string name="med_next">Next</string>
     <string name="how_often_do_you_take_this_medication">How often do you take this medication?</string>
     <string name="once_daily">Once daily</string>
@@ -98,5 +98,7 @@
     <string name="first_intake">First Intake</string>
     <string name="second_intake">Second Intake</string>
     <string name="enter_your_name">Enter your Name</string>
+    <string name="back">Back</string>
+    <string name="your_blogs">Your Blogs</string>
 
 </resources>

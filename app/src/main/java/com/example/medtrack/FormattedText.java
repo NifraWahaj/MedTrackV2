@@ -3,6 +3,8 @@ package com.example.medtrack;
 
 public class FormattedText {
     private String text;
+    private String link;       // For clickable links
+
     private String imageBase64;  // Store image as Base64 string
     private boolean isBold;
     private boolean isItalic;
@@ -54,7 +56,13 @@ public class FormattedText {
     public void setUnderline(boolean isUnderline) {
         this.isUnderline = isUnderline;
     }
+    public String getLink() {
+        return link;
+    }
 
+    public void setLink(String link) {
+        this.link = link;
+    }
     public boolean isStrikethrough() {
         return isStrikethrough;
     }

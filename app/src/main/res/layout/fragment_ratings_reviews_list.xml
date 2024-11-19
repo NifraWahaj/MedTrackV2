@@ -82,12 +82,13 @@
             android:id="@+id/verticalSeparator"
             android:layout_width="1dp"
             android:layout_height="100dp"
+            app:layout_constraintHorizontal_bias="0.4"
             android:background="@color/lightgrey"
             app:layout_constraintStart_toEndOf="@id/tvRating"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tvRating"
             app:layout_constraintBottom_toBottomOf="@+id/tvRating"
-            android:layout_marginEnd="8dp" />
+             />
         <TextView
             android:id="@+id/tvReviews"
             android:layout_width="wrap_content"
@@ -107,7 +108,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
     <!-- RecyclerView to display the list of items -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewCommunity"
+        android:id="@+id/recyclerViewReviews"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

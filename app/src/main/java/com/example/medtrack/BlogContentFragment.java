@@ -1,5 +1,6 @@
 package com.example.medtrack;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
@@ -7,8 +8,10 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -16,10 +19,14 @@ import androidx.fragment.app.FragmentManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
+import android.text.style.URLSpan;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,12 +50,14 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 public class BlogContentFragment extends Fragment {
-    private TextView etTitle, etBlogContent;
-    private String blogId,title;
+    private TextView etTitle, etBlogContent,tvRateThisBlog,tvWriteAReview,tvAuthor;
+    private String blogId,title,reviewText, author;
+     float ratingFromDb;
+
     private ScrollView scrollView;
     private RatingBar ratingBar;
     private RatingBar.OnRatingBarChangeListener ratingBarChangeListener;
-    private ImageButton backButton;
+    private ImageButton backButton,btnReviewList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -60,6 +69,10 @@ public class BlogContentFragment extends Fragment {
         ratingBar = view.findViewById(R.id.rating);
         scrollView= view.findViewById(R.id.ScrollViewBlogContent);
         backButton=view.findViewById(R.id.backButton);
+        btnReviewList=view.findViewById(R.id.btnReviewList);
+        tvRateThisBlog=view.findViewById(R.id.tvRateThisBlog);
+        tvWriteAReview=view.findViewById(R.id.tvWriteAReview);
+        tvAuthor=view.findViewById(R.id.tvAuthor);
         // Get the progress drawable
         LayerDrawable stars = (LayerDrawable) ratingBar.getProgressDrawable();
 
@@ -69,6 +82,7 @@ public class BlogContentFragment extends Fragment {
         if (getArguments() != null) {
             blogId = getArguments().getString("blogId");
         }
+        checkIfUserHasReviewed(blogId);
          ratingBarChangeListener = (ratingBar, rating, fromUser) -> {
             if (fromUser) {  // Ensure the change was user-initiated
                 ratingBar.setOnRatingBarChangeListener(null);  // Temporarily disable
@@ -90,7 +104,29 @@ public class BlogContentFragment extends Fragment {
         };
         ratingBar.setOnRatingBarChangeListener(ratingBarChangeListener);
 
+        tvWriteAReview.setOnClickListener(V->
+        {                Bundle bundle = new Bundle();
 
+            bundle.putFloat("userRating", 0.0f);
+            bundle.putString("blogTitle", title);
+            bundle.putString("blogId", blogId);
+            if(tvWriteAReview.getText().equals("Edit your Review")){
+                bundle.putString("etValue","Edit your Review");
+                bundle.putFloat("userRating",ratingFromDb);
+                bundle.putString("etReview",reviewText);
+            }
+            else{
+                bundle.putString("etValue","Write a Review");
+
+            }
+            writeReviewFragment writeReviewFragment = new writeReviewFragment();
+            writeReviewFragment.setArguments(bundle);
+
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.main_container, writeReviewFragment, "WRITE_REVIEW_FRAGMENT")
+                    .addToBackStack("WRITE_REVIEW_FRAGMENT")
+                    .commit();
+        });
         fetchBlogContent(blogId);  // Fetch content based on blogId
 // Check the fragment back stack size
         getParentFragmentManager().addOnBackStackChangedListener(() -> {
@@ -108,6 +144,15 @@ public class BlogContentFragment extends Fragment {
 
 
         });
+        btnReviewList.setOnClickListener(v -> {
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.main_container, new RatingsReviewsListFragment(), "REVIEW_LIST_FRAGMENT")
+                    .addToBackStack("REVIEW_LIST_FRAGMENT")
+                    .commit();
+
+
+        });
+
         return view;
     }
     @Override
@@ -129,6 +174,8 @@ public class BlogContentFragment extends Fragment {
                 if (snapshot.exists()) {
                       title = snapshot.child("title").getValue(String.class);
                     String json = snapshot.child("content").getValue(String.class);
+                      author= snapshot.child("userName").getValue(String.class) ;
+                      tvAuthor.setText(author);
                     displayFormattedText(title, json);
                 }
             }
@@ -177,14 +224,75 @@ public class BlogContentFragment extends Fragment {
                 if (formattedText.getRelativeSize() > 1.0f) {
                     spanText.setSpan(new RelativeSizeSpan(formattedText.getRelativeSize()), 0, formattedText.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
+                // Handle clickable links
+
+                // Handle clickable links using ClickableSpan
+                if (formattedText.getLink() != null) {
+                    final String url = formattedText.getLink();
+                    SpannableString spannableString = new SpannableString(url);
+
+                    // Create ClickableSpan
+                    ClickableSpan clickableSpan = new ClickableSpan() {
+                        @Override
+                        public void onClick(@NonNull View widget) {
+                            // Open the URL in Chrome explicitly
+                            String url = widget.getTag().toString();  // Ensure URL is correctly passed to the method
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            intent.setPackage("com.android.chrome");  // Target Chrome
+                            try {
+                            // Check if Chrome is installed
+                            if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                                try {
+                                    startActivity(intent);  // Launch Chrome if installed
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    // Fallback to default browser if there's an error
+                                    Intent defaultIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                    if (getActivity() != null) { // Make sure getActivity() is not null
+                                        startActivity(defaultIntent);
+                                    }
+                                }
+                            } else {
+                                // If Chrome is not installed, open the default browser
+                                Intent defaultIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                if (getActivity() != null) { // Ensure the activity is not null
+                                    startActivity(defaultIntent);
+                                }
+                            }}
+                            catch (Exception e) {
+                                e.printStackTrace();
+                                Toast.makeText(getContext(), "Unable to open link: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+
+
+                        @Override
+                        public void updateDrawState(@NonNull TextPaint ds) {
+                            super.updateDrawState(ds);
+                            ds.setColor(ContextCompat.getColor(getContext(), android.R.color.holo_blue_dark));  // Set the color to blue
+                            ds.setUnderlineText(true);  // Set the text to be underlined
+                        }
+                    };
+
+                    // Apply the clickable span to the entire URL
+                    spannableString.setSpan(clickableSpan, 0, url.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    spanText = spannableString;
+                }
             }
 
             spannableText.append(spanText);
         }
 
         // Set the formatted text to the TextView
+
+
         etTitle.setText(title);
         etBlogContent.setText(spannableText);
+        etBlogContent.setMovementMethod(LinkMovementMethod.getInstance());
+         etBlogContent.setClickable(true); // Make sure the TextView itself is clickable
+        etBlogContent.setFocusableInTouchMode(true); // Make sure the TextView can handle touch interactions
+
     }
 
     // Method to convert base64 string to Bitmap
@@ -192,4 +300,55 @@ public class BlogContentFragment extends Fragment {
         byte[] decodedString = Base64.decode(base64, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
     }
+
+
+    private void checkIfUserHasReviewed(String blogId) {
+        String currentUserEmail = UserUtils.getUserEmail(getContext()); // Get the current user's email
+        DatabaseReference reviewsRef = FirebaseDatabase.getInstance()
+                .getReference("reviews");
+
+        reviewsRef.orderByChild("userEmail").equalTo(currentUserEmail)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        boolean hasReviewed = false;
+
+                        for (DataSnapshot reviewSnapshot : snapshot.getChildren()) {
+                            String reviewBlogId = reviewSnapshot.child("BlogId").getValue(String.class);
+                            if (blogId.equals(reviewBlogId)) {
+                                hasReviewed = true;
+                                // Retrieve review details
+                                  reviewText = reviewSnapshot.child("review").getValue(String.class);
+                                ratingFromDb = reviewSnapshot.child("rating").getValue(Float.class);
+
+                                // Display the existing review
+                                displayExistingReview(reviewText, ratingFromDb);
+                                break;
+                            }
+                        }
+
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(getContext(), "Failed to check reviews", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void displayExistingReview(String reviewText, float rating) {
+        // Set the existing review and rating to the views
+        ratingBar.setOnRatingBarChangeListener(null); // Disable the listener
+        tvWriteAReview.setText("Edit your Review");
+         ratingBar.setRating(rating);
+
+        // Optionally, disable further edits
+        ratingBar.setIsIndicator(true); // Make RatingBar read-only
+        tvRateThisBlog.setText("You rated This blog");
+
+     }
+
+
+
 }

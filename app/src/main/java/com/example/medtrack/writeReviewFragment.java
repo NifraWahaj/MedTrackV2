@@ -36,6 +36,7 @@ public class writeReviewFragment extends Fragment {
     private  String title,review,blogId;
     private    float userRating;
     private Button btnSubmit;
+    private Boolean isEditMode;
     private ImageButton backButton;
     public writeReviewFragment() {
         // Required empty public constructor
@@ -46,7 +47,7 @@ public class writeReviewFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_write_review, container, false);
-
+        isEditMode=false;
         // Initialize RatingBar and TextView
         ratingBar = rootView.findViewById(R.id.reviewRatingBar);
         tvTitle=rootView.findViewById(R.id.tvTitle);
@@ -66,9 +67,17 @@ public class writeReviewFragment extends Fragment {
         });
 
         if (getArguments() != null) {
-              userRating = getArguments().getFloat("userRating", 0f);
+              userRating = getArguments().getFloat("userRating");
               title= getArguments().getString("blogTitle","Users Blog");
           blogId=getArguments().getString( "blogId");
+            String tvValue=getArguments().getString("etValue");
+
+
+            if(tvValue.equals("Edit your Review")){
+                isEditMode=true;
+                String reviewText=getArguments().getString("etReview");
+                etReview.setText(reviewText);
+              }
 
             // Set the received rating to the RatingBar in WriteReviewFragment
             tvTitle.setText(title);
@@ -89,20 +98,41 @@ public class writeReviewFragment extends Fragment {
                 userRating= ratingBar.getRating();
                 review=etReview.getText().toString();
                 FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
-                DatabaseReference blogsref = database.getReference("reviews");
+                DatabaseReference reviewsRef = database.getReference("reviews");
                 Map<String, Object> reviewData = new HashMap<>();
                 //user id and user name
                 reviewData.put("BlogTitle", title);
                 reviewData.put("BlogId", blogId);
                 reviewData.put("rating", userRating);
                 reviewData.put("review",review);
-                blogsref.push().setValue(reviewData)
-                        .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Blog saved to Firebase!", Toast.LENGTH_SHORT).show())
-                        .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to save blog", Toast.LENGTH_SHORT).show());
+                reviewData.put("userEmail",UserUtils.getUserEmail(getContext()));
+                reviewData.put("name",UserUtils.getUserName(getContext()));
+                if (isEditMode) {
+                    // Update the existing review if in edit mode (based on userEmail)
+                    reviewsRef.orderByChild("userEmail").equalTo(UserUtils.getUserEmail(getContext())).get().addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            if (task.getResult().exists()) {
+                                String reviewKey = task.getResult().getChildren().iterator().next().getKey();
+                                if (reviewKey != null) {
+                                    // Update the existing review data
+                                    reviewsRef.child(reviewKey).updateChildren(reviewData)
+                                            .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Review updated!", Toast.LENGTH_SHORT).show())
+                                            .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to update review", Toast.LENGTH_SHORT).show());
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    // Create a new review if not in edit mode
+                    reviewsRef.push().setValue(reviewData)
+                            .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Review added to Firebase!", Toast.LENGTH_SHORT).show())
+                            .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to add review", Toast.LENGTH_SHORT).show());
+                }
             }
 
-             }
-        );
+             });
+
+
         return rootView;
     }
 }

@@ -78,16 +78,29 @@
                 android:contentDescription="Search"
                 android:background="?android:attr/selectableItemBackgroundBorderless" />
         </LinearLayout>
-
-        <!-- Community Button placed below the search bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/btnYourBlogs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Your Blogs"
+                android:layout_margin="10dp"
+                android:layout_gravity="center"
+                 android:layout_marginTop="16dp" />
+         <!-- Community Button placed below the search bar -->
         <Button
             android:id="@+id/buttonCommunity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/write_blog"
             android:layout_margin="10dp"
-            android:layout_gravity="center_horizontal|end"
+             android:layout_gravity="center"
             android:layout_marginTop="16dp" />
+        </LinearLayout>
 
         <!-- RecyclerView to display the list of items -->
         <androidx.recyclerview.widget.RecyclerView

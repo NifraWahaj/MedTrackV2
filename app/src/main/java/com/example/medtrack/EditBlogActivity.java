@@ -32,6 +32,7 @@ import android.text.style.ImageSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
+import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Base64;
 import android.util.TypedValue;
@@ -43,6 +44,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -73,7 +75,8 @@ public class EditBlogActivity extends AppCompatActivity {
     private EditText etBlogContent,etTitle;
     private SpannableStringBuilder spannableStringBuilder;
     private UndoManager undoManager;
-    private ImageButton btnpost;
+    private TextView tvusername;
+    private ImageButton btnpost,btnGoBack;
     private boolean isBoldActive = false;
     private boolean isItalicActive = false;
     private boolean isUnderLine = false;
@@ -103,8 +106,10 @@ public class EditBlogActivity extends AppCompatActivity {
         etTitle= findViewById(R.id.etBlogTitle);
         spannableStringBuilder = new SpannableStringBuilder(etBlogContent.getText());
         undoManager = new UndoManager();
+        tvusername=findViewById(R.id.tvusername);
+        tvusername.setText(UserUtils.getUserName(this));
         etBlogContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);  // Set a base size for the text in SP
-
+        btnGoBack=findViewById(R.id.btnGoBack);
         etBlogContent.setText(spannableStringBuilder);
         etBlogContent.setMovementMethod(LinkMovementMethod.getInstance()); // for adding links
 
@@ -177,8 +182,15 @@ public class EditBlogActivity extends AppCompatActivity {
     }
 
     private void setupButtons() {
+        btnGoBack.setOnClickListener(v -> finish()); // Close the current activity
 
-        btnpost.setOnClickListener(v-> saveFormattedText());
+        btnpost.setOnClickListener(v->
+        {  if(etBlogContent.getText().toString().isEmpty()||etBlogContent.getText().toString()==null || etTitle.getText().toString().isEmpty()|| etTitle.getText().toString()==null){
+            Toast.makeText(this,"Title or Content can't be empty",Toast.LENGTH_SHORT).show();
+
+        }else{
+            saveFormattedText();
+        finish();}} );
         findViewById(R.id.btnBold).setOnClickListener(v -> toggleBold());
         findViewById(R.id.btnItalic).setOnClickListener(v -> toggleItalic());
         findViewById(R.id.btnUnderline).setOnClickListener(v -> {
@@ -515,8 +527,8 @@ public class EditBlogActivity extends AppCompatActivity {
         builder.setPositiveButton("OK", (dialog, which) -> {
             String url = input.getText().toString().trim();
             if (!url.isEmpty()) {
-                temp(url);
-                // insertLinkIntoText(url);
+              //  temp(url);
+                 insertLinkIntoText(url);
             }
         });
 
@@ -567,6 +579,9 @@ public class EditBlogActivity extends AppCompatActivity {
     }
 
 
+
+
+
     private void insertLinkIntoText(String url) {
         Editable spannableText = etBlogContent.getText();
         int start = etBlogContent.getSelectionStart();
@@ -574,14 +589,19 @@ public class EditBlogActivity extends AppCompatActivity {
 
         // If there's no selection, append the URL at the cursor position
         if (start == end) {
-            start = end = spannableText.length(); // Append at the end
+            start = spannableText.length(); // Append at the end
+            end = start + url.length();
+            spannableText.insert(start, url); // Insert the URL as text
+        } else {
+            spannableText.replace(start, end, url); // Replace the selected text with the URL
+            end = start + url.length();
         }
 
-        // Create a clickable span for the URL with blue and underlined text style
+        // Create a clickable span for the URL
         ClickableSpan clickableSpan = new ClickableSpan() {
             @Override
             public void onClick(@NonNull View widget) {
-                // When the link is clicked, open the URL in the browser
+                // Open the URL in the browser
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(intent);
             }
@@ -589,25 +609,26 @@ public class EditBlogActivity extends AppCompatActivity {
             @Override
             public void updateDrawState(@NonNull TextPaint ds) {
                 super.updateDrawState(ds);
-                // Set the color of the link to blue
-                ds.setColor(Color.BLUE);
-                // Underline the text
-                ds.setUnderlineText(true);
+                ds.setColor(Color.BLUE); // Set link color to blue
+                ds.setUnderlineText(true); // Underline the text
             }
         };
 
-        // Set the clickable span in the selected text or insert it at the cursor position
+        // Apply the clickable span to the URL text
         spannableText.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableText.setSpan(new URLSpan(url), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-        // Set the URL as plain text (you can customize the URL styling if needed)
-        spannableText.replace(start, end, url);
-
-        // Update the EditText with the new content
+        // Update the EditText content
         etBlogContent.setText(spannableText);
+        etBlogContent.setSelection(end); // Place cursor at the end of the URL
 
-        // Make the text clickable
+        // Make links clickable
         etBlogContent.setMovementMethod(LinkMovementMethod.getInstance());
     }
+
+
+
+
 
 
     private void applyLeftAlign() {
@@ -742,50 +763,117 @@ public class EditBlogActivity extends AppCompatActivity {
         Spannable spannableText = etBlogContent.getText();
         List<FormattedText> formattedTexts = new ArrayList<>();
 
-        for (int i = 0; i < spannableText.length(); i++) {
-            FormattedText formattedText = new FormattedText();
-            int start = i;
-            int end = i + 1;
+        // Maintain a processed range to avoid duplicate processing
+        int processedIndex = 0;
 
-            ImageSpan[] imageSpans = spannableText.getSpans(start, end, ImageSpan.class);
-            if (imageSpans.length > 0) {
-                Bitmap bitmap = ((BitmapDrawable) imageSpans[0].getDrawable()).getBitmap();
-                String imageBase64 = bitmapToBase64(bitmap);
-                formattedText.setImageBase64(imageBase64);
-            } else {
-                formattedText.setText(String.valueOf(spannableText.charAt(i)));
+        while (processedIndex < spannableText.length()) {
+            // Find the next span that starts at or after the current index
+            URLSpan[] urlSpans = spannableText.getSpans(processedIndex, spannableText.length(), URLSpan.class);
+            ImageSpan[] imageSpans = spannableText.getSpans(processedIndex, spannableText.length(), ImageSpan.class);
+
+            int nextSpanStart = spannableText.length();
+
+            // Determine the nearest span start
+            for (URLSpan span : urlSpans) {
+                nextSpanStart = Math.min(nextSpanStart, spannableText.getSpanStart(span));
+            }
+            for (ImageSpan span : imageSpans) {
+                nextSpanStart = Math.min(nextSpanStart, spannableText.getSpanStart(span));
             }
 
-            StyleSpan[] styleSpans = spannableText.getSpans(start, end, StyleSpan.class);
-            for (StyleSpan span : styleSpans) {
-                if (span.getStyle() == Typeface.BOLD) formattedText.setBold(true);
-                if (span.getStyle() == Typeface.ITALIC) formattedText.setItalic(true);
+            // Process plain text before the next span
+            if (processedIndex < nextSpanStart) {
+                for (int i = processedIndex; i < nextSpanStart; i++) {
+                    FormattedText formattedText = new FormattedText();
+                    formattedText.setText(String.valueOf(spannableText.charAt(i)));
+
+                    // Handle Style Spans (bold, italic, etc.)
+                    StyleSpan[] styleSpans = spannableText.getSpans(i, i + 1, StyleSpan.class);
+                    for (StyleSpan span : styleSpans) {
+                        if (span.getStyle() == Typeface.BOLD) formattedText.setBold(true);
+                        if (span.getStyle() == Typeface.ITALIC) formattedText.setItalic(true);
+                    }
+
+                    // Handle Strikethrough Spans
+                    StrikethroughSpan[] strikethroughSpans = spannableText.getSpans(i, i + 1, StrikethroughSpan.class);
+                    if (strikethroughSpans.length > 0) formattedText.setStrikethrough(true);
+
+                    // Handle Relative Size Spans (text size change)
+                    RelativeSizeSpan[] sizeSpans = spannableText.getSpans(i, i + 1, RelativeSizeSpan.class);
+                    for (RelativeSizeSpan sizeSpan : sizeSpans) formattedText.setRelativeSize(sizeSpan.getSizeChange());
+
+                    // Store alignment information
+                    formattedText.setAlignment(etBlogContent.getGravity());
+
+                    formattedTexts.add(formattedText);
+                }
+                processedIndex = nextSpanStart;
             }
 
-            StrikethroughSpan[] strikethroughSpans = spannableText.getSpans(start, end, StrikethroughSpan.class);
-            if (strikethroughSpans.length > 0) formattedText.setStrikethrough(true);
+            // Process URLSpan or ImageSpan
+            if (processedIndex < spannableText.length()) {
+                boolean processedSpan = false;
 
-            RelativeSizeSpan[] sizeSpans = spannableText.getSpans(start, end, RelativeSizeSpan.class);
-            for (RelativeSizeSpan sizeSpan : sizeSpans) formattedText.setRelativeSize(sizeSpan.getSizeChange());
+                // Check for URLSpan
+                for (URLSpan urlSpan : urlSpans) {
+                    int spanStart = spannableText.getSpanStart(urlSpan);
+                    int spanEnd = spannableText.getSpanEnd(urlSpan);
+                    if (spanStart == processedIndex) {
+                        FormattedText formattedText = new FormattedText();
+                        formattedText.setLink(urlSpan.getURL());
+                        formattedText.setText(spannableText.subSequence(spanStart, spanEnd).toString());
+                        formattedTexts.add(formattedText);
 
-            formattedText.setAlignment(etBlogContent.getGravity());
-            formattedTexts.add(formattedText);
+                        processedIndex = spanEnd;
+                        processedSpan = true;
+                        break;
+                    }
+                }
+
+                // Check for ImageSpan
+                if (!processedSpan) {
+                    for (ImageSpan imageSpan : imageSpans) {
+                        int spanStart = spannableText.getSpanStart(imageSpan);
+                        int spanEnd = spannableText.getSpanEnd(imageSpan);
+                        if (spanStart == processedIndex) {
+                            FormattedText formattedText = new FormattedText();
+                            Bitmap bitmap = ((BitmapDrawable) imageSpan.getDrawable()).getBitmap();
+                            String imageBase64 = bitmapToBase64(bitmap);
+                            formattedText.setImageBase64(imageBase64);
+
+                            formattedTexts.add(formattedText);
+
+                            processedIndex = spanEnd;
+                            processedSpan = true;
+                            break;
+                        }
+                    }
+                }
+            }
         }
-        String title = etTitle.getText().toString(); // Assuming you have an EditText for title
 
+        // Retrieve the title from the EditText
+        String title = etTitle.getText().toString();
+
+        // Convert the list of formatted texts to JSON
         Gson gson = new Gson();
         String json = gson.toJson(formattedTexts);
 
+        // Save the data to Firebase
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
-        DatabaseReference blogsref = database.getReference("blogs");        Map<String, Object> blogData = new HashMap<>();
+        DatabaseReference blogsRef = database.getReference("blogs");
+
+        Map<String, Object> blogData = new HashMap<>();
         blogData.put("title", title);
-        blogData.put("content", json);
-        blogData.put("isApproved",false);
-        blogsref.push().setValue(blogData)
+        blogData.put("userEmail", UserUtils.getUserEmail(this));
+        blogData.put("userName", UserUtils.getUserName(this));
+        blogData.put("content", json); // Store formatted text content as JSON
+        blogData.put("isApproved", false);
+
+        blogsRef.push().setValue(blogData)
                 .addOnSuccessListener(aVoid -> Toast.makeText(this, "Blog saved to Firebase!", Toast.LENGTH_SHORT).show())
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to save blog", Toast.LENGTH_SHORT).show());
     }
-
 
 
  /*   private void saveFormattedText() {
