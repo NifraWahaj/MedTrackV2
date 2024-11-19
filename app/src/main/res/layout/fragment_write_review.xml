@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+             android:gravity="center_vertical"
+             >
+    <!-- Back Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:background="@color/blueDark"
+        android:gravity="center_vertical|start">
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:src="@drawable/go_back"
+            android:contentDescription="Back"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:layout_gravity="center_vertical" />
+
+        <!-- Page Title (centered) -->
+        <TextView
+            android:id="@+id/pageTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Blog Post"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/tvAuthor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginTop="30dp"
+        android:text="Author"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+         android:gravity="center"
+        android:text="Blog Title"
+        android:textColor="@color/greytext"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+    <!-- Rating Bar -->
+    <RatingBar
+        android:id="@+id/reviewRatingBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        style="?android:attr/ratingBarStyle"
+        android:numStars="5"
+        android:stepSize="1.0"
+        android:layout_gravity="center" />
+
+    <!-- Review EditText -->
+    <EditText
+        android:id="@+id/reviewEditText"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:hint="@string/write_your_review_here"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
+         android:padding="12dp"
+        android:layout_marginTop="16dp"
+        android:gravity="top"
+        android:outlineAmbientShadowColor="@color/black"
+        android:background="@color/bluelight"
+        android:inputType="textMultiLine"
+        android:minHeight="120dp" />
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="300dp"
+        android:layout_marginTop="30dp"
+        android:layout_height="@dimen/loginButtonheight"
+        android:layout_gravity="center"
+         android:backgroundTint="@color/blueMain"
+        android:text="@string/submit"
+        android:textColor="@color/white"
+       />
+
+</LinearLayout>

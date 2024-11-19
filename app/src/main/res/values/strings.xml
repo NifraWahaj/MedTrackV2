@@ -54,5 +54,13 @@
     <string name="blog_title">Blog Title</string>
     <string name="blog_description">BLog description</string>
     <string name="write_blog">Write Blog</string>
+    <string name="rate_this_blog">Rate this blog</string>
+    <string name="write_a_review">Write a review</string>
+    <string name="ratings_and_reviews">Ratings and reviews</string>
+    <string name="write_your_review_here">Write your review here...</string>
+    <string name="submit">Submit</string>
+    <string name="reviews">Reviews</string>
+    <string name="ratings">Ratings</string>
+    <string name="author">Author</string>
 
 </resources>
