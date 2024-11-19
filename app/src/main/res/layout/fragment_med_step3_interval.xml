@@ -14,14 +14,14 @@
         android:layout_height="100dp"
         android:src="@drawable/logo"
         android:layout_marginBottom="32dp"
-        android:contentDescription="Logo" />
+        android:contentDescription="@string/logo" />
 
     <!-- Question Text -->
     <TextView
         android:id="@+id/questionText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="When would you like to be reminded?"
+        android:text="@string/when_would_you_like_to_be_reminded"
         android:textSize="@dimen/addmedfrag_QuestiontextSize"
         android:textAlignment="textStart"
         android:layout_gravity="start"
@@ -40,23 +40,37 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Intake every"
+            android:text="@string/intake_every"
             android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
             android:textColor="@color/fontColormAIN"
             android:layout_marginEnd="16dp" />
 
-        <EditText
-            android:id="@+id/editTextInterval"
+        <!-- EditText with Blue Line Below -->
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Enter interval (hours)"
-            android:inputType="number"
-            android:background="@android:color/transparent"
-            android:textColor="@color/fontColormAIN"
-            android:textColorHint="@color/fontColormAIN"
-            android:paddingBottom="4dp" />
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/editTextInterval"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hours"
+                android:inputType="number"
+                android:textSize="@dimen/addmedfrag_hints"
+                android:background="@android:color/transparent"
+                android:textColor="@color/greytext"
+                android:textColorHint="@color/fontColormAIN"
+                android:paddingBottom="4dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/blueMain" />
+        </LinearLayout>
     </LinearLayout>
+
 
     <!-- Start Time Section with Button Right-Aligned -->
     <LinearLayout
@@ -69,7 +83,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Starting at"
+            android:text="@string/starting_at"
             android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
             android:textColor="@color/fontColormAIN" />
 
@@ -77,11 +91,12 @@
             android:id="@+id/buttonPickStartTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Select Start Time"
+            android:text="@string/select"
             android:backgroundTint="@color/blueMain"
             android:textColor="#FFFFFF"
             android:paddingHorizontal="24dp"
             android:elevation="4dp" />
+
     </LinearLayout>
 
     <!-- End Time Section with Button Right-Aligned -->
@@ -103,7 +118,7 @@
             android:id="@+id/buttonPickEndTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Select End Time"
+            android:text="Select"
             android:backgroundTint="@color/blueMain"
             android:textColor="#FFFFFF"
             android:paddingHorizontal="24dp"
@@ -111,37 +126,49 @@
     </LinearLayout>
 
     <!-- Dose Quantity Input Section -->
+
+
+    <!-- Dose Spinner -->
+
+    <!-- Dose Quantity Input Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:gravity="center_vertical"
         android:layout_marginBottom="16dp">
 
-        <EditText
-            android:id="@+id/editTextDoseQuantity"
-            android:layout_width="match_parent"
+        <!-- EditText with Blue Line Below -->
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="Dose Quantity"
-            android:inputType="number"
-            android:background="@android:color/transparent"
-            android:textColor="@color/fontColormAIN"
-            android:textColorHint="@color/fontColormAIN"
-            android:paddingBottom="4dp" />
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/blueMain" />
+            <EditText
+                android:id="@+id/editTextDoseQuantity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/quantity"
+                android:inputType="number"
+                android:background="@android:color/transparent"
+                android:textColorHint="@color/greytext"
+                android:paddingBottom="4dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/blueMain" />
+        </LinearLayout>
+
+        <!-- Spinner -->
+        <Spinner
+            android:id="@+id/spinnerDose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/blueMain" />
     </LinearLayout>
 
-    <!-- Dose Spinner -->
-    <Spinner
-        android:id="@+id/spinnerDose"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/blueMain" />
 
     <!-- Spacer to push the "Next" button to the bottom -->
     <LinearLayout
@@ -154,7 +181,7 @@
         android:id="@+id/nextButton"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:text="Next"
+        android:text="@string/next"
         android:background="@drawable/button_rounded"
         android:textColor="#FFFFFF"
         android:paddingVertical="12dp"
@@ -162,4 +189,3 @@
         android:layout_marginBottom="32dp" />
 
 </LinearLayout>
-

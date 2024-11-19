@@ -1,102 +1,205 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
-    <!-- fragment_med_step3_two_doses -->
+    android:padding="32dp"
+    android:background="@color/bg_main">
 
-    <!-- First Intake Section -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="First Intake"
-        android:textStyle="bold" />
-
-    <!-- First Intake Time -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Time" />
-
-    <Button
-        android:id="@+id/buttonPickTimeFirstIntake"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Select Time" />
-
-    <!-- First Intake Dosage Quantity -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Quantity" />
-
-    <EditText
-        android:id="@+id/editTextQuantityFirstIntake"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Quantity (e.g., 1, 2)"
-        android:inputType="number" />
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
-    <!-- First Intake Unit Spinner -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Unit" />
+        <!-- Logo -->
+        <ImageView
+            android:id="@+id/logoImage"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/logo"
+            android:layout_marginBottom="32dp"
+            android:contentDescription="@string/logo" />
 
-    <Spinner
-        android:id="@+id/spinnerUnitFirstIntake"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <!-- First Intake Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/first_intake"
+            android:textSize="@dimen/addmedfrag_QuestiontextSize"
+            android:textColor="@color/fontColormAIN"
+            android:textStyle="bold"
+            android:layout_gravity="start"
+            android:layout_marginBottom="16dp" />
 
-    <!-- Second Intake Section -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Second Intake"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp" />
+        <!-- First Intake Time Selection -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
 
-    <!-- Second Intake Time -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Time" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/time"
+                android:textColor="@color/fontColormAIN"
+                android:textSize="@dimen/addmedfrag_nonQuestiontextSize" />
 
-    <Button
-        android:id="@+id/buttonPickTimeSecondIntake"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Select Time" />
+            <Button
+                android:id="@+id/buttonPickTimeFirstIntake"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_button"
+                android:elevation="4dp"
+                android:paddingHorizontal="24dp"
+                android:text="@string/select"
+                android:textColor="#FFFFFF"
+                tools:ignore="DuplicateSpeakableTextCheck" />
+        </LinearLayout>
 
-    <!-- Second Intake Dosage Quantity -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Quantity" />
+        <!-- First Intake Dosage Quantity and Spinner in One Line -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
 
-    <EditText
-        android:id="@+id/editTextQuantitySecondIntake"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Quantity (e.g., 1, 2)"
-        android:inputType="number" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:layout_marginEnd="16dp">
 
-    <!-- Second Intake Unit Spinner -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Unit" />
+                <EditText
+                    android:id="@+id/editTextQuantityFirstIntake"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:hint="@string/quantity"
+                    android:inputType="number"
+                    android:textColor="@color/fontColormAIN"
+                    android:textColorHint="@color/greytext"
+                    android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
+                    tools:ignore="Autofill,DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
 
-    <Spinner
-        android:id="@+id/spinnerUnitSecondIntake"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/blueMain" />
+            </LinearLayout>
 
-    <!-- Next Button -->
-    <Button
-        android:id="@+id/nextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Next"
-        android:layout_marginTop="16dp" />
-</LinearLayout>
+            <Spinner
+                android:id="@+id/spinnerUnitFirstIntake"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/blueMain"
+                android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
+                tools:ignore="TouchTargetSizeCheck" />
+        </LinearLayout>
+
+        <!-- Second Intake Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/second_intake"
+            android:textSize="@dimen/addmedfrag_QuestiontextSize"
+            android:textColor="@color/fontColormAIN"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:layout_gravity="start"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Second Intake Time Selection -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/time"
+                android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
+                android:textColor="@color/fontColormAIN" />
+
+            <Button
+                android:id="@+id/buttonPickTimeSecondIntake"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/select"
+                android:background="@drawable/rounded_button"
+                android:textColor="#FFFFFF"
+                android:paddingHorizontal="24dp"
+                android:elevation="4dp" />
+        </LinearLayout>
+
+        <!-- Second Intake Dosage Quantity and Spinner in One Line -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="32dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:layout_marginEnd="16dp">
+
+                <EditText
+                    android:id="@+id/editTextQuantitySecondIntake"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:hint="@string/quantity"
+                    android:inputType="number"
+                    android:textColor="@color/fontColormAIN"
+                    android:textColorHint="@color/greytext"
+                    android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
+                    tools:ignore="Autofill,TouchTargetSizeCheck" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/blueMain" />
+            </LinearLayout>
+
+            <Spinner
+                android:id="@+id/spinnerUnitSecondIntake"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/blueMain"
+                android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
+                tools:ignore="TouchTargetSizeCheck" />
+        </LinearLayout>
+
+        <!-- Spacer to push the "Next" button to the bottom -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            tools:ignore="UselessLeaf" />
+
+        <!-- Next Button with Rounded Corners -->
+        <Button
+            android:id="@+id/nextButton"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="@string/next"
+            android:background="@drawable/button_rounded"
+            android:textColor="#FFFFFF"
+            android:paddingVertical="12dp"
+            android:elevation="4dp"
+            android:layout_marginBottom="32dp" />
+
+    </LinearLayout>
+</ScrollView>

@@ -78,5 +78,12 @@
     <string name="do_you_want_to_get_reminders_to_refill_your_inventory">Do you want to get reminders to refill your inventory?</string>
     <string name="threshold_for_refill">Threshold for Refill</string>
     <string name="save">Save</string>
+    <string name="intake_every">Intake every</string>
+    <string name="hours">hours</string>
+    <string name="starting_at">Starting at</string>
+    <string name="intake_on_selected_days">Intake on [Selected Days]</string>
+    <string name="time">Time</string>
+    <string name="first_intake">First Intake</string>
+    <string name="second_intake">Second Intake</string>
 
 </resources>

@@ -1,40 +1,123 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:gravity="center_horizontal"
+    android:padding="32dp"
+    android:background="@color/bg_main">
 
+    <!-- Logo -->
+    <ImageView
+        android:id="@+id/logoImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/logo"
+        android:layout_marginBottom="32dp"
+        android:contentDescription="@string/logo" />
+
+    <!-- Selected Days Text -->
     <TextView
         android:id="@+id/textViewSelectedDays"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Intake on [Selected Days]"
-        android:textSize="18sp"
-        android:layout_marginBottom="16dp" />
+        android:text="@string/intake_on_selected_days"
+        android:textSize="@dimen/addmedfrag_QuestiontextSize"
+        android:textAlignment="textStart"
+        android:layout_gravity="start"
+        android:layout_marginBottom="40dp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/fontColormAIN"
+        />
 
-    <Button
-        android:id="@+id/buttonPickTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Pick Time" />
-
-    <EditText
-        android:id="@+id/editTextQuantity"
+    <!-- Time Selection Button Right-Aligned -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter dosage quantity"
-        android:inputType="number" />
+        android:orientation="horizontal"
+        android:layout_marginBottom="20dp">
 
-    <Spinner
-        android:id="@+id/spinnerDose"
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/time"
+            android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
+            android:textColor="@color/fontColormAIN" />
+
+        <Button
+            android:id="@+id/buttonPickTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select"
+            android:background="@drawable/rounded_button"
+            android:textColor="#FFFFFF"
+            android:paddingHorizontal="24dp"
+            android:elevation="4dp" />
+    </LinearLayout>
+
+    <!-- Quantity and Dose Spinner in One Line -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="32dp"
+        android:paddingTop="20dp">
 
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+
+            android:layout_marginEnd="16dp">
+
+            <!-- Quantity EditText with Bottom Line -->
+            <EditText
+                android:id="@+id/editTextQuantity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/quantity"
+                android:inputType="number"
+                android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
+                android:background="@android:color/transparent"
+                android:textColor="@color/fontColormAIN"
+                android:textColorHint="@color/greytext"
+                tools:ignore="TouchTargetSizeCheck" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/blueMain" />
+        </LinearLayout>
+
+        <!-- Dose Spinner -->
+        <Spinner
+            android:id="@+id/spinnerDose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/blueMain"
+            android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
+            tools:ignore="TouchTargetSizeCheck" />
+    </LinearLayout>
+
+    <!-- Spacer to push the "Next" button to the bottom -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Next Button with Rounded Corners -->
     <Button
         android:id="@+id/nextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
         android:text="Next"
-        android:layout_marginTop="16dp" />
+        android:background="@drawable/button_rounded"
+        android:textColor="#FFFFFF"
+        android:paddingVertical="12dp"
+        android:elevation="4dp"
+        android:layout_marginBottom="32dp" />
+
 </LinearLayout>

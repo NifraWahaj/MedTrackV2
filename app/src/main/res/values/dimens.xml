@@ -35,6 +35,8 @@
 
     <dimen name="addmedfrag_nonQuestiontextSize">18sp</dimen>
     <dimen name="addmedfrag_QuestiontextSize">20sp</dimen>
+    <dimen name="addmedfrag_hints">18sp</dimen>
+
 
 
 
