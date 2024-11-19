@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_vertical"
+    >
+    <!-- Back Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:background="@color/blueDark"
+        android:gravity="center_vertical|start">
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:src="@drawable/go_back"
+            android:contentDescription="Back"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:layout_gravity="center_vertical" />
+
+        <!-- Page Title (centered) -->
+        <TextView
+            android:id="@+id/pageTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Blog Post"
+            android:textColor="#ffffff"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+
+        <TextView
+            android:id="@+id/tvRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/ratings"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginStart="40dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent@+id/textView4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.496" />
+
+
+
+        <RatingBar
+            android:id="@+id/reviewRatingBar"
+            style="?android:attr/ratingBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+             android:numStars="5"
+            android:stepSize="0.8"
+            android:scaleX="0.7"
+        android:scaleY="0.7"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvRating" />
+
+        <View
+            android:id="@+id/verticalSeparator"
+            android:layout_width="1dp"
+            android:layout_height="100dp"
+            android:background="@color/lightgrey"
+            app:layout_constraintStart_toEndOf="@id/tvRating"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvRating"
+            app:layout_constraintBottom_toBottomOf="@+id/tvRating"
+            android:layout_marginEnd="8dp" />
+        <TextView
+            android:id="@+id/tvReviews"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/reviews"
+            app:layout_constraintStart_toEndOf="@id/verticalSeparator"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvRating"
+            app:layout_constraintBottom_toBottomOf="@+id/tvRating"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+
+            android:textStyle="bold">
+
+        </TextView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- RecyclerView to display the list of items -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewCommunity"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"
+        android:padding="8dp"
+        tools:listitem="@layout/single_item_ratings_reviews" />
+
+
+
+
+</LinearLayout>
