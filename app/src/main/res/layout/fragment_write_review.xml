@@ -71,22 +71,23 @@
 
     <!-- Review EditText -->
     <EditText
-        android:id="@+id/reviewEditText"
+        android:id="@+id/etReview"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:hint="@string/write_your_review_here"
-        android:textColor="@color/black"
-        android:textColorHint="@color/black"
-         android:padding="12dp"
         android:layout_marginTop="16dp"
-        android:gravity="top"
-        android:outlineAmbientShadowColor="@color/black"
         android:background="@color/bluelight"
+        android:gravity="top"
+        android:hint="@string/write_your_review_here"
         android:inputType="textMultiLine"
-        android:minHeight="120dp" />
+        android:minHeight="120dp"
+        android:outlineAmbientShadowColor="@color/black"
+        android:padding="12dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black" />
+
     <Button
-        android:id="@+id/btnLogin"
+        android:id="@+id/btnSubmit"
         android:layout_width="300dp"
         android:layout_marginTop="30dp"
         android:layout_height="@dimen/loginButtonheight"

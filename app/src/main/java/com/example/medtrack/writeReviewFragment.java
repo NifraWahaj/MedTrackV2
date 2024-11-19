@@ -1,64 +1,107 @@
 package com.example.medtrack;
 
+import android.graphics.PorterDuff;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RatingBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link writeReviewFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class writeReviewFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
+    private RatingBar ratingBar;
+    private TextView tvTitle;
+    private EditText etReview;
+    private  String title,review,blogId;
+    private    float userRating;
+    private Button btnSubmit;
+    private ImageButton backButton;
     public writeReviewFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment writeReviewFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static writeReviewFragment newInstance(String param1, String param2) {
-        writeReviewFragment fragment = new writeReviewFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_write_review, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_write_review, container, false);
+
+        // Initialize RatingBar and TextView
+        ratingBar = rootView.findViewById(R.id.reviewRatingBar);
+        tvTitle=rootView.findViewById(R.id.tvTitle);
+        etReview= rootView.findViewById(R.id.etReview);
+        btnSubmit=rootView.findViewById(R.id.btnSubmit);
+        backButton= rootView.findViewById(R.id.backButton);
+        // Get the rating passed from BlogPostFragment
+        // Handle back button click to navigate back to BlogContentFragment
+
+        backButton.setOnClickListener(v -> {
+            getParentFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+           // getParentFragmentManager().popBackStack("WRITE_REVIEW_FRAGMENT", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            return;
+
+
+        });
+
+        if (getArguments() != null) {
+              userRating = getArguments().getFloat("userRating", 0f);
+              title= getArguments().getString("blogTitle","Users Blog");
+          blogId=getArguments().getString( "blogId");
+
+            // Set the received rating to the RatingBar in WriteReviewFragment
+            tvTitle.setText(title);
+            ratingBar.setRating(userRating);
+            // Get the progress drawable
+            LayerDrawable stars = (LayerDrawable) ratingBar.getProgressDrawable();
+
+// Change the color of the filled stars
+            stars.getDrawable(2).setColorFilter(ContextCompat.getColor(getContext(), R.color.ratingColor), PorterDuff.Mode.SRC_ATOP);
+            // Retrieve blogId from the arguments
+         }
+
+
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Toast.makeText(getActivity(), "Button clicked!", Toast.LENGTH_SHORT).show();
+                userRating= ratingBar.getRating();
+                review=etReview.getText().toString();
+                FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
+                DatabaseReference blogsref = database.getReference("reviews");
+                Map<String, Object> reviewData = new HashMap<>();
+                //user id and user name
+                reviewData.put("BlogTitle", title);
+                reviewData.put("BlogId", blogId);
+                reviewData.put("rating", userRating);
+                reviewData.put("review",review);
+                blogsref.push().setValue(reviewData)
+                        .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Blog saved to Firebase!", Toast.LENGTH_SHORT).show())
+                        .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to save blog", Toast.LENGTH_SHORT).show());
+            }
+
+             }
+        );
+        return rootView;
     }
 }

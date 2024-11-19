@@ -2,11 +2,14 @@ package com.example.medtrack;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.text.Spannable;
@@ -17,9 +20,12 @@ import android.text.style.RelativeSizeSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RatingBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +42,10 @@ import java.util.List;
 
 public class BlogContentFragment extends Fragment {
     private TextView etTitle, etBlogContent;
-    private String blogId;
+    private String blogId,title;
+    private ScrollView scrollView;
+    private RatingBar ratingBar;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -45,15 +54,55 @@ public class BlogContentFragment extends Fragment {
 
         etTitle = view.findViewById(R.id.etTitle);
         etBlogContent = view.findViewById(R.id.etBlogContent);
+        ratingBar = view.findViewById(R.id.rating);
+        scrollView= view.findViewById(R.id.ScrollViewBlogContent);
+        // Get the progress drawable
+        LayerDrawable stars = (LayerDrawable) ratingBar.getProgressDrawable();
 
+// Change the color of the filled stars
+        stars.getDrawable(2).setColorFilter(ContextCompat.getColor(getContext(), R.color.ratingColor), PorterDuff.Mode.SRC_ATOP);
         // Retrieve blogId from the arguments
         if (getArguments() != null) {
             blogId = getArguments().getString("blogId");
         }
+        ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
+            // When rating is changed, pass it to the WriteReviewFragment
+            Bundle bundle = new Bundle();
+            bundle.putFloat("userRating", rating);
+            bundle.putString("blogTitle",title);
+            bundle.putString("blogId",blogId);
+            // Create a new instance of WriteReviewFragment
+            writeReviewFragment writeReviewFragment = new writeReviewFragment();
+            writeReviewFragment.setArguments(bundle);
+           scrollView.setVisibility(View.GONE);
+            // Navigate to WriteReviewFragment
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.main_container, writeReviewFragment)
+                    .addToBackStack("WRITE_REVIEW_FRAGMENT")
+                    .commit();
+
+        });
 
         fetchBlogContent(blogId);  // Fetch content based on blogId
+// Check the fragment back stack size
+        getParentFragmentManager().addOnBackStackChangedListener(() -> {
+            if (getParentFragmentManager().getBackStackEntryCount() == 1) {
+                // No fragments in back stack, so restore visibility of RecyclerView and Button
+                ratingBar.setRating(0.0f);  // Reset the rating to 0.0f (no rating)
+                scrollView.setVisibility(View.VISIBLE);
 
+            }
+        });
         return view;
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("BlogContentFragment", "onResume called");
+
+        // Reset RatingBar and visibility when coming back
+        ratingBar.setRating(0.0f);  // Reset the rating to 0.0f (no rating)
+        scrollView.setVisibility(View.VISIBLE);  // Ensure the content is visible
     }
 
     private void fetchBlogContent(String blogId) {
@@ -63,7 +112,7 @@ public class BlogContentFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    String title = snapshot.child("title").getValue(String.class);
+                      title = snapshot.child("title").getValue(String.class);
                     String json = snapshot.child("content").getValue(String.class);
                     displayFormattedText(title, json);
                 }

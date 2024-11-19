@@ -11,5 +11,5 @@
     <color name="bg_main">#FDFBF7</color>
     <color name="fontColormAIN">#000000</color>
     <color name="radioBG">#EDF2F2</color>
-
-</resources>
+    <color name="ratingColor">#FF9529</color>
+ </resources>
