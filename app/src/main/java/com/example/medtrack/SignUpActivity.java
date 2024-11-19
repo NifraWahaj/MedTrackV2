@@ -23,9 +23,14 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SignUpActivity extends AppCompatActivity {
-    private EditText etEmail, etPassword, etConfirmPassword;
+    private EditText etEmail, etPassword, etConfirmPassword,etName;
     private TextView tvLogin;
     private Button btnSignUp;
     private FirebaseAuth mAuth;
@@ -50,6 +55,7 @@ public class SignUpActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
+        etName=findViewById(R.id.etName);
         btnSignUp = findViewById(R.id.btnSignUp);
         tvLogin = findViewById(R.id.tvAlreadyHaveAnAccountLogin);
 
@@ -60,8 +66,12 @@ public class SignUpActivity extends AppCompatActivity {
                 String email = etEmail.getText().toString().trim();
                 String password = etPassword.getText().toString().trim();
                 String confirmPassword = etConfirmPassword.getText().toString().trim();
-
+                String name= etName.getText().toString().trim();
                 // Validation checks
+                if (TextUtils.isEmpty(name)) {
+                    Toast.makeText(SignUpActivity.this, "Name can't be empty", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (TextUtils.isEmpty(email)) {
                     Toast.makeText(SignUpActivity.this, "Email can't be empty", Toast.LENGTH_SHORT).show();
                     return;
@@ -83,6 +93,17 @@ public class SignUpActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     Log.d(TAG, "createUserWithEmail:success");
                                     Toast.makeText(SignUpActivity.this, "Sign-up successful", Toast.LENGTH_SHORT).show();
+
+                                    // storing user in db
+                                    FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
+                                    DatabaseReference userRef = database.getReference("users");
+                                    Map<String, Object> userData = new HashMap<>();
+                                    userData.put("name", name);
+                                    userData.put("email", email);
+                                    userData.put("password",password);
+                                    userRef.push().setValue(userData)
+                                            .addOnSuccessListener(aVoid -> Toast.makeText(getApplicationContext(), "user saved to Firebase!", Toast.LENGTH_SHORT).show())
+                                            .addOnFailureListener(e -> Toast.makeText(getApplicationContext(), "Failed to save user", Toast.LENGTH_SHORT).show());
 
                                     // Redirect to LoginActivity
                                     Intent i = new Intent(SignUpActivity.this, LoginActivity.class);

@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -56,6 +57,7 @@ public class writeReviewFragment extends Fragment {
         // Handle back button click to navigate back to BlogContentFragment
 
         backButton.setOnClickListener(v -> {
+
 
             getParentFragmentManager().popBackStack("WRITE_REVIEW_FRAGMENT", FragmentManager.POP_BACK_STACK_INCLUSIVE);
             return;

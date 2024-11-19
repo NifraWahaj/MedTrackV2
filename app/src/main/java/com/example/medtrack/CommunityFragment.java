@@ -113,6 +113,18 @@ import java.util.List;
              }
          });
      }
+     @Override
+     public void onResume() {
+         super.onResume();
+         Log.d("BlogContentFragment", "onResume called");
+
+         recyclerView.setVisibility(View.VISIBLE);
+         btnCommunity.setVisibility(View.VISIBLE);
+         etSearch.setVisibility(View.VISIBLE);
+         btnSearch.setVisibility(View.VISIBLE);
+         linearLayoutCommunity.setVisibility(View.VISIBLE);
+
+     }
 
      // Filter blogs based on search query
      private void filterBlogs(String query) {
@@ -149,10 +161,13 @@ import java.util.List;
 
          try {
              Log.d("CommunityFragment", "Attempting to replace fragment...");
+
+
              getParentFragmentManager().beginTransaction()
-                     .replace(R.id.main_container, fragment)
-                     .addToBackStack(null)
+                     .replace(R.id.main_container, fragment, "BLOG_CONTENT_FRAGMENT")
+                     .addToBackStack("BLOG_CONTENT_FRAGMENT")
                      .commit();
+
          } catch (Exception e) {
              Log.e("CommunityFragment", "Error during fragment transaction: " + e.getMessage());
          }

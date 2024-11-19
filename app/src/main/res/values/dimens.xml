@@ -8,9 +8,9 @@
 
     <dimen name="LogoImageWidth">200dp</dimen>
     <dimen name="LogoImageHeight">100dp</dimen>
-    <dimen name="LogoImageMarginTop">-500dp</dimen>
+    <dimen name="LogoImageMarginTop">-400dp</dimen>
 
-    <dimen name="tvWelcomeToMedTrackMarginTop">25dp</dimen>
+    <dimen name="tvWelcomeToMedTrackMarginTop">20dp</dimen>
     <dimen name="tvWelcomeToMedTrackTextSize">26sp</dimen>
 
 

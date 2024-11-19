@@ -11,6 +11,7 @@ import android.os.Bundle;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -24,6 +25,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.RatingBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -45,7 +47,8 @@ public class BlogContentFragment extends Fragment {
     private String blogId,title;
     private ScrollView scrollView;
     private RatingBar ratingBar;
-
+    private RatingBar.OnRatingBarChangeListener ratingBarChangeListener;
+    private ImageButton backButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,6 +59,7 @@ public class BlogContentFragment extends Fragment {
         etBlogContent = view.findViewById(R.id.etBlogContent);
         ratingBar = view.findViewById(R.id.rating);
         scrollView= view.findViewById(R.id.ScrollViewBlogContent);
+        backButton=view.findViewById(R.id.backButton);
         // Get the progress drawable
         LayerDrawable stars = (LayerDrawable) ratingBar.getProgressDrawable();
 
@@ -65,33 +69,44 @@ public class BlogContentFragment extends Fragment {
         if (getArguments() != null) {
             blogId = getArguments().getString("blogId");
         }
-        ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
-            // When rating is changed, pass it to the WriteReviewFragment
-            Bundle bundle = new Bundle();
-            bundle.putFloat("userRating", rating);
-            bundle.putString("blogTitle",title);
-            bundle.putString("blogId",blogId);
-            // Create a new instance of WriteReviewFragment
-            writeReviewFragment writeReviewFragment = new writeReviewFragment();
-            writeReviewFragment.setArguments(bundle);
-           scrollView.setVisibility(View.GONE);
-            // Navigate to WriteReviewFragment
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.main_container, writeReviewFragment)
-                    .addToBackStack("WRITE_REVIEW_FRAGMENT")
-                    .commit();
+         ratingBarChangeListener = (ratingBar, rating, fromUser) -> {
+            if (fromUser) {  // Ensure the change was user-initiated
+                ratingBar.setOnRatingBarChangeListener(null);  // Temporarily disable
+                Bundle bundle = new Bundle();
+                bundle.putFloat("userRating", rating);
+                bundle.putString("blogTitle", title);
+                bundle.putString("blogId", blogId);
+                writeReviewFragment writeReviewFragment = new writeReviewFragment();
+                writeReviewFragment.setArguments(bundle);
+              //  scrollView.setVisibility(View.GONE);
 
-        });
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.main_container, writeReviewFragment, "WRITE_REVIEW_FRAGMENT")
+                        .addToBackStack("WRITE_REVIEW_FRAGMENT")
+                        .commit();
+
+                ratingBar.postDelayed(() -> ratingBar.setOnRatingBarChangeListener(ratingBarChangeListener), 500);  // Re-enable after a short delay
+            }
+        };
+        ratingBar.setOnRatingBarChangeListener(ratingBarChangeListener);
+
 
         fetchBlogContent(blogId);  // Fetch content based on blogId
 // Check the fragment back stack size
         getParentFragmentManager().addOnBackStackChangedListener(() -> {
             if (getParentFragmentManager().getBackStackEntryCount() == 1) {
-                // No fragments in back stack, so restore visibility of RecyclerView and Button
-                ratingBar.setRating(0.0f);  // Reset the rating to 0.0f (no rating)
+                 ratingBar.setRating(0.0f);  // Reset the rating to 0.0f (no rating)
+              //  ratingBar.setVisibility(View.GONE);
                 scrollView.setVisibility(View.VISIBLE);
 
             }
+        });
+        backButton.setOnClickListener(v -> {
+         getActivity().onBackPressed();
+          //  getParentFragmentManager().popBackStack("BLOG_CONTENT_FRAGMENT", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+           //return;
+
+
         });
         return view;
     }

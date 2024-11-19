@@ -54,25 +54,19 @@
     <string name="blog_title">Blog Title</string>
     <string name="blog_description">BLog description</string>
     <string name="write_blog">Write Blog</string>
-<<<<<<< HEAD
-     <string name="rate_this_blog">Rate this blog</string>
-=======
+
     <string name="rate_this_blog">Rate this blog</string>
->>>>>>> 99c4585511b569904977172e9fd3b8169712f0aa
-    <string name="write_a_review">Write a review</string>
+     <string name="write_a_review">Write a review</string>
     <string name="ratings_and_reviews">Ratings and reviews</string>
     <string name="write_your_review_here">Write your review here...</string>
     <string name="submit">Submit</string>
     <string name="reviews">Reviews</string>
     <string name="ratings">Ratings</string>
     <string name="author">Author</string>
-<<<<<<< HEAD
-     <string name="which_medication_would_you_like_to_set_the_reminder_for">Which medication would you like to set the reminder for?</string>
-=======
+
 
     <string name="which_medication_would_you_like_to_set_the_reminder_for">Which medication would you like to set the reminder for?</string>
->>>>>>> 99c4585511b569904977172e9fd3b8169712f0aa
-    <string name="med_name">Name</string>
+     <string name="med_name">Name</string>
     <string name="med_next">Next</string>
     <string name="how_often_do_you_take_this_medication">How often do you take this medication?</string>
     <string name="once_daily">Once daily</string>
@@ -95,8 +89,7 @@
     <string name="do_you_want_to_get_reminders_to_refill_your_inventory">Do you want to get reminders to refill your inventory?</string>
     <string name="threshold_for_refill">Threshold for Refill</string>
     <string name="save">Save</string>
-<<<<<<< HEAD
-=======
+
     <string name="intake_every">Intake every</string>
     <string name="hours">hours</string>
     <string name="starting_at">Starting at</string>
@@ -104,6 +97,6 @@
     <string name="time">Time</string>
     <string name="first_intake">First Intake</string>
     <string name="second_intake">Second Intake</string>
->>>>>>> 99c4585511b569904977172e9fd3b8169712f0aa
+    <string name="enter_your_name">Enter your Name</string>
 
 </resources>
