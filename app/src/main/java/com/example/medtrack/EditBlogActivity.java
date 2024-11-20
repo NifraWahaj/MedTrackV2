@@ -3,6 +3,7 @@ package com.example.medtrack;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -90,16 +91,18 @@ public class EditBlogActivity extends AppCompatActivity {
     private boolean isSimpleText =false;
     private boolean isBloqQuote=false;
 
-    private String lastSavedText = "";  // Track last saved state of the text
+    private String lastSavedText = "",  blogId ;  // Track last saved state of the text
     private Handler handler = new Handler();
     private Runnable saveStateRunnable;  // Runnable to periodically save state
     private Stack<CharSequence> undoStack = new Stack<>();
     private Stack<CharSequence> redoStack = new Stack<>();
-
+    boolean isEdit;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_blog);
+        Intent intent = getIntent();
+          isEdit = intent.getBooleanExtra("isEdit",false); // Default to false if not provided
 
         btnpost= findViewById(R.id.btnPost);
         etBlogContent = findViewById(R.id.etBlogContent);
@@ -112,7 +115,12 @@ public class EditBlogActivity extends AppCompatActivity {
         btnGoBack=findViewById(R.id.btnGoBack);
         etBlogContent.setText(spannableStringBuilder);
         etBlogContent.setMovementMethod(LinkMovementMethod.getInstance()); // for adding links
-
+        if(isEdit==true) {
+              blogId = intent.getStringExtra("blogId");
+            String blogTitle = intent.getStringExtra("blogTitle");
+            String blogContent = intent.getStringExtra("blogContent");
+            displayFormattedText(blogTitle,blogContent);
+        }
         // TextWatcher to apply formatting to newly typed text when bold/italic is active
         etBlogContent.addTextChangedListener(new TextWatcher() {
             private int lastStart = 0;
@@ -182,7 +190,10 @@ public class EditBlogActivity extends AppCompatActivity {
     }
 
     private void setupButtons() {
-        btnGoBack.setOnClickListener(v -> finish()); // Close the current activity
+        btnGoBack.setOnClickListener(v ->{
+
+            finish();
+        }  ); // Close the current activity
 
         btnpost.setOnClickListener(v->
         {  if(etBlogContent.getText().toString().isEmpty()||etBlogContent.getText().toString()==null || etTitle.getText().toString().isEmpty()|| etTitle.getText().toString()==null){
@@ -863,6 +874,20 @@ public class EditBlogActivity extends AppCompatActivity {
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
         DatabaseReference blogsRef = database.getReference("blogs");
 
+        if(isEdit==true){
+            DatabaseReference blogRef = blogsRef.child(blogId);
+            Map<String, Object> blogData = new HashMap<>();
+            blogData.put("title", title);
+            blogData.put("userEmail", UserUtils.getUserEmail(this));
+            blogData.put("userName", UserUtils.getUserName(this));
+            blogData.put("content", json); // Store formatted text content as JSON
+            blogData.put("isApproved", false);
+
+            blogRef.updateChildren(blogData)
+                    .addOnSuccessListener(aVoid -> Toast.makeText(this, "Blog updated successfully!", Toast.LENGTH_SHORT).show())
+                    .addOnFailureListener(e -> Toast.makeText(this, "Failed to update blog", Toast.LENGTH_SHORT).show());
+        }
+        else{
         Map<String, Object> blogData = new HashMap<>();
         blogData.put("title", title);
         blogData.put("userEmail", UserUtils.getUserEmail(this));
@@ -873,6 +898,111 @@ public class EditBlogActivity extends AppCompatActivity {
         blogsRef.push().setValue(blogData)
                 .addOnSuccessListener(aVoid -> Toast.makeText(this, "Blog saved to Firebase!", Toast.LENGTH_SHORT).show())
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to save blog", Toast.LENGTH_SHORT).show());
+    }}
+    private void displayFormattedText(String title, String json) {
+        // Parse the JSON content to get the formatted text
+        Gson gson = new Gson();
+        Type listType = new TypeToken<List<FormattedText>>() {
+        }.getType();
+        List<FormattedText> formattedTexts = gson.fromJson(json, listType);
+
+        SpannableStringBuilder spannableText = new SpannableStringBuilder();
+
+        for (FormattedText formattedText : formattedTexts) {
+            Spannable spanText;
+
+            if (formattedText.getImageBase64() != null) {
+                // Decode the image from base64 and add it to the spannable text
+                Bitmap bitmap = base64ToBitmap(formattedText.getImageBase64());
+                Drawable drawable = new BitmapDrawable(getResources(), bitmap);
+                drawable.setBounds(0, 0, 400, 400);
+                ImageSpan imageSpan = new ImageSpan(drawable);
+
+                spanText = new SpannableString(" ");
+                spanText.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            } else {
+                spanText = new SpannableString(formattedText.getText());
+
+                // Apply formatting
+                if (formattedText.isBold()) {
+                    spanText.setSpan(new StyleSpan(Typeface.BOLD), 0, formattedText.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+                if (formattedText.isItalic()) {
+                    spanText.setSpan(new StyleSpan(Typeface.ITALIC), 0, formattedText.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+                if (formattedText.isStrikethrough()) {
+                    spanText.setSpan(new StrikethroughSpan(), 0, formattedText.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+                if (formattedText.getRelativeSize() > 1.0f) {
+                    spanText.setSpan(new RelativeSizeSpan(formattedText.getRelativeSize()), 0, formattedText.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+                // Handle clickable links
+
+                // Handle clickable links using ClickableSpan
+                if (formattedText.getLink() != null) {
+                    final String url = formattedText.getLink();
+                    SpannableString spannableString = new SpannableString(url);
+
+                    // Create ClickableSpan
+                    ClickableSpan clickableSpan = new ClickableSpan() {
+                        @Override
+                        public void onClick(@NonNull View widget) {
+                            // Open the URL in Chrome explicitly
+                            String url = widget.getTag().toString();  // Ensure URL is correctly passed to the method
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            intent.setPackage("com.android.chrome");  // Target Chrome
+                            try {
+                                // Check if Chrome is installed
+                                if (intent.resolveActivity( getPackageManager()) != null) {
+                                    try {
+                                        startActivity(intent);  // Launch Chrome if installed
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                        // Fallback to default browser if there's an error
+                                        Intent defaultIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                             startActivity(defaultIntent);
+
+                                    }
+                                } else {
+                                    // If Chrome is not installed, open the default browser
+                                    Intent defaultIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                         startActivity(defaultIntent);
+
+                                }}
+                            catch (Exception e) {
+                                e.printStackTrace();
+                                Toast.makeText(getApplication(), "Unable to open link: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+
+
+                        @Override
+                        public void updateDrawState(@NonNull TextPaint ds) {
+                            super.updateDrawState(ds);
+                            ds.setColor(ContextCompat.getColor(getApplicationContext(), android.R.color.holo_blue_dark));  // Set the color to blue
+                            ds.setUnderlineText(true);  // Set the text to be underlined
+                        }
+                    };
+
+                    // Apply the clickable span to the entire URL
+                    spannableString.setSpan(clickableSpan, 0, url.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    spanText = spannableString;
+                }
+            }
+
+            spannableText.append(spanText);
+        }
+
+        // Set the formatted text to the TextView
+
+
+        etTitle.setText(title);
+        etBlogContent.setText(spannableText);
+        etBlogContent.setMovementMethod(LinkMovementMethod.getInstance());
+        etBlogContent.setClickable(true); // Make sure the TextView itself is clickable
+        etBlogContent.setFocusableInTouchMode(true); // Make sure the TextView can handle touch interactions
+
     }
 
 

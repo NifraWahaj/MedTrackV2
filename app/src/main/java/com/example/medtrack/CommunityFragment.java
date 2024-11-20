@@ -31,7 +31,7 @@ import java.util.List;
      private BlogAdapter blogAdapter;
      private List<Blog> blogList = new ArrayList<>();
      private List<Blog> filteredBlogList = new ArrayList<>();
-     private Button btnCommunity, btnSearch;
+     private Button btnCommunity, btnSearch,btnYourBlog;
      private EditText etSearch;
      private LinearLayout linearLayoutCommunity;
      public CommunityFragment() {
@@ -53,9 +53,18 @@ import java.util.List;
          btnCommunity = view.findViewById(R.id.buttonCommunity);
          btnSearch = view.findViewById(R.id.btnSearch);
          etSearch = view.findViewById(R.id.etSearch);
-
+         btnYourBlog=view.findViewById(R.id.btnYourBlogs);
          btnCommunity.setOnClickListener(v -> {
              Intent i = new Intent(getActivity(), EditBlogActivity.class);
+             i.putExtra("isEdit", false);
+
+             startActivity(i);
+         });
+         // Handle btnYourBlog click (to move to YourBlogFragment)
+         btnYourBlog.setOnClickListener(v -> {
+              Intent i = new Intent(getActivity(), usersBlogActivity.class);
+             i.putExtra("isEdit", false);
+
              startActivity(i);
          });
 
@@ -75,6 +84,8 @@ import java.util.List;
                  etSearch.setVisibility(View.VISIBLE);
                  btnSearch.setVisibility(View.VISIBLE);
                  linearLayoutCommunity.setVisibility(View.VISIBLE);
+                 btnYourBlog.setVisibility(View.VISIBLE);
+
              }
          });
          return view;
@@ -123,6 +134,8 @@ import java.util.List;
          etSearch.setVisibility(View.VISIBLE);
          btnSearch.setVisibility(View.VISIBLE);
          linearLayoutCommunity.setVisibility(View.VISIBLE);
+         btnYourBlog.setVisibility(View.VISIBLE);
+
 
      }
 
@@ -158,6 +171,7 @@ import java.util.List;
          etSearch.setVisibility(View.GONE);
          btnSearch.setVisibility(View.GONE);
          linearLayoutCommunity.setVisibility(View.GONE);
+         btnYourBlog.setVisibility(View.GONE);
 
          try {
              Log.d("CommunityFragment", "Attempting to replace fragment...");
