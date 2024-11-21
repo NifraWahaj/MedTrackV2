@@ -15,32 +15,32 @@
         android:theme="@style/AppTheme"
         tools:targetApi="31">
         <activity
-            android:name=".RatingsReviewsListActivity"
+            android:name=".activities.RatingsReviewsListActivity"
             android:exported="false" />
         <activity
-            android:name=".WriteReviewActivity"
+            android:name=".activities.WriteReviewActivity"
             android:exported="false" />
         <activity
-            android:name=".BlogContentActivity"
+            android:name=".activities.BlogContentActivity"
             android:exported="false" />
 
         <activity
-            android:name=".usersBlogActivity"
+            android:name=".activities.usersBlogActivity"
             android:exported="false" />
         <activity
-            android:name=".EditBlogActivity"
+            android:name=".activities.EditBlogActivity"
             android:exported="false" />
         <activity
-            android:name=".AddMedActivity"
+            android:name=".activities.AddMedActivity"
             android:exported="false" />
         <activity
-            android:name=".SignUpActivity"
+            android:name=".activities.SignUpActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".activities.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".SplashActivity"
+            android:name=".activities.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -49,7 +49,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:launchMode="singleTop"
 
         android:exported="false" />
