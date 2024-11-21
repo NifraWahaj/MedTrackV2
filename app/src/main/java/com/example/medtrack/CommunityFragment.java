@@ -91,31 +91,34 @@ import java.util.List;
          return view;
      }
 
-     // Fetch blogs from Firebase
      private void fetchBlogsFromFirebase() {
          DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("blogs");
+
+         // Attach the listener to get updates
          databaseReference.addValueEventListener(new ValueEventListener() {
              @Override
              public void onDataChange(DataSnapshot dataSnapshot) {
-                 blogList.clear(); // Clear the previous data
+                 blogList.clear();  // Clear previous data for a fresh list
                  Log.d("CommunityFragment", "Number of blogs: " + dataSnapshot.getChildrenCount());
 
+                 // Iterate over each blog in the snapshot
                  for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                      String id = snapshot.getKey();
                      String title = snapshot.child("title").getValue(String.class);
                      String content = snapshot.child("content").getValue(String.class);
-                     boolean isApproved = snapshot.child("isApproved").getValue(Boolean.class); // Use Boolean.class for a boolean value
-                     Log.d("CommunityFragment", "Blog Title: " + title);
-                     Log.d("CommunityFragment", "Blog Content: " + content);
-                    if(isApproved==true) {
-                        Blog blog = new Blog(id, title, content, isApproved);
-                        blogList.add(blog);
-                    }
+                     Boolean isApproved = snapshot.child("isApproved").getValue(Boolean.class);
+
+                     if (isApproved != null && isApproved) {
+                         Blog blog = new Blog(id, title, content, isApproved);
+                         blogList.add(blog);  // Add each blog to the list
+                         Log.d("CommunityFragment", "Blog Title: " + title);  // Debugging log
+                     }
                  }
 
-                 // Initially, show all blogs in the RecyclerView
-                 filteredBlogList.addAll(blogList);
-                 blogAdapter.notifyDataSetChanged();
+                 // Update the filtered list and notify adapter
+                 filteredBlogList.clear();  // Clear filtered list
+                 filteredBlogList.addAll(blogList);  // Add all blogs to filtered list
+                 blogAdapter.notifyDataSetChanged();  // Notify adapter to refresh the view
              }
 
              @Override
@@ -124,6 +127,7 @@ import java.util.List;
              }
          });
      }
+
      @Override
      public void onResume() {
          super.onResume();

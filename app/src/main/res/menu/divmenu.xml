@@ -28,7 +28,7 @@
         android:id="@+id/heading4"
         android:title="@string/minor_heading"/>
     <item
-        android:icon="@drawable/normal"
+        android:icon="@drawable/normal_text"
 
         android:id="@+id/simple"
         android:title="@string/simple_text"/>

@@ -109,8 +109,13 @@ Toast.makeText(this,"inside ratingsrviewlsit ",Toast.LENGTH_SHORT).show();
             sum += review.getRating();
         }
 
-        sum = sum / reviewList.size();
-        tvRating.setText(sum + " Ratings");
-        reviewRatingBar.setRating(sum);
+        float average = sum / reviewList.size();
+        // Round to 2 decimal places
+        average = Math.round(average * 100.0f) / 100.0f;
+
+        // Update the UI with the rounded average rating
+        tvRating.setText(average + " Ratings");
+        reviewRatingBar.setRating(average);
     }
+
 }

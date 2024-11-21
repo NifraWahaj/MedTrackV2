@@ -81,7 +81,7 @@ public class usersBlogActivity extends Activity implements BlogAdapter.OnBlogCli
                     boolean isApproved = snapshot.child("isApproved").getValue(Boolean.class); // Use Boolean.class for boolean value
                     Toast.makeText(usersBlogActivity.this, "EMAIL FETCHED ARE: " + email, Toast.LENGTH_SHORT).show();
 
-                    if (email != null && email.equals(userEmail)) {
+                    if (email != null && email.equals(userEmail) &&isApproved==true) {
                         Blog blog = new Blog(id, title, content, isApproved);
                         blogList.add(blog);
                     }

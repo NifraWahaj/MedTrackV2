@@ -16,17 +16,17 @@
         android:background="@color/blueDark"
         android:gravity="center_vertical|start">
 
+        <!-- Page Title (centered) -->
         <ImageButton
             android:id="@+id/backButton"
-            android:layout_width="wrap_content"
+            android:layout_width="30dp"
             android:layout_height="wrap_content"
 
-            android:src="@drawable/go_back"
-            android:contentDescription="Back"
+            android:layout_gravity="center_vertical"
             android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:layout_gravity="center_vertical" />
+            android:contentDescription="Back"
+            android:src="@drawable/go_back" />
 
-        <!-- Page Title (centered) -->
         <TextView
             android:id="@+id/pageTitle"
             android:layout_width="0dp"
@@ -68,6 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:isIndicator="true"
             android:numStars="5"
             android:stepSize="0.8"
             android:scaleX="0.7"

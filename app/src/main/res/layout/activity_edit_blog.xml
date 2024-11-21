@@ -193,14 +193,16 @@
                     android:id="@+id/btnBold"
 
                     android:layout_marginEnd="5dp"/>
+
                 <ImageButton
+                    android:id="@+id/btnItalic"
                     android:layout_width="wrap_content"
                     android:layout_height="58dp"
-                    android:contentDescription="@string/italic_button"
-                    android:id="@+id/btnItalic"
+                    android:layout_marginEnd="5dp"
                     android:backgroundTint="@color/bluelight"
-                    android:src="@drawable/community_btn_italic"
-                    android:layout_marginEnd="5dp"/>
+                    android:contentDescription="@string/italic_button"
+                    android:src="@drawable/community_btn_italic" />
+
                 <ImageButton
                     android:layout_width="wrap_content"
                     android:layout_height="58dp"
@@ -269,14 +271,7 @@
                     android:id="@+id/btnCenterAlign"
                     android:src="@drawable/community_btn_centeralign"
                     android:layout_marginEnd="5dp"/>
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="58dp"
-                    android:backgroundTint="@color/bluelight"
-                    android:contentDescription="@string/justify_align"
-                    android:id="@+id/btnJustify"
-                    android:src="@drawable/community_btn_justified"
-                    android:layout_marginEnd="5dp"/>
+
                 <ImageButton
                     android:layout_width="wrap_content"
                     android:layout_height="58dp"

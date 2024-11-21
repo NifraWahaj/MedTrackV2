@@ -10,12 +10,15 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.text.LineBreaker;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -23,6 +26,7 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
+import android.text.style.AlignmentSpan;
 import android.text.style.BulletSpan;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
@@ -88,6 +92,8 @@ public class EditBlogActivity extends AppCompatActivity {
     private Stack<CharSequence> undoStack = new Stack<>();
     private Stack<CharSequence> redoStack = new Stack<>();
     boolean isEdit;
+    private String Alignment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -284,8 +290,7 @@ public class EditBlogActivity extends AppCompatActivity {
         findViewById(R.id.btnLeftAlign).setOnClickListener(v -> applyLeftAlign());
         findViewById(R.id.btnCenterAlign).setOnClickListener(v -> applyCenterAlign());
         findViewById(R.id.btnRightAlign).setOnClickListener(v -> applyRightAlign());
-        findViewById(R.id.btnJustify).setOnClickListener(v -> applyJustify());
-        findViewById(R.id.btnUndo).setOnClickListener(v -> undoText());
+         findViewById(R.id.btnUndo).setOnClickListener(v -> undoText());
         findViewById(R.id.btnRedo).setOnClickListener(v -> redoText());
         findViewById(R.id.btnAddImage).setOnClickListener(v -> openImagePicker());
     }
@@ -635,19 +640,18 @@ public class EditBlogActivity extends AppCompatActivity {
 
     private void applyLeftAlign() {
         etBlogContent.setGravity(Gravity.START);
-    }
+     }
 
     private void applyCenterAlign() {
         etBlogContent.setGravity(Gravity.CENTER);
-    }
+     }
 
     private void applyRightAlign() {
         etBlogContent.setGravity(Gravity.END);
-    }
+     }
 
-    private void applyJustify() {
-        etBlogContent.setGravity(Gravity.START | Gravity.END);
-    }
+
+
 
     private void saveTextState(String newText) {
         String currentText = etBlogContent.getText().toString();
@@ -805,6 +809,7 @@ public class EditBlogActivity extends AppCompatActivity {
                     for (RelativeSizeSpan sizeSpan : sizeSpans) formattedText.setRelativeSize(sizeSpan.getSizeChange());
 
                     // Store alignment information
+
                     formattedText.setAlignment(etBlogContent.getGravity());
 
                     formattedTexts.add(formattedText);
@@ -928,7 +933,28 @@ public class EditBlogActivity extends AppCompatActivity {
                 if (formattedText.getRelativeSize() > 1.0f) {
                     spanText.setSpan(new RelativeSizeSpan(formattedText.getRelativeSize()), 0, formattedText.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
-                // Handle clickable links
+                 // Handle text alignment
+                     int gravity = formattedText.getAlignment();  // You can define alignment as an int
+                switch (gravity) {
+                    case 8388611: // Start alignment
+                        spanText.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_NORMAL),
+                                0, spanText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        break;
+                    case 17: // Center alignment
+                        spanText.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER),
+                                0, spanText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        break;
+                    case 8388613: // End alignment
+                        spanText.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE),
+                                0, spanText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        break;
+
+                    default: // Fallback for unexpected values
+                        spanText.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_NORMAL),
+                                0, spanText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        break;
+                }
+
 
                 // Handle clickable links using ClickableSpan
                 if (formattedText.getLink() != null) {

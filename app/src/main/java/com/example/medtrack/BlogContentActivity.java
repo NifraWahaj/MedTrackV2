@@ -8,13 +8,17 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.graphics.text.LineBreaker;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
+import android.text.style.AlignmentSpan;
 import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.text.style.RelativeSizeSpan;
@@ -56,7 +60,7 @@ public class BlogContentActivity extends AppCompatActivity {
     private RatingBar ratingBar;
     private boolean isEdit;
     private RatingBar.OnRatingBarChangeListener ratingBarChangeListener;
-    private ImageButton backButton, btnReviewList;
+    private ImageButton backButton, btnReviewList,ivProfilePic;
     private LinearLayout LinearLayoutRateBlog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +80,7 @@ public class BlogContentActivity extends AppCompatActivity {
         LinearLayoutRateBlog=findViewById(R.id.LinearLayoutRateBlog);
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
-
+        //ivProfilePic=findViewById(R.id.ivProfilePic);
         isEdit=false;
         // Customize RatingBar Colors
         LayerDrawable stars = (LayerDrawable) ratingBar.getProgressDrawable();
@@ -162,7 +166,7 @@ public class BlogContentActivity extends AppCompatActivity {
                     author = snapshot.child("userName").getValue(String.class);
                     authorEmail= snapshot.child("userEmail").getValue(String.class);
                     Toast.makeText(getApplicationContext(),"Auhto email "+authorEmail,Toast.LENGTH_SHORT).show();
-                    tvAuthor.setText(author);
+                    tvAuthor.setText("by "+author);
                     displayFormattedText(title, json);
                     // Only check after data is retrieved
                     if (authorEmail != null && authorEmail.equals(User.getCurrentUserEmail(BlogContentActivity.this))) {
@@ -203,6 +207,30 @@ public class BlogContentActivity extends AppCompatActivity {
                 if (formattedText.isItalic()) spanText.setSpan(new StyleSpan(Typeface.ITALIC), 0, formattedText.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 if (formattedText.isStrikethrough()) spanText.setSpan(new StrikethroughSpan(), 0, formattedText.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 if (formattedText.getRelativeSize() > 1.0f) spanText.setSpan(new RelativeSizeSpan(formattedText.getRelativeSize()), 0, formattedText.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                int gravity = formattedText.getAlignment();  // You can define alignment as an int
+                switch (gravity) {
+                    case 8388611: // Start alignment
+                        spanText.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_NORMAL),
+                                0, spanText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        break;
+                    case 17: // Center alignment
+                        spanText.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER),
+                                0, spanText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        break;
+                    case 8388613: // End alignment
+                        spanText.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE),
+                                0, spanText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        break;
+                    case 16777224: // Justify (START | END)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            etBlogContent.setJustificationMode(LineBreaker.JUSTIFICATION_MODE_INTER_WORD);
+                        }
+                        break;
+                    default: // Fallback for unexpected values
+                        spanText.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_NORMAL),
+                                0, spanText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        break;
+                }
                 if (formattedText.getLink() != null) {
                     final String url = formattedText.getLink();
                     ClickableSpan clickableSpan = new ClickableSpan() {

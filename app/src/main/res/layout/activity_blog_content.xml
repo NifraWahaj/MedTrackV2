@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/ScrollViewBlogContent"
     android:fillViewport="true">
 
@@ -52,7 +54,7 @@
             </LinearLayout>
 
             <!-- Image and Title Container -->
-            <FrameLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:layout_marginTop="8dp">
@@ -62,38 +64,57 @@
                 <!-- Blog Title -->
 
                 <ImageView
-                    android:id="@+id/headerImage"
+                    android:id="@+id/ivProfilePic"
+
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:layout_marginTop="70dp"
-                    android:layout_marginStart="20dp"
-                    android:scaleType="fitStart"
-                    android:src="@drawable/h1" />
+                    android:layout_gravity="center"
+
+                    android:background="@drawable/circular_border"
+                    android:clipToOutline="true"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/user_profile"
+
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.157"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/etTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginStart="78dp"
                     android:background="@color/blueDark"
                     android:gravity="center"
                     android:text="Blog Title"
                     android:textColor="@color/white"
                     android:textSize="24sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/ivProfilePic"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:textSize="18sp"
                     android:id="@+id/tvAuthor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:text="Author"
                     android:textColor="@color/white"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="40dp"
 
-                    android:layout_height="wrap_content"></TextView>
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.612"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/etTitle"
+                    app:layout_constraintVertical_bias="0.333"></TextView>
 
-            </FrameLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
             <ProgressBar
                 android:id="@+id/progressBar"
                 android:layout_width="wrap_content"
@@ -179,8 +200,9 @@
                 android:id="@+id/btnReviewList"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/community_btn_back"
+                android:src="@drawable/go_next"
                 android:layout_marginStart="80dp"
+                android:background="@android:color/transparent"
                 />
         </LinearLayout>
     </LinearLayout>
