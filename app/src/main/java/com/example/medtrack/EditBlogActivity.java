@@ -3,9 +3,7 @@ package com.example.medtrack;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -17,7 +15,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.Editable;
-import android.text.Html;
 import android.text.InputType;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -40,10 +37,8 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,8 +51,6 @@ import androidx.core.content.ContextCompat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,8 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 public class EditBlogActivity extends AppCompatActivity {
@@ -110,7 +101,7 @@ public class EditBlogActivity extends AppCompatActivity {
         spannableStringBuilder = new SpannableStringBuilder(etBlogContent.getText());
         undoManager = new UndoManager();
         tvusername=findViewById(R.id.tvusername);
-        tvusername.setText(UserUtils.getUserName(this));
+        tvusername.setText(User.getCurrentUserName(this));
         etBlogContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);  // Set a base size for the text in SP
         btnGoBack=findViewById(R.id.btnGoBack);
         etBlogContent.setText(spannableStringBuilder);
@@ -878,8 +869,8 @@ public class EditBlogActivity extends AppCompatActivity {
             DatabaseReference blogRef = blogsRef.child(blogId);
             Map<String, Object> blogData = new HashMap<>();
             blogData.put("title", title);
-            blogData.put("userEmail", UserUtils.getUserEmail(this));
-            blogData.put("userName", UserUtils.getUserName(this));
+            blogData.put("userEmail", User.getCurrentUserEmail(this));
+            blogData.put("userName", User.getCurrentUserName(this));
             blogData.put("content", json); // Store formatted text content as JSON
             blogData.put("isApproved", false);
 
@@ -890,8 +881,9 @@ public class EditBlogActivity extends AppCompatActivity {
         else{
         Map<String, Object> blogData = new HashMap<>();
         blogData.put("title", title);
-        blogData.put("userEmail", UserUtils.getUserEmail(this));
-        blogData.put("userName", UserUtils.getUserName(this));
+
+        blogData.put("userEmail", User.getCurrentUserEmail(this));
+        blogData.put("userName", User.getCurrentUserName(this));
         blogData.put("content", json); // Store formatted text content as JSON
         blogData.put("isApproved", false);
 

@@ -88,16 +88,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
-                if(position==0 || position==1 || position==2 || position==4){
-                    findViewById(R.id.main_container).setVisibility(View.GONE);
-                }
-                else if (position == 3) { // Ensure the container is visible on the Community tab
-                    findViewById(R.id.main_container).setVisibility(View.VISIBLE);
-                }
-                // Clear the main container's content if necessary
-                if ( findViewById(R.id.main_container) instanceof ViewGroup) {
-                    ((ViewGroup) findViewById(R.id.main_container)).removeAllViews();
-                }
+
 
                 TabLayout.Tab selectedTab = tabLayout.getTabAt(position);
                 BadgeDrawable badgeDrawable = selectedTab.getBadge();
@@ -112,21 +103,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    @Override
-    public void onBackPressed() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment currentFragment = fragmentManager.findFragmentById(R.id.main_container);
-
-        if (currentFragment instanceof BlogContentFragment) {
-            // Explicitly restore the CommunityFragment when back is pressed
-            fragmentManager.beginTransaction()
-                    .replace(R.id.main_container, new CommunityFragment())
-                    .commit();
-            return;
-        }
-
-        super.onBackPressed();
-    }
-
-
 }

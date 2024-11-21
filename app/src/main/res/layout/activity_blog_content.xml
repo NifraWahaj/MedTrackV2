@@ -8,7 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-         android:orientation="vertical">
+        android:orientation="vertical">
 
         <!-- Toolbar with Back Button and Page Title -->
         <LinearLayout
@@ -82,20 +82,26 @@
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
-                 <TextView
-                     android:layout_width="wrap_content"
-                     android:textSize="18sp"
-   android:id="@+id/tvAuthor"
-                     android:text="Author"
-                     android:textColor="@color/white"
-                     android:layout_gravity="center"
-                     android:layout_marginTop="40dp"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:textSize="18sp"
+                    android:id="@+id/tvAuthor"
+                    android:text="Author"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="40dp"
 
-                     android:layout_height="wrap_content"></TextView>
+                    android:layout_height="wrap_content"></TextView>
+
             </FrameLayout>
-        </LinearLayout>
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_centerInParent="true" />
 
-        <!-- Blog Content -->
+        </LinearLayout>
         <TextView
             android:id="@+id/etBlogContent"
             android:layout_width="match_parent"
@@ -103,9 +109,18 @@
             android:text="Blog content goes here"
             android:textColor="@color/black"
             android:textSize="16sp"
+            android:layout_gravity="center"
             android:layout_marginTop="16dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/LinearLayoutRateBlog">
+
+         <!-- Blog Content -->
+
 
         <TextView
             android:layout_width="wrap_content"
@@ -124,20 +139,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:layout_gravity="center"
+             android:layout_gravity="center"
+
             style="?android:attr/ratingBarStyle"
             android:numStars="5"
             android:stepSize="0.1"
-             />
+            />
 
         <TextView
             android:id="@+id/tvWriteAReview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+             android:layout_gravity="center"
+
             android:layout_marginStart="50dp"
             android:text="@string/write_a_review"
             android:textColor="@color/blueDark" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -157,15 +157,18 @@ import java.util.List;
 
      @Override
      public void onBlogClick(Blog blog) {
-         BlogContentFragment fragment = new BlogContentFragment();
+         // Create an Intent to start BlogContentActivity
+         Intent intent = new Intent(getContext(), BlogContentActivity.class);
 
-         Bundle bundle = new Bundle();
-         bundle.putString("blogId", blog.getId());
-         bundle.putString("blogTitle", blog.getTitle());
-         bundle.putString("blogContent", blog.getContent());
-         fragment.setArguments(bundle);
+         // Put necessary data in the Intent
+         intent.putExtra("blogId", blog.getId());
+         intent.putExtra("blogTitle", blog.getTitle());
+         intent.putExtra("blogContent", blog.getContent());
 
+         // Display a Toast for debugging
          Toast.makeText(getContext(), "Inside onBlogClick", Toast.LENGTH_SHORT).show();
+
+         // Hide the views
          recyclerView.setVisibility(View.GONE);
          btnCommunity.setVisibility(View.GONE);
          etSearch.setVisibility(View.GONE);
@@ -174,16 +177,12 @@ import java.util.List;
          btnYourBlog.setVisibility(View.GONE);
 
          try {
-             Log.d("CommunityFragment", "Attempting to replace fragment...");
-
-
-             getParentFragmentManager().beginTransaction()
-                     .replace(R.id.main_container, fragment, "BLOG_CONTENT_FRAGMENT")
-                     .addToBackStack("BLOG_CONTENT_FRAGMENT")
-                     .commit();
+             // Start BlogContentActivity
+             Log.d("CommunityFragment", "Attempting to start BlogContentActivity...");
+             startActivity(intent);
 
          } catch (Exception e) {
-             Log.e("CommunityFragment", "Error during fragment transaction: " + e.getMessage());
+             Log.e("CommunityFragment", "Error during activity start: " + e.getMessage());
          }
      }
 
