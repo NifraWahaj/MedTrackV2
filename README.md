@@ -42,7 +42,7 @@ To set up the project locally, follow these steps:
 1. **Clone the Repository**  
    Clone the repository using the following command:
    ```
-   git clone https://github.com/yourusername/MedTrack.git
+   git clone https://github.com/NifraWahaj/MedTrackV2.git
    ```
 
 2. **Open the Project in Android Studio**  
