@@ -889,7 +889,9 @@ public class EditBlogActivity extends AppCompatActivity {
         blogData.put("title", title);
 
         blogData.put("userEmail", User.getCurrentUserEmail(this));
-        blogData.put("userName", User.getCurrentUserName(this));
+            blogData.put("userName", User.getCurrentUserName(this));
+            blogData.put("userId", User.getCurrentUserId(this));
+
         blogData.put("content", json); // Store formatted text content as JSON
         blogData.put("isApproved", false);
 

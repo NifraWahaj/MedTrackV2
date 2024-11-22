@@ -8,6 +8,7 @@ public class User {
 
     String email;
     String name;
+    String userId;
 
     public String getEmail() {
         return email;
@@ -29,6 +30,10 @@ public class User {
     public static String getCurrentUserName(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("user_pref", Context.MODE_PRIVATE);
         return sharedPreferences.getString("name", ""); // Returns default empty string if name doesn't exist
+    }
+    public static String getCurrentUserId(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("user_pref", Context.MODE_PRIVATE);
+        return sharedPreferences.getString("userId", null); // Returns default null string if id doesn't exist
     }
 
     public static String getCurrentUserEmail(Context context) {

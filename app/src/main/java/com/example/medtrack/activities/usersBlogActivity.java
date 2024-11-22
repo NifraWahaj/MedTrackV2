@@ -79,16 +79,21 @@ public class usersBlogActivity extends Activity implements BlogAdapter.OnBlogCli
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String id = snapshot.getKey();
+                    String userId= snapshot.child("userId").getValue(String.class);
                     String title = snapshot.child("title").getValue(String.class);
                     String content = snapshot.child("content").getValue(String.class);
                     String email = snapshot.child("userEmail").getValue(String.class);
                     boolean isApproved = snapshot.child("isApproved").getValue(Boolean.class); // Use Boolean.class for boolean value
                     Toast.makeText(usersBlogActivity.this, "EMAIL FETCHED ARE: " + email, Toast.LENGTH_SHORT).show();
 
-                    if (email != null && email.equals(userEmail) &&isApproved==true) {
+                    if(userId!=null && userId.equals(User.getCurrentUserId(getApplicationContext()))&&isApproved==true){
                         Blog blog = new Blog(id, title, content, isApproved);
                         blogList.add(blog);
                     }
+                 //   if (email != null && email.equals(userEmail) &&isApproved==true) {
+                //        Blog blog = new Blog(id, title, content, isApproved);
+                 //       blogList.add(blog);
+                  //  }
                 }
                 Toast.makeText(usersBlogActivity.this, "BLOGS FETCHED: " + blogList.size(), Toast.LENGTH_SHORT).show();
                 blogAdapter.notifyDataSetChanged();

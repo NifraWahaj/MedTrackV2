@@ -32,6 +32,7 @@ public class LoginActivity extends AppCompatActivity {
     // Firebase authentication instance
     private FirebaseAuth mAuth;
     private EditText etEmail, etPassword;
+    private String userId;
     private Button btnLogin;
     private TextView tvSignUp, tvForgotPassword;
 
@@ -121,6 +122,8 @@ public class LoginActivity extends AppCompatActivity {
                         if (dataSnapshot.exists()) {
                             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                 // Fetch user data
+                                // Fetch user ID
+                                  userId = snapshot.getKey(); // Get the unique user ID
                                 String name = snapshot.child("name").getValue(String.class);
                                 String email = snapshot.child("email").getValue(String.class);
 
@@ -148,6 +151,8 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("user_pref", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("name", name);
+        editor.putString("userId", userId); // Store user ID
+
         editor.putString("email", email);
         editor.apply();
     }
