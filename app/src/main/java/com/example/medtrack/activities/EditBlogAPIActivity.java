@@ -60,7 +60,7 @@ import okhttp3.Response;
 
 public class EditBlogAPIActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
-
+private  TextView tvusername;
     private RichEditor mEditor;
     private String blogId;
     private ImageButton btnPost,btnGoBack;
@@ -74,29 +74,35 @@ public class EditBlogAPIActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_blog_apiactivity);
+
         Intent intent = getIntent();
         isEdit = intent.getBooleanExtra("isEdit",false); // Default to false if not provided
-        etTitle= findViewById(R.id.etBlogTitle);
 
-        mEditor = findViewById(R.id.etBlogContent);
-        mEditor.setEditorHeight(200);
+        // Toolbar buttons
+        setToolbarActions();
+
+         mEditor.setEditorHeight(200);
         mEditor.setEditorFontSize(22);
         mEditor.setEditorFontColor(Color.BLACK);
         mEditor.setPadding(10, 10, 10, 10);
         mEditor.setPlaceholder("Insert text here...");
+      tvusername.setText(User.getCurrentUserName(this));
         if(isEdit==true) {
             blogId = intent.getStringExtra("blogId");
             String blogTitle = intent.getStringExtra("blogTitle");
             String blogContent = intent.getStringExtra("blogContent");
             mEditor.setHtml(blogContent);
         }
-        // Toolbar buttons
-        setToolbarActions();
+
 
          // findViewById(R.id.btnGoBack).setOnClickListener(v-> fetchFromDB());
     }
 
     private void setToolbarActions() {
+        etTitle= findViewById(R.id.etBlogTitle);
+          tvusername =findViewById(R.id.tvusername);
+        mEditor = findViewById(R.id.etBlogContent);
+
         btnGoBack=findViewById(R.id.btnGoBack);
         btnPost=findViewById(R.id.btnPost);
         btnUndo = findViewById(R.id.btnUndo);

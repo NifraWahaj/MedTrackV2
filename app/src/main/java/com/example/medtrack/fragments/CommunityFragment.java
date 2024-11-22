@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.medtrack.R;
 import com.example.medtrack.activities.BlogContentActivity;
 import com.example.medtrack.activities.EditBlogAPIActivity;
-import com.example.medtrack.activities.EditBlogActivity;
 import com.example.medtrack.adapters.BlogAdapter;
 import com.example.medtrack.models.Blog;
 import com.example.medtrack.activities.usersBlogActivity;

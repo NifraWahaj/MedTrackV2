@@ -1,6 +1,8 @@
 package com.example.medtrack.activities;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.content.Intent;
 import android.os.Handler;
@@ -31,6 +33,7 @@ public class SplashActivity extends AppCompatActivity {
         // Start the animation on both pills
         leftPill.startAnimation(leftPillAnimation);
         rightPill.startAnimation(rightPillAnimation);
+
 
         new Handler().postDelayed(new Runnable() {
             @Override

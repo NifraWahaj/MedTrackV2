@@ -57,7 +57,7 @@ public class usersBlogActivity extends Activity implements BlogAdapter.OnBlogCli
         }  );
         fabWriteBlog.setOnClickListener(v -> {
             // For example, open a new activity (AddBlogActivity)
-            Intent i = new Intent(usersBlogActivity.this, EditBlogActivity.class);
+            Intent i = new Intent(usersBlogActivity.this, EditBlogAPIActivity.class);
             i.putExtra("isEdit", false);
 
             startActivity(i);

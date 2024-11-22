@@ -150,6 +150,8 @@ public class LoginActivity extends AppCompatActivity {
     private void storeUserInSharedPreferences(String name, String email) {
         SharedPreferences sharedPreferences = getSharedPreferences("user_pref", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
+        // Clear all stored preferences
+        editor.clear();
         editor.putString("name", name);
         editor.putString("userId", userId); // Store user ID
 
