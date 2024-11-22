@@ -2,10 +2,10 @@ package com.example.medtrack.adapters;
 
 import android.content.Context;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,15 +20,19 @@ public class BlogAdapter extends RecyclerView.Adapter<BlogAdapter.BlogViewHolder
     private List<Blog> blogList;
     private Context context;
     private OnBlogClickListener onBlogClickListener;
+    private boolean isUserBlog; // Flag to check if called from usersBlogActivity
 
     public interface OnBlogClickListener {
         void onBlogClick(Blog blog);
+        void onEditBlog(Blog blog);
+        void onDeleteBlog(Blog blog);
     }
 
-    public BlogAdapter(Context context, List<Blog> blogList, OnBlogClickListener onBlogClickListener) {
+    public BlogAdapter(Context context, List<Blog> blogList, OnBlogClickListener listener, boolean isUserBlog) {
         this.context = context;
         this.blogList = blogList;
-        this.onBlogClickListener = onBlogClickListener;
+        this.onBlogClickListener = listener;
+        this.isUserBlog = isUserBlog; // Set the flag
     }
 
     @NonNull
@@ -67,11 +71,32 @@ public class BlogAdapter extends RecyclerView.Adapter<BlogAdapter.BlogViewHolder
             holder.contentTextView.setText(Html.fromHtml(limitedContent.toString(), Html.FROM_HTML_MODE_LEGACY));
         }
 
-
         // Set an OnClickListener that will invoke the onBlogClick function
         holder.itemView.setOnClickListener(v -> {
             if (onBlogClickListener != null) {
                 onBlogClickListener.onBlogClick(blog);  // Notify the fragment
+            }
+        });
+
+        // Control visibility based on the flag
+        if (isUserBlog) {
+            holder.editButton.setVisibility(View.VISIBLE);
+            holder.deleteButton.setVisibility(View.VISIBLE);
+        } else {
+            holder.editButton.setVisibility(View.GONE);
+            holder.deleteButton.setVisibility(View.GONE);
+        }
+
+        // Set click listeners for edit and delete
+        holder.editButton.setOnClickListener(v -> {
+            if (onBlogClickListener != null) {
+                onBlogClickListener.onEditBlog(blog);  // Call edit method
+            }
+        });
+
+        holder.deleteButton.setOnClickListener(v -> {
+            if (onBlogClickListener != null) {
+                onBlogClickListener.onDeleteBlog(blog);  // Call delete method
             }
         });
     }
@@ -84,11 +109,15 @@ public class BlogAdapter extends RecyclerView.Adapter<BlogAdapter.BlogViewHolder
     public class BlogViewHolder extends RecyclerView.ViewHolder {
         TextView titleTextView;
         TextView contentTextView;
+        ImageView editButton;
+        ImageView deleteButton;
 
         public BlogViewHolder(View itemView) {
             super(itemView);
             titleTextView = itemView.findViewById(R.id.blogTitle);
             contentTextView = itemView.findViewById(R.id.blogDescription);
+            editButton = itemView.findViewById(R.id.ivEdit);  // Add reference to Edit button
+            deleteButton = itemView.findViewById(R.id.ivDelete);  // Add reference to Delete button
         }
     }
 }

@@ -56,7 +56,7 @@ import java.util.List;
          recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
          // Initialize the BlogAdapter and pass the OnBlogClickListener
-         blogAdapter = new BlogAdapter(getContext(), filteredBlogList, this);
+         blogAdapter = new BlogAdapter(getContext(), filteredBlogList, this,false);
          recyclerView.setAdapter(blogAdapter);
 
          btnCommunity = view.findViewById(R.id.buttonCommunity);
@@ -203,7 +203,15 @@ import java.util.List;
          }
      }
 
+     @Override
+     public void onEditBlog(Blog blog) {
+         //do nothing
+     }
 
+     @Override
+     public void onDeleteBlog(Blog blog) {
+ // do nothing
+     }
 
 
  }

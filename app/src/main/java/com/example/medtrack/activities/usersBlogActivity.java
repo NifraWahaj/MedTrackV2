@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -48,7 +49,7 @@ public class usersBlogActivity extends Activity implements BlogAdapter.OnBlogCli
         recyclerViewYourBlogs.setLayoutManager(new LinearLayoutManager(this));
 
         // Initialize the BlogAdapter and pass the OnBlogClickListener
-        blogAdapter = new BlogAdapter(this, blogList, this);
+        blogAdapter = new BlogAdapter(this, blogList, this,true);
         recyclerViewYourBlogs.setAdapter(blogAdapter);
         btnGoBack.setOnClickListener(v ->{
 
@@ -108,6 +109,11 @@ public class usersBlogActivity extends Activity implements BlogAdapter.OnBlogCli
 
     @Override
     public void onBlogClick(Blog blog) {
+        // do nothing
+    }
+
+    @Override
+    public void onEditBlog(Blog blog) {
         try {
             Log.d("YourBlogActivity", "Attempting to open EditBlogActivity...");
 
@@ -126,4 +132,40 @@ public class usersBlogActivity extends Activity implements BlogAdapter.OnBlogCli
             Log.e("YourBlogActivity", "Error during activity launch: " + e.getMessage());
         }
     }
+
+    @Override
+    public void onDeleteBlog(Blog blog) {
+        // Create a confirmation dialog
+        new AlertDialog.Builder(usersBlogActivity.this)
+                .setTitle("Delete Blog")
+                .setMessage("Are you sure you want to delete this blog?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // If the user confirms, delete the blog
+                    String blogId = blog.getId();  // Get the unique ID of the blog to delete
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("blogs");
+
+                    // Delete the blog from Firebase
+                    databaseReference.child(blogId).removeValue()
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(usersBlogActivity.this, "Blog deleted successfully", Toast.LENGTH_SHORT).show();
+                                    // Optionally, remove the blog from your local list and notify the adapter
+                                    blogList.remove(blog);
+                                    blogAdapter.notifyDataSetChanged();  // Refresh the adapter
+                                } else {
+                                    Toast.makeText(usersBlogActivity.this, "Failed to delete blog", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("YourBlogActivity", "Failed to delete blog: " + e.getMessage());
+                                Toast.makeText(usersBlogActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    // If the user cancels, do nothing (close the dialog)
+                    dialog.dismiss();
+                })
+                .show();  // Show the dialog
+    }
+
 }

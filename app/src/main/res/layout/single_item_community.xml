@@ -1,35 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardView"
-    app:cardBackgroundColor="@color/bluelight"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp">
+    android:layout_margin="8dp"
+    app:cardBackgroundColor="@color/bluelight">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:padding="20dp">
 
-         <TextView
-            android:id="@+id/blogTitle"
+        <!-- Blog Text Content -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/blogTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/blog_title"
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/blogDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/blog_description"
+                android:textSize="14sp"
+                android:textColor="@color/greytext" />
+        </LinearLayout>
+
+        <!-- Edit and Delete Icons -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/blog_title"
-            android:textSize="20sp"
-             android:textColor="@color/black"
-        android:textStyle="bold" />
+            android:orientation="vertical"
+            android:gravity="center">
 
-         <TextView
-            android:id="@+id/blogDescription"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/blog_description"
-             android:textSize="14sp"
-             android:textColor="@color/greytext"
-        />
+            <!-- Edit Button -->
+            <ImageView
+                android:id="@+id/ivEdit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/edit"
+                android:padding="10dp"
+                android:contentDescription="Edit Blog" />
 
+            <!-- Delete Button -->
+            <ImageView
+                android:id="@+id/ivDelete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/delete"
+                android:padding="10dp"
+                android:contentDescription="Delete Blog"
+                android:layout_marginTop="10dp" /> <!-- Added margin for spacing -->
+        </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
