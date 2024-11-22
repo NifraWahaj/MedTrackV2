@@ -112,12 +112,13 @@ public class usersBlogActivity extends Activity implements BlogAdapter.OnBlogCli
             Log.d("YourBlogActivity", "Attempting to open EditBlogActivity...");
 
             // Create an Intent to open EditBlogActivity
-            Intent intent = new Intent(usersBlogActivity.this, EditBlogActivity.class);
+            Intent intent = new Intent(usersBlogActivity.this, EditBlogAPIActivity.class);
             // Pass data to the activity
             intent.putExtra("blogId", blog.getId());
             intent.putExtra("blogTitle", blog.getTitle());
             intent.putExtra("blogContent", blog.getContent());
             intent.putExtra("isEdit", true);
+
 
             startActivity(intent);
 

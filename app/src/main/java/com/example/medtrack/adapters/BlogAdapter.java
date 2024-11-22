@@ -1,7 +1,7 @@
 package com.example.medtrack.adapters;
 
 import android.content.Context;
-import android.text.SpannableStringBuilder;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,22 +11,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.medtrack.models.FormattedText;
 import com.example.medtrack.R;
 import com.example.medtrack.models.Blog;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
 import java.util.List;
-
 
 public class BlogAdapter extends RecyclerView.Adapter<BlogAdapter.BlogViewHolder> {
     private List<Blog> blogList;
     private Context context;
     private OnBlogClickListener onBlogClickListener;
-    SpannableStringBuilder spannableText;
-    int wordCount;
 
     public interface OnBlogClickListener {
         void onBlogClick(Blog blog);
@@ -49,8 +42,31 @@ public class BlogAdapter extends RecyclerView.Adapter<BlogAdapter.BlogViewHolder
     public void onBindViewHolder(@NonNull BlogViewHolder holder, int position) {
         Blog blog = blogList.get(position);
         holder.titleTextView.setText(blog.getTitle());
-        displayFormattedText(blog.getTitle(), blog.getContent());
-        holder.contentTextView.setText(spannableText);
+
+        // Assuming the content is already in HTML format
+        String htmlContent = blog.getContent();
+        if (htmlContent != null && !htmlContent.isEmpty()) {
+            // Remove <img> tags from the HTML content
+            htmlContent = htmlContent.replaceAll("<img[^>]*>", "");
+
+            // Split the content into words
+            String[] words = htmlContent.split("\\s+");
+
+            // Limit to 30 words
+            StringBuilder limitedContent = new StringBuilder();
+            for (int i = 0; i < Math.min(30, words.length); i++) {
+                limitedContent.append(words[i]).append(" ");
+            }
+
+            // Append "..." to indicate more content if there are more than 30 words
+            if (words.length > 30) {
+                limitedContent.append("...");
+            }
+
+            // Display the limited content in the TextView, formatted as HTML
+            holder.contentTextView.setText(Html.fromHtml(limitedContent.toString(), Html.FROM_HTML_MODE_LEGACY));
+        }
+
 
         // Set an OnClickListener that will invoke the onBlogClick function
         holder.itemView.setOnClickListener(v -> {
@@ -75,62 +91,4 @@ public class BlogAdapter extends RecyclerView.Adapter<BlogAdapter.BlogViewHolder
             contentTextView = itemView.findViewById(R.id.blogDescription);
         }
     }
-
-    private void displayFormattedText(String title, String json) {
-        Gson gson = new Gson();
-        Type listType = new TypeToken<List<FormattedText>>() {
-        }.getType();
-        List<FormattedText> formattedTexts = gson.fromJson(json, listType);
-        Log.d("JSON Content", json);
-
-        spannableText = new SpannableStringBuilder();
-        int wordCount = 0;
-        StringBuilder currentWord = new StringBuilder();
-
-        // Loop through the formatted text
-        for (FormattedText formattedText : formattedTexts) {
-            // Skip headings
-            if (formattedText.getHeadingLevel() > 0) {
-                continue;
-            }
-
-            // Skip if it's an image (check the content type)
-            if (formattedText.getImageBase64() != null) {
-                continue;  // Skip image content
-            }
-
-            // Collect characters into words
-            String text = formattedText.getText();
-            if (text.equals(" ")) {
-                // Append a space if it's a space character
-                if (currentWord.length() > 0) {
-                    appendWordToSpannable(currentWord.toString());
-                    currentWord.setLength(0);
-                }
-                spannableText.append(" ");
-                continue;
-            }
-
-            // Append the current character to the current word
-            currentWord.append(text);
-
-            // If the wordCount reaches 30, stop processing
-            if (wordCount >= 30) {
-                break;
-            }
-        }
-
-        // If there's any remaining word, append it
-             appendWordToSpannable("........");
-
-    }
-
-    // Helper method to append the word (without formatting)
-    private void appendWordToSpannable(String word) {
-        spannableText.append(word);
-
-        // Increment the word count after appending the word
-        wordCount++;
-    }
 }
-

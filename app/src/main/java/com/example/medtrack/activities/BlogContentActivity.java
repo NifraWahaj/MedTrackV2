@@ -12,6 +12,7 @@ import android.graphics.text.LineBreaker;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
 import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -26,6 +27,7 @@ import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.util.Base64;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -64,6 +66,7 @@ public class BlogContentActivity extends AppCompatActivity {
     private boolean isEdit;
     private RatingBar.OnRatingBarChangeListener ratingBarChangeListener;
     private ImageButton backButton, btnReviewList,ivProfilePic;
+    private WebView webViewContent;
     private LinearLayout LinearLayoutRateBlog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +75,10 @@ public class BlogContentActivity extends AppCompatActivity {
 
         // Initialize Views
         etTitle = findViewById(R.id.etTitle);
-        etBlogContent = findViewById(R.id.etBlogContent);
+          webViewContent = findViewById(R.id.webViewContent);
+        webViewContent.getSettings().setJavaScriptEnabled(true);  // If you need JavaScript support
+        webViewContent.getSettings().setLoadsImagesAutomatically(true);  // Ensure images load automatically
+
         ratingBar = findViewById(R.id.rating);
         scrollView = findViewById(R.id.ScrollViewBlogContent);
         backButton = findViewById(R.id.backButton);
@@ -165,13 +171,22 @@ public class BlogContentActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     title = snapshot.child("title").getValue(String.class);
-                    String json = snapshot.child("content").getValue(String.class);
+                    String html = snapshot.child("content").getValue(String.class);
                     author = snapshot.child("userName").getValue(String.class);
                     authorEmail= snapshot.child("userEmail").getValue(String.class);
                     Toast.makeText(getApplicationContext(),"Auhto email "+authorEmail,Toast.LENGTH_SHORT).show();
                     tvAuthor.setText("by "+author);
-                    displayFormattedText(title, json);
-                    // Only check after data is retrieved
+
+                    if (html != null) {
+                        webViewContent.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
+
+                     progressBar.setVisibility(View.GONE);
+                    } else {
+                        // Handle the case when the content is null
+                        etBlogContent.setText("No content available.");
+                    }
+
+                     // Only check after data is retrieved
                     if (authorEmail != null && authorEmail.equals(User.getCurrentUserEmail(BlogContentActivity.this))) {
                         LinearLayoutRateBlog.setVisibility(View.GONE);
                     }
@@ -186,81 +201,7 @@ public class BlogContentActivity extends AppCompatActivity {
         });
     }
 
-    private void displayFormattedText(String title, String json) {
-        // Parse and display formatted text
-        Gson gson = new Gson();
-        Type listType = new TypeToken<List<FormattedText>>() {}.getType();
-        List<FormattedText> formattedTexts = gson.fromJson(json, listType);
 
-        SpannableStringBuilder spannableText = new SpannableStringBuilder();
-        for (FormattedText formattedText : formattedTexts) {
-            Spannable spanText;
-
-            if (formattedText.getImageBase64() != null) {
-                Bitmap bitmap = base64ToBitmap(formattedText.getImageBase64());
-                Drawable drawable = new BitmapDrawable(getResources(), bitmap);
-                drawable.setBounds(0, 0, 400, 400);
-                ImageSpan imageSpan = new ImageSpan(drawable);
-
-                spanText = new SpannableString(" ");
-                spanText.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            } else {
-                spanText = new SpannableString(formattedText.getText());
-                if (formattedText.isBold()) spanText.setSpan(new StyleSpan(Typeface.BOLD), 0, formattedText.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                if (formattedText.isItalic()) spanText.setSpan(new StyleSpan(Typeface.ITALIC), 0, formattedText.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                if (formattedText.isStrikethrough()) spanText.setSpan(new StrikethroughSpan(), 0, formattedText.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                if (formattedText.getRelativeSize() > 1.0f) spanText.setSpan(new RelativeSizeSpan(formattedText.getRelativeSize()), 0, formattedText.getText().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                int gravity = formattedText.getAlignment();  // You can define alignment as an int
-                switch (gravity) {
-                    case 8388611: // Start alignment
-                        spanText.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_NORMAL),
-                                0, spanText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        break;
-                    case 17: // Center alignment
-                        spanText.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER),
-                                0, spanText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        break;
-                    case 8388613: // End alignment
-                        spanText.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE),
-                                0, spanText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        break;
-                    case 16777224: // Justify (START | END)
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            etBlogContent.setJustificationMode(LineBreaker.JUSTIFICATION_MODE_INTER_WORD);
-                        }
-                        break;
-                    default: // Fallback for unexpected values
-                        spanText.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_NORMAL),
-                                0, spanText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        break;
-                }
-                if (formattedText.getLink() != null) {
-                    final String url = formattedText.getLink();
-                    ClickableSpan clickableSpan = new ClickableSpan() {
-                        @Override
-                        public void onClick(@NonNull View widget) {
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                            startActivity(intent);
-                        }
-
-                        @Override
-                        public void updateDrawState(@NonNull TextPaint ds) {
-                            super.updateDrawState(ds);
-                            ds.setColor(ContextCompat.getColor(BlogContentActivity.this, android.R.color.holo_blue_dark));
-                            ds.setUnderlineText(true);
-                        }
-                    };
-                    spanText.setSpan(clickableSpan, 0, url.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                }
-            }
-            spannableText.append(spanText);
-        }
-
-        etTitle.setText(title);
-        etBlogContent.setText(spannableText);
-        etBlogContent.setMovementMethod(LinkMovementMethod.getInstance());
-        progressBar.setVisibility(View.GONE);  // Hide progress bar on failure
-     }
 
     private Bitmap base64ToBitmap(String base64) {
         byte[] decodedString = Base64.decode(base64, Base64.DEFAULT);

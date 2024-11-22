@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.medtrack.R;
 import com.example.medtrack.activities.BlogContentActivity;
+import com.example.medtrack.activities.EditBlogAPIActivity;
 import com.example.medtrack.activities.EditBlogActivity;
 import com.example.medtrack.adapters.BlogAdapter;
 import com.example.medtrack.models.Blog;
@@ -37,6 +39,8 @@ import java.util.List;
      private List<Blog> filteredBlogList = new ArrayList<>();
      private Button btnCommunity, btnSearch,btnYourBlog;
      private EditText etSearch;
+     private ProgressBar progressBar;  // Declare ProgressBar
+
      private LinearLayout linearLayoutCommunity;
      public CommunityFragment() {
          // Required empty public constructor
@@ -45,6 +49,7 @@ import java.util.List;
      @Override
      public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
          View view = inflater.inflate(R.layout.fragment_community, container, false);
+         progressBar = view.findViewById(R.id.progressBar); // Initialize ProgressBar
 
          linearLayoutCommunity=view.findViewById(R.id.linearLayoutCommunity);
          recyclerView = view.findViewById(R.id.recyclerViewCommunity);
@@ -59,7 +64,7 @@ import java.util.List;
          etSearch = view.findViewById(R.id.etSearch);
          btnYourBlog=view.findViewById(R.id.btnYourBlogs);
          btnCommunity.setOnClickListener(v -> {
-             Intent i = new Intent(getActivity(), EditBlogActivity.class);
+             Intent i = new Intent(getActivity(), EditBlogAPIActivity.class);
              i.putExtra("isEdit", false);
 
              startActivity(i);
@@ -97,7 +102,8 @@ import java.util.List;
 
      private void fetchBlogsFromFirebase() {
          DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("blogs");
-
+         progressBar.setVisibility(View.VISIBLE);
+          recyclerView.setVisibility(View.GONE);
          // Attach the listener to get updates
          databaseReference.addValueEventListener(new ValueEventListener() {
              @Override
@@ -123,6 +129,9 @@ import java.util.List;
                  filteredBlogList.clear();  // Clear filtered list
                  filteredBlogList.addAll(blogList);  // Add all blogs to filtered list
                  blogAdapter.notifyDataSetChanged();  // Notify adapter to refresh the view
+                 progressBar.setVisibility(View.GONE);
+                 recyclerView.setVisibility(View.VISIBLE);
+
              }
 
              @Override
