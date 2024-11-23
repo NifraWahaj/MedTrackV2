@@ -212,7 +212,14 @@
                 android:id="@+id/btnStrikeThrough"
                 android:src="@drawable/community_btn_strike_through"
                 android:layout_marginEnd="5dp"/>
-
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="58dp"
+                android:backgroundTint="@color/bluelight"
+                android:contentDescription="Color Picker"
+                android:id="@+id/btnColorPicker"
+                android:src="@drawable/color_picker"
+                android:layout_marginEnd="5dp"/>
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="58dp"
@@ -220,6 +227,14 @@
                 android:contentDescription="@string/bullet_list_button"
                 android:id="@+id/btnBulletList"
                 android:src="@drawable/community_btn_bullet_list"
+                android:layout_marginEnd="5dp"/>
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="58dp"
+                android:backgroundTint="@color/bluelight"
+                android:contentDescription="@string/bullet_list_button"
+                android:id="@+id/btnNumberingList"
+                android:src="@drawable/numbering_list"
                 android:layout_marginEnd="5dp"/>
             <ImageButton
                 android:layout_width="wrap_content"

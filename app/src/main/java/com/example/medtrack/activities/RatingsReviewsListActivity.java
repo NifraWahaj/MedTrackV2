@@ -1,8 +1,10 @@
 package com.example.medtrack.activities;
 
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -21,9 +23,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RatingsReviewsListActivity extends AppCompatActivity {
 
@@ -34,7 +39,7 @@ public class RatingsReviewsListActivity extends AppCompatActivity {
     private RatingBar reviewRatingBar;
     private ImageButton backButton;
 
-
+String blogId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +51,10 @@ public class RatingsReviewsListActivity extends AppCompatActivity {
         tvReviews = findViewById(R.id.tvReviews);
         reviewRatingBar = findViewById(R.id.reviewRatingBar);
         backButton = findViewById(R.id.backButton);
+             Intent i= getIntent();
+        Toast.makeText(this, "inside  reviews clicked", Toast.LENGTH_SHORT).show();
 
+        blogId=     i.getStringExtra("blogId");
         // Set up RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -62,51 +70,106 @@ public class RatingsReviewsListActivity extends AppCompatActivity {
         adapter = new RatingReviewAdapter(this, reviewList);
         recyclerView.setAdapter(adapter);
         backButton.setOnClickListener(v -> finish());
-Toast.makeText(this,"inside ratingsrviewlsit ",Toast.LENGTH_SHORT).show();
-        // Fetch Reviews from Firebase
-        fetchReviewsFromFirebase();
-    }
+         // Fetch Reviews from Firebase
+        getAllReviewsAndRatings(blogId);
+     }
 
-    private void fetchReviewsFromFirebase() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
-        DatabaseReference reviewsRef = database.getReference("reviews");
+    private void getAllReviewsAndRatings(String blogId) {
+        DatabaseReference blogRef = FirebaseDatabase.getInstance().getReference("blogs").child(blogId);
 
-        reviewsRef.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
+        blogRef.child("reviews_and_ratings").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                reviewList.clear(); // Clear the list to avoid duplicates
+                if (snapshot.exists()) {
+                    // Step 1: Gather all user IDs
+                    List<String> userIds = new ArrayList<>();
+                    Map<String, Review> tempReviewMap = new HashMap<>();
 
-                for (DataSnapshot reviewSnapshot : snapshot.getChildren()) {
-                    String blogTitle = reviewSnapshot.child("BlogTitle").getValue(String.class);
-                    String blogId = reviewSnapshot.child("BlogId").getValue(String.class);
-                    float rating = reviewSnapshot.child("rating").getValue(Float.class);
-                    String reviewText = reviewSnapshot.child("review").getValue(String.class);
-                    String userEmail = reviewSnapshot.child("userEmail").getValue(String.class);
-                    String userName = reviewSnapshot.child("name").getValue(String.class);
+                    for (DataSnapshot reviewSnapshot : snapshot.getChildren()) {
+                        String userId = reviewSnapshot.getKey();
+                        String review = reviewSnapshot.child("review").getValue(String.class);
+                        Float rating = reviewSnapshot.child("rating").getValue(Float.class);
 
-                    // Add each review to the list
-                    reviewList.add(new Review(userName, rating, reviewText, blogTitle, userEmail));
+                        if (userId != null) {
+                            userIds.add(userId);
+                            tempReviewMap.put(userId, new Review(userId, rating, review));
+                        }
+                    }
+
+                    // Step 2: Fetch all usernames in one query
+                    fetchAllUserNames(userIds, new UserNamesCallback() {
+                        @Override
+                        public void onUserNamesFetched(Map<String, String> userNameMap) {
+                            // Step 3: Combine user data with reviews
+                            for (String userId : userNameMap.keySet()) {
+                                Review review = tempReviewMap.get(userId);
+                                if (review != null) {
+                                    review.setUserName(userNameMap.get(userId));
+                                    reviewList.add(review);
+                                }
+                            }
+                            calculateRatingsAverage();
+                            // Update the RecyclerView
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+                } else {
+                    Log.d("BlogContent", "No reviews found for this blog.");
+                    adapter.notifyDataSetChanged(); // Notify for empty list
                 }
 
-                // Update UI
-                tvReviews.setText(reviewList.size() + " Reviews");
-                calculateRatingsAverage();
-                adapter.notifyDataSetChanged(); // Notify adapter of data changes
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(RatingsReviewsListActivity.this, "Failed to fetch reviews: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+             }
+        });
+    }
+
+    // Helper method to fetch all usernames in a single query
+    private void fetchAllUserNames(List<String> userIds, UserNamesCallback callback) {
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+
+        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Map<String, String> userNameMap = new HashMap<>();
+
+                for (String userId : userIds) {
+                    if (snapshot.child(userId).exists()) {
+                        String userName = snapshot.child(userId).child("name").getValue(String.class);
+                        if (userName != null) {
+                            userNameMap.put(userId, userName);
+                        }
+                    }
+                }
+
+                callback.onUserNamesFetched(userNameMap);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                 callback.onUserNamesFetched(new HashMap<>()); // Return empty map on error
             }
         });
     }
 
+    // Callback interface for fetching all usernames
+    public interface UserNamesCallback {
+        void onUserNamesFetched(Map<String, String> userNameMap);
+    }
+
+
+
+
     private void calculateRatingsAverage() {
         if (reviewList == null || reviewList.isEmpty()) {
             reviewRatingBar.setRating(0.0f);
+            Toast.makeText(this," no reviews   "+ reviewList.size(),Toast.LENGTH_SHORT).show();
+
             return; // Return if there are no reviews
         }
-
+Toast.makeText(this," ratign avaregr "+ reviewList.size(),Toast.LENGTH_SHORT).show();
         float sum = 0.0f;
         for (Review review : reviewList) {
             sum += review.getRating();

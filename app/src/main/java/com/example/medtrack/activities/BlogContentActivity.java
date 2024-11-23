@@ -26,6 +26,7 @@ import android.text.style.RelativeSizeSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.ImageButton;
@@ -53,11 +54,10 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.List;
-
 public class BlogContentActivity extends AppCompatActivity {
 
     private TextView etTitle, etBlogContent, tvRateThisBlog, tvWriteAReview, tvAuthor;
-    private String blogId, title, reviewText, author,authorEmail;
+    private String blogId, title, reviewText, author,authorEmail, blogUserId;
     private float ratingFromDb;
     private ProgressBar progressBar;
 
@@ -65,17 +65,18 @@ public class BlogContentActivity extends AppCompatActivity {
     private RatingBar ratingBar;
     private boolean isEdit;
     private RatingBar.OnRatingBarChangeListener ratingBarChangeListener;
-    private ImageButton backButton, btnReviewList,ivProfilePic;
+    private ImageButton backButton, btnReviewList, ivProfilePic;
     private WebView webViewContent;
-    private LinearLayout LinearLayoutRateBlog;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_blog_content); // Use an appropriate activity layout
+        setContentView(R.layout.activity_blog_content);
 
         // Initialize Views
         etTitle = findViewById(R.id.etTitle);
-          webViewContent = findViewById(R.id.webViewContent);
+        webViewContent = findViewById(R.id.webViewContent);
         webViewContent.getSettings().setJavaScriptEnabled(true);  // If you need JavaScript support
         webViewContent.getSettings().setLoadsImagesAutomatically(true);  // Ensure images load automatically
 
@@ -86,11 +87,11 @@ public class BlogContentActivity extends AppCompatActivity {
         tvRateThisBlog = findViewById(R.id.tvRateThisBlog);
         tvWriteAReview = findViewById(R.id.tvWriteAReview);
         tvAuthor = findViewById(R.id.tvAuthor);
-        LinearLayoutRateBlog=findViewById(R.id.LinearLayoutRateBlog);
+
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
-        //ivProfilePic=findViewById(R.id.ivProfilePic);
-        isEdit=false;
+        isEdit = false;
+
         // Customize RatingBar Colors
         LayerDrawable stars = (LayerDrawable) ratingBar.getProgressDrawable();
         stars.getDrawable(2).setColorFilter(ContextCompat.getColor(this, R.color.ratingColor), PorterDuff.Mode.SRC_ATOP);
@@ -98,21 +99,24 @@ public class BlogContentActivity extends AppCompatActivity {
         // Retrieve Intent Data
         if (getIntent() != null) {
             blogId = getIntent().getStringExtra("blogId");
+            blogUserId = getIntent().getStringExtra("userId");
         }
+     if(blogUserId.equals(User.getCurrentUserId(BlogContentActivity.this))){
+           tvRateThisBlog.setVisibility(View.INVISIBLE);
+         tvWriteAReview.setVisibility(View.INVISIBLE);
+            ratingBar.setVisibility(View.INVISIBLE);
+           findViewById(R.id.tvRatingsAndReviews).setVisibility(View.VISIBLE);
+           btnReviewList.setVisibility(View.VISIBLE);
 
+        }
         // Set Listeners
         setupListeners();
 
         // Fetch Blog Content
         fetchBlogContent(blogId);
-        if (authorEmail != null && authorEmail.equals(User.getCurrentUserEmail(this))) {
-            LinearLayoutRateBlog.setVisibility(View.GONE);
-        }
-        if(authorEmail!=null){
-            Toast.makeText(this, "author "+authorEmail+ " "+ User.getCurrentUserEmail(this),Toast.LENGTH_SHORT).show();
-        }
-        checkIfUserHasReviewed(blogId);
 
+        // Check if the current user has reviewed this blog
+        checkIfUserHasReviewed(blogId);
     }
 
     private void setupListeners() {
@@ -124,12 +128,10 @@ public class BlogContentActivity extends AppCompatActivity {
                 intent.putExtra("userRating", rating);
                 intent.putExtra("blogTitle", title);
                 intent.putExtra("blogId", blogId);
-                intent.putExtra("editMode",true);
-                intent.putExtra("author",author);
+                intent.putExtra("editMode", true);
 
-                if(isEdit==true){
+                if (isEdit) {
                     intent.putExtra("reviewText", reviewText);
-
                 }
 
                 startActivity(intent);
@@ -145,7 +147,11 @@ public class BlogContentActivity extends AppCompatActivity {
             intent.putExtra("userRating", ratingFromDb);
             intent.putExtra("blogTitle", title);
             intent.putExtra("blogId", blogId);
-            intent.putExtra("author",author);
+            intent.putExtra("editMode", isEdit);
+            intent.putExtra("editMode", isEdit);
+            intent.putExtra("userRating", ratingBar.getRating());
+            intent.putExtra("reviewText",reviewText );
+            intent.putExtra("author", author);
             intent.putExtra("reviewText", reviewText);
             startActivity(intent);
         });
@@ -156,11 +162,13 @@ public class BlogContentActivity extends AppCompatActivity {
         // Review List Button
         btnReviewList.setOnClickListener(v -> {
             Intent intent = new Intent(BlogContentActivity.this, RatingsReviewsListActivity.class);
-            Toast.makeText(this,"button clicked ",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "button  reviews clicked", Toast.LENGTH_SHORT).show();
+            intent.putExtra("blogId", blogId);
+
+
 
             startActivity(intent);
-            Toast.makeText(this,"button start activity ",Toast.LENGTH_SHORT).show();
-
+            Toast.makeText(this, "button start activity", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -172,23 +180,17 @@ public class BlogContentActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     title = snapshot.child("title").getValue(String.class);
                     String html = snapshot.child("content").getValue(String.class);
-                    author = snapshot.child("userName").getValue(String.class);
-                    authorEmail= snapshot.child("userEmail").getValue(String.class);
-                    Toast.makeText(getApplicationContext(),"Auhto email "+authorEmail,Toast.LENGTH_SHORT).show();
-                    tvAuthor.setText("by "+author);
+                    String userId = snapshot.child("userId").getValue(String.class);  // Get the userId of the author
+
+                    // Fetch the author's name and email from the User class using the userId
+                    fetchAuthorDetails(userId);
+
 
                     if (html != null) {
                         webViewContent.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
-
-                     progressBar.setVisibility(View.GONE);
+                        progressBar.setVisibility(View.GONE);
                     } else {
-                        // Handle the case when the content is null
                         etBlogContent.setText("No content available.");
-                    }
-
-                     // Only check after data is retrieved
-                    if (authorEmail != null && authorEmail.equals(User.getCurrentUserEmail(BlogContentActivity.this))) {
-                        LinearLayoutRateBlog.setVisibility(View.GONE);
                     }
                 }
             }
@@ -196,46 +198,67 @@ public class BlogContentActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError error) {
                 progressBar.setVisibility(View.GONE);  // Hide progress bar on failure
-                 Toast.makeText(BlogContentActivity.this, "Failed to load blog content", Toast.LENGTH_SHORT).show();
+                Toast.makeText(BlogContentActivity.this, "Failed to load blog content", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    private void fetchAuthorDetails(String userId) {
+        // Assuming User class has a method to fetch user details by userId
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String userName = snapshot.child("name").getValue(String.class);  // Get the name
+                    authorEmail = snapshot.child("email").getValue(String.class);  // Get the email
+                    author = userName;  // Set the author's name to the TextView
 
+                    tvAuthor.setText("by " + author);  // Display the author's name
+                }
+            }
 
-    private Bitmap base64ToBitmap(String base64) {
-        byte[] decodedString = Base64.decode(base64, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(BlogContentActivity.this, "Failed to fetch author details", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void checkIfUserHasReviewed(String blogId) {
-        String currentUserEmail = User.getCurrentUserEmail(this);
-        DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference("reviews");
+        String currentUserId = User.getCurrentUserId(this);  // Fetch the current user's ID
+        DatabaseReference blogRef = FirebaseDatabase.getInstance().getReference("blogs").child(blogId);
 
-        reviewsRef.orderByChild("userEmail").equalTo(currentUserEmail)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot reviewSnapshot : snapshot.getChildren()) {
-                            String reviewBlogId = reviewSnapshot.child("BlogId").getValue(String.class);
-                            if (blogId.equals(reviewBlogId)) {
-                                reviewText = reviewSnapshot.child("review").getValue(String.class);
-                                ratingFromDb = reviewSnapshot.child("rating").getValue(Float.class);
+        // Check if the user has already submitted a review and rating
+        blogRef.child("reviews_and_ratings").child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    // Retrieve the review and rating for the current user
+                    Log.d("BlogContent", "Review and rating found!");
+                      reviewText = snapshot.child("review").getValue(String.class);
+                    Float existingRating = snapshot.child("rating").getValue(Float.class);
+                    isEdit=true;
 
-                                ratingBar.setRating(ratingFromDb);
-                                tvRateThisBlog.setText("Edit Your Review");
-                                tvWriteAReview.setText("Edit Review");
-
-                                return;
-                            }
-                        }
-
+                    if (existingRating != null) {
+                        ratingBar.setRating(existingRating);  // Set the existing rating in the RatingBar
                     }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        Toast.makeText(BlogContentActivity.this, "Failed to check review status", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                    // Change UI text to indicate the user can edit the review
+                    tvRateThisBlog.setText("Edit Your Review");
+                    tvWriteAReview.setText("Edit Review");
+                } else {
+                    // If no review exists, allow the user to add a new review
+                    tvRateThisBlog.setText("Rate this Blog");
+                    tvWriteAReview.setText("Write a Review");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(BlogContentActivity.this, "Failed to check review status", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
 }

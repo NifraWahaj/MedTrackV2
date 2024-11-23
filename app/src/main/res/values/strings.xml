@@ -100,5 +100,6 @@
     <string name="enter_your_name">Enter your Name</string>
     <string name="back">Back</string>
     <string name="your_blogs">Your Blogs</string>
+    <string name="search_blog_title">Search Blog Title...</string>
 
 </resources>

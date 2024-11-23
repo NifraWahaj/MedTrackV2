@@ -46,7 +46,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="@string/your_blogs"
+                    android:text="Rated blogs"
                     android:textColor="#ffffff"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -60,7 +60,7 @@
                 android:layout_centerInParent="true" />
             <!-- RecyclerView to display the list of items -->
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewYourBlogs"
+                android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -70,16 +70,5 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- FloatingActionButton -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabWriteBlog"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_margin="16dp"
-        android:backgroundTint="@color/blueMain"
-        android:src="@drawable/ic_add"
-        app:fabSize="normal"
-        android:layout_gravity="bottom|end"
-  />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

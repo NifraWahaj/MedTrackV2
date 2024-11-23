@@ -3,6 +3,7 @@ package com.example.medtrack.activities;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -29,6 +30,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.palette.graphics.Palette;
 
 import com.example.medtrack.R;
 import com.example.medtrack.models.User;
@@ -63,11 +65,12 @@ public class EditBlogAPIActivity extends AppCompatActivity {
 private  TextView tvusername;
     private RichEditor mEditor;
     private String blogId;
+    private Bitmap bitmap;
     private ImageButton btnPost,btnGoBack;
     private String IMGBB_API_KEY="40c7d1f33a00acd8ecd5ed77b2bff4a9";
     private boolean isEdit = false;
-    private   ImageButton btnUndo, btnRedo,btnBold,btnItalic,btnStrikeThrough,btnUnderline,btnDiv,btnLeftAlign,
-            btnCenterAlign,btnRightAlign,btnBlockQuote,btnBulletList,btnAddImage,btnAddLink;
+     private   ImageButton btnUndo, btnRedo,btnBold,btnItalic,btnStrikeThrough,btnUnderline,btnDiv,btnLeftAlign,
+        btnNumberingList,    btnColorPicker,btnCenterAlign,btnRightAlign,btnBlockQuote,btnBulletList,btnAddImage,btnAddLink;
 
     private EditText etTitle;
     @Override
@@ -77,6 +80,8 @@ private  TextView tvusername;
 
         Intent intent = getIntent();
         isEdit = intent.getBooleanExtra("isEdit",false); // Default to false if not provided
+        // Load a sample bitmap in the background (not displayed in UI)
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.color_palette);
 
         // Toolbar buttons
         setToolbarActions();
@@ -95,14 +100,15 @@ private  TextView tvusername;
         }
 
 
-         // findViewById(R.id.btnGoBack).setOnClickListener(v-> fetchFromDB());
+
+        // findViewById(R.id.btnGoBack).setOnClickListener(v-> fetchFromDB());
     }
 
     private void setToolbarActions() {
         etTitle= findViewById(R.id.etBlogTitle);
           tvusername =findViewById(R.id.tvusername);
         mEditor = findViewById(R.id.etBlogContent);
-
+        btnNumberingList=findViewById(R.id.btnNumberingList);
         btnGoBack=findViewById(R.id.btnGoBack);
         btnPost=findViewById(R.id.btnPost);
         btnUndo = findViewById(R.id.btnUndo);
@@ -119,8 +125,13 @@ private  TextView tvusername;
         btnBulletList = findViewById(R.id.btnBulletList);
         btnAddImage = findViewById(R.id.btnAddImage);
         btnAddLink = findViewById(R.id.btnAddLink);
-
-
+        btnColorPicker=findViewById(R.id.btnColorPicker);
+        findViewById(R.id.btnNumberingList).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mEditor.setNumbers();
+            }
+        });
 
  // Set onClickListeners for each button
         btnGoBack.setOnClickListener(v -> finish());
@@ -132,6 +143,12 @@ private  TextView tvusername;
         else{
             saveBlogToFirebase();
             finish();}} );
+
+        btnColorPicker.setOnClickListener(v ->
+        {
+            showColorPickerDialog(bitmap);
+          });
+
         btnUndo.setOnClickListener(v -> mEditor.undo());
         btnRedo.setOnClickListener(v -> mEditor.redo());
         btnBold.setOnClickListener(v -> mEditor.setBold());
@@ -145,7 +162,7 @@ private  TextView tvusername;
         btnBlockQuote.setOnClickListener(v -> mEditor.setBlockquote());
         btnBulletList.setOnClickListener(v -> mEditor.setBullets());
         btnAddImage.setOnClickListener(v -> openImagePicker());
-        btnAddLink.setOnClickListener(v -> mEditor.insertLink("https://github.com/wasabeef", "Wasabeef"));    }
+        btnAddLink.setOnClickListener(v ->   showLinkDialog());    }
 
     private void showDivPopupMenu(View v) {
         PopupMenu popupMenu = new PopupMenu(this, v);
@@ -167,6 +184,81 @@ private  TextView tvusername;
         });
         popupMenu.show();
     }
+    private void showColorPickerDialog(Bitmap bitmap) {
+        if (bitmap == null) {
+            Log.e("ColorPicker", "Bitmap is null!");
+            return;  // Exit if bitmap is null
+        }
+
+        // Generate a palette asynchronously
+        Palette.from(bitmap).generate(palette -> {
+            if (palette != null) {
+                // Create an AlertDialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Pick a Color");
+
+                // Create a layout to display the colors
+                LinearLayout colorLayout = new LinearLayout(this);
+                colorLayout.setOrientation(LinearLayout.HORIZONTAL);
+                colorLayout.setPadding(16, 16, 16, 16);
+
+                // Extract colors from the palette
+                int[] colors = {
+                        palette.getVibrantColor(0),
+                        palette.getLightVibrantColor(0),
+                        palette.getDarkVibrantColor(0),
+                        palette.getMutedColor(0),
+                        palette.getLightMutedColor(0),
+                        palette.getDarkMutedColor(0)
+                };
+                // Log to check the extracted colors
+                for (int color : colors) {
+                    Log.d("ColorPicker", "Extracted color: " + color);
+                }
+
+                // Add each color as a color swatch to the layout
+                for (int color : colors) {
+                    if (color != 0) { // Only add valid colors
+                        View colorView = new View(this);
+                        colorView.setBackgroundColor(color);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100);
+                        params.setMargins(16, 0, 16, 0);
+                        colorView.setLayoutParams(params);
+
+                        // Set click listener to select color
+                        colorView.setOnClickListener(v -> {
+                              if (mEditor != null) {  // Ensure mEditor is not null
+
+
+                                 mEditor.setEditorFontColor(color);
+
+                                Log.d("ColorPicker", "Color swatch clicked: " + color);
+
+                                // Dismiss the dialog
+                                if (builder != null && builder.create() != null) {
+                                    builder.create().dismiss();
+                                }
+                            }
+                        });
+
+                        colorLayout.addView(colorView);
+                    }
+                }
+
+                // Set the layout for the dialog
+                builder.setView(colorLayout);
+
+                // Set "Cancel" button behavior
+                builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+                // Show the dialog
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+    }
+
+
     // Method to open the image picker
 
     private void openImagePicker() {
@@ -328,6 +420,54 @@ private  TextView tvusername;
 
 
 
+    // Method to show the dialog for adding a link
+    private void showLinkDialog() {
+        // Create a layout for the dialog inputs
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+        // Create input fields for URL and label
+        EditText linkInput = new EditText(this);
+        linkInput.setHint("Enter URL (e.g., https://example.com)");
+        layout.addView(linkInput);
+
+        EditText labelInput = new EditText(this);
+        labelInput.setHint("Enter link text");
+        layout.addView(labelInput);
+
+        // Build the AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Insert Link")
+                .setView(layout)
+                .setPositiveButton("Insert", (dialog, which) -> {
+                    String linkUrl = linkInput.getText().toString().trim();
+                    String linkText = labelInput.getText().toString().trim();
+
+                    // Validate the input
+                    if (linkUrl.isEmpty() || linkText.isEmpty()) {
+                        Toast.makeText(this, "URL and text are required", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Insert the link into the editor
+                     String htmlContent=   mEditor.getHtml();
+                     if(htmlContent==null){
+                         mEditor.setHtml(" ");
+                     }
+                        mEditor.insertLink(linkUrl, linkText);
+
+                        // Optionally style the link color
+                        String styledLinkHtml = "<a href='" + linkUrl + "' style='color:blue;'>" + linkText + "</a>";
+                        mEditor.setHtml(mEditor.getHtml() + styledLinkHtml);
+
+                      }
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .create()
+                .show();
+    }
+
+
+
+
 
 
 
@@ -353,12 +493,12 @@ private  TextView tvusername;
             Map<String, Object> blogData = new HashMap<>();
             blogData.put("title", etTitle.getText().toString());
 
-            blogData.put("userEmail", User.getCurrentUserEmail(this));
-            blogData.put("userName", User.getCurrentUserName(this));
             blogData.put("userId", User.getCurrentUserId(this));
-
+ 
             blogData.put("content", mEditor.getHtml()); // Store formatted text content as JSON
             blogData.put("isApproved", false);
+            blogData.put("reviews",new HashMap<>());
+            blogData.put("ratings",new HashMap<>());
 
             blogsRef.push().setValue(blogData)
                     .addOnSuccessListener(aVoid -> Toast.makeText(this, "Blog saved to Firebase!", Toast.LENGTH_SHORT).show())

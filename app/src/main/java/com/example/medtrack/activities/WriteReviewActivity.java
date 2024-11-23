@@ -3,6 +3,7 @@ package com.example.medtrack.activities;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -28,7 +29,7 @@ public class WriteReviewActivity extends AppCompatActivity {
     private EditText etReview;
     private String title, review, blogId,  author;
     private float userRating;
-    private Button btnSubmit;
+    private Button btnSubmit,btnDelete;
     private boolean isEditMode;
     private ImageButton backButton;
 
@@ -44,6 +45,7 @@ public class WriteReviewActivity extends AppCompatActivity {
         btnSubmit = findViewById(R.id.btnSubmit);
         backButton = findViewById(R.id.backButton);
         tvAuthor=findViewById(R.id.tvAuthor);
+        btnDelete=findViewById(R.id.btnDelete);
         // Initialize data
         isEditMode = false;
 
@@ -52,12 +54,18 @@ public class WriteReviewActivity extends AppCompatActivity {
             userRating = getIntent().getFloatExtra("userRating", 0);
             title = getIntent().getStringExtra("blogTitle");
             blogId = getIntent().getStringExtra("blogId");
-              author= getIntent().getStringExtra("author");
-
-            isEditMode= getIntent().getBooleanExtra("editMode",false);
+            author= getIntent().getStringExtra("author");
+            review= getIntent().getStringExtra("reviewText");
+             isEditMode= getIntent().getBooleanExtra("editMode",false);
             if (isEditMode==true) {
-                 String reviewText = getIntent().getStringExtra("etReview");
+                 String reviewText = getIntent().getStringExtra("reviewText");
                 etReview.setText(reviewText);
+                btnDelete.setVisibility(View.VISIBLE);
+
+
+            }
+            else{
+                btnDelete.setVisibility(View.GONE);
             }
 
             // Set the data to views
@@ -72,7 +80,11 @@ public class WriteReviewActivity extends AppCompatActivity {
 
         // Back button listener
         backButton.setOnClickListener(v -> finish());
+        btnDelete.setOnClickListener(v->{
+            deleteReview(blogId);
+            finish();
 
+        });
         // Submit button listener
         btnSubmit.setOnClickListener(v -> {
             submitReview();
@@ -81,44 +93,53 @@ public class WriteReviewActivity extends AppCompatActivity {
         );
     }
 
+ private void  deleteReview(String blogId){
+      String userId = User.getCurrentUserId(this); // Get userId to use as the key for ratings and reviews
+         // Get a reference to the specific blog in Firebase
+         DatabaseReference blogRef = FirebaseDatabase.getInstance().getReference("blogs").child(blogId);
+
+         // Get the reference to the specific user's review and rating
+         DatabaseReference reviewRef = blogRef.child("reviews_and_ratings").child(userId);
+
+         // Delete the review and rating for the specific user
+         reviewRef.removeValue()
+                 .addOnSuccessListener(aVoid -> {
+                     // Show success message
+                     Toast.makeText(this, "Review and Rating deleted successfully!", Toast.LENGTH_SHORT).show();
+                 })
+                 .addOnFailureListener(e -> {
+                     // Show failure message
+                     Toast.makeText(this, "Failed to delete review and rating", Toast.LENGTH_SHORT).show();
+                 });
+     }
+
+
+
+
     private void submitReview() {
         userRating = ratingBar.getRating();
         review = etReview.getText().toString();
-       if(userRating==0.0f){
-           Toast.makeText(this,"Please add ratings ro procees",Toast.LENGTH_SHORT).show();
-           return;
+        String userId = User.getCurrentUserId(this); // Get userId to use as the key for ratings and reviews
 
-       }
-        // Initialize Firebase
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
-        DatabaseReference reviewsRef = database.getReference("reviews");
-
-        Map<String, Object> reviewData = new HashMap<>();
-        reviewData.put("BlogTitle", title);
-        reviewData.put("BlogId", blogId);
-        reviewData.put("rating", userRating);
-        reviewData.put("review", review);
-
-        reviewData.put("userEmail", User.getCurrentUserEmail(this));
-        reviewData.put("name", User.getCurrentUserName(this));
-
-        if (isEditMode) {
-            // Update existing review
-            reviewsRef.orderByChild("userEmail").equalTo(User.getCurrentUserName(this)).get().addOnCompleteListener(task -> {
-                if (task.isSuccessful() && task.getResult().exists()) {
-                    String reviewKey = task.getResult().getChildren().iterator().next().getKey();
-                    if (reviewKey != null) {
-                        reviewsRef.child(reviewKey).updateChildren(reviewData)
-                                .addOnSuccessListener(aVoid -> Toast.makeText(this, "Review updated!", Toast.LENGTH_SHORT).show())
-                                .addOnFailureListener(e -> Toast.makeText(this, "Failed to update review", Toast.LENGTH_SHORT).show());
-                    }
-                }
-            });
-        } else {
-            // Create a new review
-            reviewsRef.push().setValue(reviewData)
-                    .addOnSuccessListener(aVoid -> Toast.makeText(this, "Review added to Firebase!", Toast.LENGTH_SHORT).show())
-                    .addOnFailureListener(e -> Toast.makeText(this, "Failed to add review", Toast.LENGTH_SHORT).show());
+        if (userRating == 0.0f) {
+            Toast.makeText(this, "Please add ratings to proceed", Toast.LENGTH_SHORT).show();
+            return;
         }
+        DatabaseReference blogRef = FirebaseDatabase.getInstance().getReference("blogs").child(blogId);
+
+        // Create a map to store both the review and rating data
+        Map<String, Object> reviewAndRatingData = new HashMap<>();
+        reviewAndRatingData.put("review", review);  // Store the user's review
+        reviewAndRatingData.put("rating", userRating);  // Store the user's rating
+
+        // Save both review and rating together under the specific blogId and userId
+        blogRef.child("reviews_and_ratings").child(userId).setValue(reviewAndRatingData)
+                .addOnSuccessListener(aVoid ->
+                        Toast.makeText(this, "Review and Rating added to Firebase!", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Failed to add review and rating", Toast.LENGTH_SHORT).show());
     }
+
+
+
 }

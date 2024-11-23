@@ -3,15 +3,32 @@ public class Review {
     private String userName;
     private float rating;
     private String reviewText;
+    private String userId;
     private String blogTitle;
     private String userEmail;
 
-    public Review(String userName, float rating, String reviewText, String blogTitle, String userEmail) {
-        this.userName = userName;
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public Review(String userId, float rating, String reviewText) {
+        this.userId = userId;
         this.rating = rating;
         this.reviewText = reviewText;
-        this.blogTitle = blogTitle;
-        this.userEmail = userEmail;
+
+    }
+public Review(){}
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+    public void setReviewText(String reviewText) {
+        this.reviewText = reviewText;
+    }  public void setRating(Float rating) {
+        this.rating = rating;
     }
 
     // Getters and setters

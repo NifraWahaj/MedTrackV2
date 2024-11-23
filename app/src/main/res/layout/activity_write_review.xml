@@ -96,5 +96,15 @@
         android:text="@string/submit"
         android:textColor="@color/white"
         />
+    <Button
+        android:id="@+id/btnDelete"
+        android:layout_width="300dp"
+        android:layout_marginTop="30dp"
+        android:layout_height="@dimen/loginButtonheight"
+        android:layout_gravity="center"
+        android:backgroundTint="@color/blueMain"
+        android:text="Delete"
+        android:textColor="@color/white"
+        />
 
 </LinearLayout>

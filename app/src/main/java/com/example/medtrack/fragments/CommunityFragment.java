@@ -19,9 +19,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.medtrack.R;
 import com.example.medtrack.activities.BlogContentActivity;
 import com.example.medtrack.activities.EditBlogAPIActivity;
+import com.example.medtrack.activities.RatedBlogsActivity;
 import com.example.medtrack.adapters.BlogAdapter;
 import com.example.medtrack.models.Blog;
 import com.example.medtrack.activities.usersBlogActivity;
+import com.google.android.material.chip.Chip;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -36,11 +38,14 @@ import java.util.List;
      private BlogAdapter blogAdapter;
      private List<Blog> blogList = new ArrayList<>();
      private List<Blog> filteredBlogList = new ArrayList<>();
-     private Button btnCommunity, btnSearch,btnYourBlog;
+     private Button   btnSearch;
      private EditText etSearch;
      private ProgressBar progressBar;  // Declare ProgressBar
 
      private LinearLayout linearLayoutCommunity;
+    private Chip chipYourBlogs ,
+       chipRatedBlogs ,
+       chipWriteBlog;
      public CommunityFragment() {
          // Required empty public constructor
      }
@@ -57,20 +62,27 @@ import java.util.List;
          // Initialize the BlogAdapter and pass the OnBlogClickListener
          blogAdapter = new BlogAdapter(getContext(), filteredBlogList, this,false);
          recyclerView.setAdapter(blogAdapter);
-
-         btnCommunity = view.findViewById(R.id.buttonCommunity);
-         btnSearch = view.findViewById(R.id.btnSearch);
+           chipYourBlogs = view.findViewById(R.id.chipYourBlogs);
+           chipRatedBlogs = view.findViewById(R.id.chipRatedBlogs);
+           chipWriteBlog = view.findViewById(R.id.chipWriteBlog);
+          btnSearch = view.findViewById(R.id.btnSearch);
          etSearch = view.findViewById(R.id.etSearch);
-         btnYourBlog=view.findViewById(R.id.btnYourBlogs);
-         btnCommunity.setOnClickListener(v -> {
+          chipWriteBlog.setOnClickListener(v -> {
              Intent i = new Intent(getActivity(), EditBlogAPIActivity.class);
              i.putExtra("isEdit", false);
 
              startActivity(i);
          });
          // Handle btnYourBlog click (to move to YourBlogFragment)
-         btnYourBlog.setOnClickListener(v -> {
+         chipYourBlogs.setOnClickListener(v -> {
               Intent i = new Intent(getActivity(), usersBlogActivity.class);
+             i.putExtra("isEdit", false);
+
+             startActivity(i);
+         });
+         chipRatedBlogs.setOnClickListener(v->{
+
+             Intent i = new Intent(getActivity(), RatedBlogsActivity.class);
              i.putExtra("isEdit", false);
 
              startActivity(i);
@@ -83,19 +95,20 @@ import java.util.List;
          });
 
          fetchBlogsFromFirebase();  // Fetch data from Firebase
-         // Add OnBackStackChangedListener to handle view visibility when returning from other fragments
+       /*  // Add OnBackStackChangedListener to handle view visibility when returning from other fragments
          getParentFragmentManager().addOnBackStackChangedListener(() -> {
              if (getParentFragmentManager().getBackStackEntryCount() == 0) {
                  // No fragments in back stack, so restore visibility of RecyclerView and Button
                  recyclerView.setVisibility(View.VISIBLE);
-                 btnCommunity.setVisibility(View.VISIBLE);
-                 etSearch.setVisibility(View.VISIBLE);
+                  etSearch.setVisibility(View.VISIBLE);
                  btnSearch.setVisibility(View.VISIBLE);
                  linearLayoutCommunity.setVisibility(View.VISIBLE);
-                 btnYourBlog.setVisibility(View.VISIBLE);
+                 chipRatedBlogs.setVisibility(View.VISIBLE);
+                 chipRatedBlogs.setVisibility(View.VISIBLE);
+                 chipYourBlogs.setVisibility(View.VISIBLE);
 
              }
-         });
+         });*/
          return view;
      }
 
@@ -116,9 +129,9 @@ import java.util.List;
                      String title = snapshot.child("title").getValue(String.class);
                      String content = snapshot.child("content").getValue(String.class);
                      Boolean isApproved = snapshot.child("isApproved").getValue(Boolean.class);
-
+                     String userId= snapshot.child("userId").getValue(String.class);
                      if (isApproved != null && isApproved) {
-                         Blog blog = new Blog(id, title, content, isApproved);
+                         Blog blog = new Blog(id, userId,title, content, isApproved);
                          blogList.add(blog);  // Add each blog to the list
                          Log.d("CommunityFragment", "Blog Title: " + title);  // Debugging log
                      }
@@ -139,21 +152,21 @@ import java.util.List;
              }
          });
      }
-
+/*
      @Override
      public void onResume() {
          super.onResume();
          Log.d("BlogContentFragment", "onResume called");
 
          recyclerView.setVisibility(View.VISIBLE);
-         btnCommunity.setVisibility(View.VISIBLE);
-         etSearch.setVisibility(View.VISIBLE);
+          etSearch.setVisibility(View.VISIBLE);
          btnSearch.setVisibility(View.VISIBLE);
          linearLayoutCommunity.setVisibility(View.VISIBLE);
-         btnYourBlog.setVisibility(View.VISIBLE);
+         chipRatedBlogs.setVisibility(View.VISIBLE);
+         chipRatedBlogs.setVisibility(View.VISIBLE);
+         chipYourBlogs.setVisibility(View.VISIBLE);
 
-
-     }
+     }*/
 
      // Filter blogs based on search query
      private void filterBlogs(String query) {
@@ -180,18 +193,19 @@ import java.util.List;
          intent.putExtra("blogId", blog.getId());
          intent.putExtra("blogTitle", blog.getTitle());
          intent.putExtra("blogContent", blog.getContent());
+         intent.putExtra("userId", blog.getUserId());
 
          // Display a Toast for debugging
          Toast.makeText(getContext(), "Inside onBlogClick", Toast.LENGTH_SHORT).show();
 
          // Hide the views
-         recyclerView.setVisibility(View.GONE);
-         btnCommunity.setVisibility(View.GONE);
-         etSearch.setVisibility(View.GONE);
+      /*   recyclerView.setVisibility(View.GONE);
+          etSearch.setVisibility(View.GONE);
          btnSearch.setVisibility(View.GONE);
          linearLayoutCommunity.setVisibility(View.GONE);
-         btnYourBlog.setVisibility(View.GONE);
-
+         chipRatedBlogs.setVisibility(View.GONE);
+         chipRatedBlogs.setVisibility(View.GONE);
+         chipYourBlogs.setVisibility(View.GONE);*/
          try {
              // Start BlogContentActivity
              Log.d("CommunityFragment", "Attempting to start BlogContentActivity...");

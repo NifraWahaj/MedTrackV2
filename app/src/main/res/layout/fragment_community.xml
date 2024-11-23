@@ -22,15 +22,6 @@
             android:layout_gravity="top|center_horizontal"
             android:weightSum="1">
 
-            <!-- Back Button -->
-            <ImageButton
-                android:id="@+id/backButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/go_back"
-                android:contentDescription="Back"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:layout_gravity="center_vertical" />
 
             <!-- Page Title (centered) -->
             <TextView
@@ -62,7 +53,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="   Search..."
+                android:hint="@string/search_blog_title"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:textSize="16sp"
@@ -77,30 +68,47 @@
                 android:drawableLeft="@drawable/search2"
                 android:contentDescription="Search"
                 android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+
         </LinearLayout>
-        <LinearLayout
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupFilters"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="end"
-            android:orientation="horizontal">
-            <Button
-                android:id="@+id/btnYourBlogs"
+            android:layout_margin="16dp"
+
+             android:gravity="center">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipYourBlogs"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Your Blogs"
-                android:layout_margin="10dp"
-                android:layout_gravity="center"
-                 android:layout_marginTop="16dp" />
-         <!-- Community Button placed below the search bar -->
-        <Button
-            android:id="@+id/buttonCommunity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/write_blog"
-            android:layout_margin="10dp"
-             android:layout_gravity="center"
-            android:layout_marginTop="16dp" />
-        </LinearLayout>
+
+                android:textColor="@color/white"
+                android:backgroundTint="@color/blueMain"
+                style="@style/Widget.MaterialComponents.Chip.Filter" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipRatedBlogs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rated Blogs"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/blueMain"
+                style="@style/Widget.MaterialComponents.Chip.Filter" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipWriteBlog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Write Blog"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/blueMain"
+                style="@style/Widget.MaterialComponents.Chip.Filter" />
+        </com.google.android.material.chip.ChipGroup>
+
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"

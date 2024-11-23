@@ -51,7 +51,9 @@ dependencies {
 
     // Retrofit dependency for networking
     implementation ("com.squareup.retrofit2:retrofit:2.9.0") // Use the latest stable version
-    implementation ("com.squareup.retrofit2:converter-gson:2.5.0") // Gson converter for Retrofit
+    implementation("androidx.palette:palette:1.0.0")
+
+
 
     // Gson dependency for JSON serialization/deserialization
     implementation ("com.google.code.gson:gson:2.6.2") // Use the version you prefer or the latest

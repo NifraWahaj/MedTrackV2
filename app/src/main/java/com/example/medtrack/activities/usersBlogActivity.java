@@ -5,10 +5,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -35,10 +37,11 @@ public class usersBlogActivity extends Activity implements BlogAdapter.OnBlogCli
     private BlogAdapter blogAdapter;
     private List<Blog> blogList = new ArrayList<>();
     private Button btnAddBlog, btnSearch;
-    private EditText etSearch;
-    private LinearLayout linearLayoutYourBlogs;
+     private LinearLayout linearLayoutYourBlogs;
     ImageButton btnGoBack;
-   FloatingActionButton fabWriteBlog;
+    private ProgressBar progressBar;  // Declare ProgressBar
+
+    FloatingActionButton fabWriteBlog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +50,7 @@ public class usersBlogActivity extends Activity implements BlogAdapter.OnBlogCli
         fabWriteBlog=findViewById(R.id.fabWriteBlog);
         recyclerViewYourBlogs = findViewById(R.id.recyclerViewYourBlogs);
         recyclerViewYourBlogs.setLayoutManager(new LinearLayoutManager(this));
+        progressBar = findViewById(R.id.progressBar); // Initialize ProgressBar
 
         // Initialize the BlogAdapter and pass the OnBlogClickListener
         blogAdapter = new BlogAdapter(this, blogList, this,true);
@@ -69,43 +73,50 @@ public class usersBlogActivity extends Activity implements BlogAdapter.OnBlogCli
 
     // Fetch user's blogs from Firebase
     private void fetchUserBlogsFromFirebase() {
-        String userEmail = User.getCurrentUserEmail(this); // Get the logged-in user's email
+        // Get the logged-in user's ID
+        String currentUserId = User.getCurrentUserId(this);
+        progressBar.setVisibility(View.VISIBLE);
+        recyclerViewYourBlogs.setVisibility(View.GONE);
+        // Reference to the "blogs" node in Firebase Database
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("blogs");
 
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                blogList.clear(); // Clear previous data
-                Log.d("YourBlogActivity", "Number of blogs: " + dataSnapshot.getChildrenCount());
+                blogList.clear(); // Clear the existing list to avoid duplicates
+                Log.d("YourBlogActivity", "Total blogs in database: " + dataSnapshot.getChildrenCount());
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    String id = snapshot.getKey();
-                    String userId= snapshot.child("userId").getValue(String.class);
+                    // Extract blog details from the snapshot
+                    String blogId = snapshot.getKey();
+                    String userId = snapshot.child("userId").getValue(String.class);
                     String title = snapshot.child("title").getValue(String.class);
                     String content = snapshot.child("content").getValue(String.class);
-                    String email = snapshot.child("userEmail").getValue(String.class);
-                    boolean isApproved = snapshot.child("isApproved").getValue(Boolean.class); // Use Boolean.class for boolean value
-                    Toast.makeText(usersBlogActivity.this, "EMAIL FETCHED ARE: " + email, Toast.LENGTH_SHORT).show();
+                    Boolean isApproved = snapshot.child("isApproved").getValue(Boolean.class);
 
-                    if(userId!=null && userId.equals(User.getCurrentUserId(getApplicationContext()))&&isApproved==true){
-                        Blog blog = new Blog(id, title, content, isApproved);
+                    // Check if the blog belongs to the current user and is approved
+                    if (userId != null && userId.equals(currentUserId) && Boolean.TRUE.equals(isApproved)) {
+                        Blog blog = new Blog(blogId, userId, title, content, isApproved);
                         blogList.add(blog);
+                        Log.d("YourBlogActivity", "Fetched blog: " + title);
                     }
-                 //   if (email != null && email.equals(userEmail) &&isApproved==true) {
-                //        Blog blog = new Blog(id, title, content, isApproved);
-                 //       blogList.add(blog);
-                  //  }
                 }
-                Toast.makeText(usersBlogActivity.this, "BLOGS FETCHED: " + blogList.size(), Toast.LENGTH_SHORT).show();
+
+                // Notify adapter of data changes and display a message
                 blogAdapter.notifyDataSetChanged();
+                progressBar.setVisibility(View.GONE);
+                recyclerViewYourBlogs.setVisibility(View.VISIBLE);
+                Toast.makeText(usersBlogActivity.this, "Fetched " + blogList.size() + " blogs.", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                // Handle errors during data fetching
                 Log.e("YourBlogActivity", "Database error: " + databaseError.getMessage());
             }
         });
     }
+
 
     @Override
     public void onBlogClick(Blog blog) {

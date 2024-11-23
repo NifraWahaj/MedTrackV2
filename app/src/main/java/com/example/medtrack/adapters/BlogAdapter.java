@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -73,8 +74,10 @@ public class BlogAdapter extends RecyclerView.Adapter<BlogAdapter.BlogViewHolder
 
         // Set an OnClickListener that will invoke the onBlogClick function
         holder.itemView.setOnClickListener(v -> {
-            if (onBlogClickListener != null) {
-                onBlogClickListener.onBlogClick(blog);  // Notify the fragment
+             if (onBlogClickListener != null) {
+                 Toast.makeText(context, "blog adapter item lcike",Toast.LENGTH_SHORT).show();
+
+                 onBlogClickListener.onBlogClick(blog);  // Notify the fragment
             }
         });
 

@@ -107,7 +107,7 @@ public class SignUpActivity extends AppCompatActivity {
                                             .addOnFailureListener(e -> Toast.makeText(getApplicationContext(), "Failed to save user", Toast.LENGTH_SHORT).show());
 
                                     // Redirect to LoginActivity
-                                    Intent i = new Intent(SignUpActivity.this, LoginActivity.class);
+                                    Intent i = new Intent(SignUpActivity.this, MainActivity.class);
                                     startActivity(i);
                                     finish();
                                 } else {
