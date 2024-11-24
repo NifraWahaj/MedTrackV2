@@ -22,19 +22,19 @@
     <Button
         android:id="@+id/btnAddPicture"
         android:layout_marginTop="240dp"
-         android:layout_width="wrap_content"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Click to Add Picture">
 
     </Button>
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="220dp"
-    android:layout_marginStart="140dp"
-    android:text="RETRIVED IMAGE FROM DB IS BELOW">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="220dp"
+        android:layout_marginStart="140dp"
+        android:text="RETRIVED IMAGE FROM DB IS BELOW">
 
-</TextView>
+    </TextView>
 
     <ImageView
         android:id="@+id/ivRetrivedPicture"

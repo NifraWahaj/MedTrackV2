@@ -12,4 +12,5 @@
     <color name="fontColormAIN">#000000</color>
     <color name="radioBG">#EDF2F2</color>
     <color name="ratingColor">#FF9529</color>
+    <color name="dateYellow">#DCFF05</color>
  </resources>

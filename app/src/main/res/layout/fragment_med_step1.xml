@@ -5,6 +5,7 @@
     android:importantForAutofill="no"
     android:orientation="vertical"
     android:gravity="center_horizontal"
+
     android:padding="32dp"
     android:background="@color/bg_main">
 
