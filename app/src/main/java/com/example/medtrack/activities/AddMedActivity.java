@@ -22,7 +22,7 @@ import com.example.medtrack.fragments.MedStep3TwoDosesFragment;
 import com.example.medtrack.fragments.MedStep4Fragment;
 import com.example.medtrack.R;
 import com.example.medtrack.models.Medication;
-import com.example.medtrack.services.NotificationWorker;
+import com.example.medtrack.utils.NotificationWorker;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;

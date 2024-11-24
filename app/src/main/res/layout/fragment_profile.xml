@@ -16,19 +16,25 @@
         android:layout_height="100dp"
         android:layout_margin="40dp"
         android:padding="40dp"
-        ></ImageView>
+        >
+
+    </ImageView>
     <Button
         android:id="@+id/btnAddPicture"
         android:layout_marginTop="240dp"
          android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Click to Add Picture"></Button>
+        android:text="Click to Add Picture">
+
+    </Button>
 <TextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginTop="220dp"
     android:layout_marginStart="140dp"
-    android:text="RETRIVED IMAGE FROM DB IS BELOW"></TextView>
+    android:text="RETRIVED IMAGE FROM DB IS BELOW">
+
+</TextView>
 
     <ImageView
         android:id="@+id/ivRetrivedPicture"
@@ -36,5 +42,18 @@
         android:layout_height="300dp"
         android:layout_marginTop="340dp"
         android:padding="40dp"
-        ></ImageView>
+        >
+
+    </ImageView>
+
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Logout"
+        android:layout_margin="16dp"
+        android:backgroundTint="@color/blueDark"
+        android:textColor="@android:color/white"
+        android:layout_gravity="center" />
+
 </FrameLayout>

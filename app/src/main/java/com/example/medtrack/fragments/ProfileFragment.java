@@ -22,6 +22,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.medtrack.R;
+import com.example.medtrack.activities.LoginActivity;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DataSnapshot;
@@ -35,6 +37,7 @@ public class ProfileFragment extends Fragment {
 
     private static final int PICK_IMAGE = 1;
     private ImageView ivProfilePicture, ivRetrivedPicture;
+    private Button btnLogout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,22 +46,23 @@ public class ProfileFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
 
         ivProfilePicture = v.findViewById(R.id.ivProfilePicture);
-        Button btnAddPicture = v.findViewById(R.id.btnAddPicture);
         ivRetrivedPicture = v.findViewById(R.id.ivRetrivedPicture);
+        Button btnAddPicture = v.findViewById(R.id.btnAddPicture);
+        btnLogout = v.findViewById(R.id.btnLogout);  // Bind the logout button
 
+        // Set up Add Picture button
         btnAddPicture.setOnClickListener(V -> {
             openImagePicker();
             retrieveImageFromFirebase();
-
         });
 
-        // Optionally, you can retrieve an image from Firebase and display it
+        // Set up Logout button functionality
+        btnLogout.setOnClickListener(v1 -> logout());
 
         return v;
     }
 
     private void openImagePicker() {
-        // Open the image picker to select an image from the gallery
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_IMAGE);
     }
@@ -68,18 +72,12 @@ public class ProfileFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == RESULT_OK && requestCode == PICK_IMAGE && data != null) {
-            // Get the URI of the selected image
             Uri selectedImageUri = data.getData();
 
             if (selectedImageUri != null) {
                 try {
-                    // Convert the URI to a Bitmap
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), selectedImageUri);
-
-                    // Display the image in an ImageView
                     ivProfilePicture.setImageBitmap(bitmap);
-
-                    // Convert the Bitmap to Base64 and upload to Firebase
                     storeImageInFirebase(bitmap);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -89,26 +87,19 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    // Convert Bitmap to Base64 String
     public String convertBitmapToBase64(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        // Compress the bitmap into JPEG format, adjust the quality to 100%
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
-        // Encode the byte array into a Base64 string
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 
-    // Store the Base64-encoded image in Firebase Realtime Database
     public void storeImageInFirebase(Bitmap bitmap) {
         String encodedImage = convertBitmapToBase64(bitmap);
-
-        // Get a reference to your Firebase Realtime Database
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
         DatabaseReference databaseRef = database.getReference("images");
 
-        // Push the Base64 string into the database under a new key
-        String imageId = databaseRef.push().getKey(); // Generate a unique key
+        String imageId = databaseRef.push().getKey();
         if (imageId != null) {
             databaseRef.child(imageId).setValue(encodedImage)
                     .addOnCompleteListener(task -> {
@@ -121,25 +112,20 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    // Optionally, retrieve the image from Firebase and display it
     public void retrieveImageFromFirebase() {
-        // Get a reference to the Firebase Realtime Database
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
         DatabaseReference databaseRef = database.getReference("images");
 
-        // Retrieve the images stored under the "images" node
         databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    // Iterate through all child nodes to retrieve the Base64 image string
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         String base64Image = snapshot.getValue(String.class);
                         if (base64Image != null) {
-                            // Convert Base64 string back to Bitmap and display it
                             Bitmap bitmap = convertBase64ToBitmap(base64Image);
                             ivRetrivedPicture.setImageBitmap(bitmap);
-                            return;  // Display the first retrieved image (or break if you need a specific one)
+                            return;
                         }
                     }
                 }
@@ -152,9 +138,25 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    // Convert Base64 string back to Bitmap
     public Bitmap convertBase64ToBitmap(String base64String) {
         byte[] decodedBytes = Base64.decode(base64String, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+    }
+
+    private void logout() {
+        FirebaseAuth.getInstance().signOut();  // Sign out the user from Firebase
+
+        // Redirect to LoginActivity
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);  // Clear activity stack
+        startActivity(intent);
+
+        // Show a logout success message
+        Toast.makeText(getContext(), "Logged out successfully!", Toast.LENGTH_SHORT).show();
+
+        // Finish the fragment's parent activity (optional)
+        if (getActivity() != null) {
+            getActivity().finish();
+        }
     }
 }

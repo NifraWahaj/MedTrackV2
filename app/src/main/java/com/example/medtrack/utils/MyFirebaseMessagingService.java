@@ -1,4 +1,4 @@
-package com.example.medtrack.services;
+package com.example.medtrack.utils;
 
 import android.Manifest;
 import android.app.NotificationChannel;
