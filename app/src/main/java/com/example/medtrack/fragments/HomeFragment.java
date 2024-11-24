@@ -1,5 +1,6 @@
 package com.example.medtrack.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,9 +16,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.medtrack.R;
+import com.example.medtrack.activities.AddMedActivity;
 import com.example.medtrack.adapters.CalendarAdapter;
 import com.example.medtrack.adapters.MedicationAdapter;
 import com.example.medtrack.models.Medication;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -84,6 +87,20 @@ public class HomeFragment extends Fragment {
         medicationRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         medicationAdapter = new MedicationAdapter(getContext(), medicationList);
         medicationRecyclerView.setAdapter(medicationAdapter);
+
+        // Find the FAB and set its click listener
+        FloatingActionButton fab = view.findViewById(R.id.fabAddMedication);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Handle FAB click
+                Toast.makeText(getActivity(), "FAB Clicked!", Toast.LENGTH_SHORT).show();
+
+                // Create an Intent to start the target activity
+                Intent intent = new Intent(getActivity(), AddMedActivity.class);
+                startActivity(intent);
+            }
+        });
 
         return view;
     }
