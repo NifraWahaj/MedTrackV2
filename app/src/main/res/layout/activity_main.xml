@@ -12,11 +12,13 @@
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:tabTextAppearance="@style/CustomTabTextStyle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:tabGravity="fill"
         app:tabIndicatorHeight="3dp"
         app:tabMode="fixed"
         tools:ignore="SpeakableTextPresentCheck" />
+
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewpager2"

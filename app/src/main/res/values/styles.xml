@@ -19,4 +19,11 @@
         <item name="android:textColor">@android:color/black</item>
     </style>
 
+
+    <!-- Custom style for TabLayout text -->
+    <style name="CustomTabTextStyle">
+        <item name="android:textSize">12sp</item> <!-- Adjust the size as needed -->
+        <item name="android:textColor">#FFFFFF</item> <!-- Optional: adjust text color -->
+    </style>
+
 </resources>
