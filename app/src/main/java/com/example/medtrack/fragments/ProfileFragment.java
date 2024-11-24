@@ -1,7 +1,9 @@
 package com.example.medtrack.fragments;
+import com.example.medtrack.activities.*; // Ensure you import the correct package
 
 import static android.app.Activity.RESULT_OK;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,15 +16,20 @@ import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.medtrack.R;
 import com.example.medtrack.activities.LoginActivity;
+import com.google.firebase.auth.AdditionalUserInfo;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -32,12 +39,14 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-
 public class ProfileFragment extends Fragment {
 
-    private static final int PICK_IMAGE = 1;
-    private ImageView ivProfilePicture, ivRetrivedPicture;
-    private Button btnLogout;
+    // Declare variables for views
+    private View profileHeader;
+    private ImageButton backButton, editButton;
+    private ImageView profilePicture;
+    private TextView profileName, profileEmail, registrationInfo;
+    private LinearLayout menuList, LL_Report, LL_CPassword, LL_About, LL_Terms, LL_Logout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -45,118 +54,54 @@ public class ProfileFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        ivProfilePicture = v.findViewById(R.id.ivProfilePicture);
-        ivRetrivedPicture = v.findViewById(R.id.ivRetrivedPicture);
-        Button btnAddPicture = v.findViewById(R.id.btnAddPicture);
-        btnLogout = v.findViewById(R.id.btnLogout);  // Bind the logout button
+        // Hook up each view using findViewById
+        profileHeader = v.findViewById(R.id.profileHeader);
+        backButton = v.findViewById(R.id.backButton);
+        editButton = v.findViewById(R.id.editButton);
+        profilePicture = v.findViewById(R.id.profilePicture);
+        profileName = v.findViewById(R.id.profileName);
+        profileEmail = v.findViewById(R.id.profileEmail);
+        registrationInfo = v.findViewById(R.id.registrationInfo);
+        menuList = v.findViewById(R.id.menuList);
+        LL_Report = v.findViewById(R.id.LL_Report);
+        LL_CPassword = v.findViewById(R.id.LL_CPassword);
+        LL_About = v.findViewById(R.id.LL_About);
+        LL_Terms = v.findViewById(R.id.LL_Terms);
+        LL_Logout = v.findViewById(R.id.LL_Logout);
 
-        // Set up Add Picture button
-        btnAddPicture.setOnClickListener(V -> {
-            openImagePicker();
-            retrieveImageFromFirebase();
+        // Set up event listeners for the buttons or other interactive views
+        backButton.setOnClickListener(v1 -> {
+            // Handle back button click
         });
 
-        // Set up Logout button functionality
-        btnLogout.setOnClickListener(v1 -> logout());
+        editButton.setOnClickListener(v1 -> {
+            // Handle edit button click
+        });
+
+        LL_Report.setOnClickListener(v1 -> {
+            // Handle Report item click
+        });
+
+        LL_CPassword.setOnClickListener(v1 -> {
+
+            Log.d("1","1");
+            Intent intent = new Intent(getActivity(), ChangePassword.class);
+            startActivity(intent);
+
+        });
+
+        LL_About.setOnClickListener(v1 -> {
+            // Handle About Us item click
+        });
+
+        LL_Terms.setOnClickListener(v1 -> {
+            // Handle Terms and Conditions item click
+        });
+
+        LL_Logout.setOnClickListener(v1 -> {
+            // Handle Logout item click
+        });
 
         return v;
-    }
-
-    private void openImagePicker() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(intent, PICK_IMAGE);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (resultCode == RESULT_OK && requestCode == PICK_IMAGE && data != null) {
-            Uri selectedImageUri = data.getData();
-
-            if (selectedImageUri != null) {
-                try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), selectedImageUri);
-                    ivProfilePicture.setImageBitmap(bitmap);
-                    storeImageInFirebase(bitmap);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getContext(), "Failed to load image.", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-    }
-
-    public String convertBitmapToBase64(Bitmap bitmap) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
-        return Base64.encodeToString(byteArray, Base64.DEFAULT);
-    }
-
-    public void storeImageInFirebase(Bitmap bitmap) {
-        String encodedImage = convertBitmapToBase64(bitmap);
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
-        DatabaseReference databaseRef = database.getReference("images");
-
-        String imageId = databaseRef.push().getKey();
-        if (imageId != null) {
-            databaseRef.child(imageId).setValue(encodedImage)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(getContext(), "Image saved successfully!", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(getContext(), "Failed to save image URL.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }
-    }
-
-    public void retrieveImageFromFirebase() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
-        DatabaseReference databaseRef = database.getReference("images");
-
-        databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        String base64Image = snapshot.getValue(String.class);
-                        if (base64Image != null) {
-                            Bitmap bitmap = convertBase64ToBitmap(base64Image);
-                            ivRetrivedPicture.setImageBitmap(bitmap);
-                            return;
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(getContext(), "Failed to retrieve image.", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    public Bitmap convertBase64ToBitmap(String base64String) {
-        byte[] decodedBytes = Base64.decode(base64String, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-    }
-
-    private void logout() {
-        FirebaseAuth.getInstance().signOut();  // Sign out the user from Firebase
-
-        // Redirect to LoginActivity
-        Intent intent = new Intent(getActivity(), LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);  // Clear activity stack
-        startActivity(intent);
-
-        // Show a logout success message
-        Toast.makeText(getContext(), "Logged out successfully!", Toast.LENGTH_SHORT).show();
-
-        // Finish the fragment's parent activity (optional)
-        if (getActivity() != null) {
-            getActivity().finish();
-        }
     }
 }
