@@ -52,17 +52,17 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/editTextInterval"
+            <Spinner
+                android:id="@+id/spinnerInterval"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hours"
-                android:inputType="number"
-                android:textSize="@dimen/addmedfrag_hints"
+                android:spinnerMode="dropdown"
                 android:background="@android:color/transparent"
                 android:textColor="@color/greytext"
-                android:textColorHint="@color/fontColormAIN"
                 android:paddingBottom="4dp" />
+
+
+
 
             <View
                 android:layout_width="match_parent"

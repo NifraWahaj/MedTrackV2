@@ -2,29 +2,28 @@ package com.example.medtrack.fragments;
 
 import android.app.TimePickerDialog;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.medtrack.R;
 import com.example.medtrack.activities.AddMedActivity;
 
+import java.util.Arrays;
 import java.util.Calendar;
-
+import java.util.List;
 
 public class MedStep3IntervalFragment extends Fragment {
 
-    private EditText intervalEditText;
+    private Spinner spinnerInterval;
     private Button buttonPickStartTime, buttonPickEndTime, nextButton;
     private Spinner doseSpinner;
     private EditText doseQuantityEditText;
@@ -36,12 +35,22 @@ public class MedStep3IntervalFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_med_step3_interval, container, false);
 
         // Bind UI elements
-        intervalEditText = view.findViewById(R.id.editTextInterval);
+        spinnerInterval = view.findViewById(R.id.spinnerInterval);
         buttonPickStartTime = view.findViewById(R.id.buttonPickStartTime);
         buttonPickEndTime = view.findViewById(R.id.buttonPickEndTime);
         doseSpinner = view.findViewById(R.id.spinnerDose);
-        doseQuantityEditText = view.findViewById(R.id.editTextDoseQuantity); // Added dose quantity EditText
+        doseQuantityEditText = view.findViewById(R.id.editTextDoseQuantity);
         nextButton = view.findViewById(R.id.nextButton);
+
+        // Populate Spinner with interval options
+        List<String> intervalOptions = Arrays.asList("1", "2", "3", "4", "5", "6", "7","8","9","10","11");
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                intervalOptions
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerInterval.setAdapter(adapter);
 
         // Set up Spinner with dose units
         String[] doses = {"Tablet(s)", "Capsule(s)", "mL (milliliters)", "Drop(s)", "Puff(s)", "mg (milligrams)", "tsp (teaspoon)", "Application(s)"};
@@ -50,24 +59,20 @@ public class MedStep3IntervalFragment extends Fragment {
         doseSpinner.setAdapter(doseAdapter);
 
         // Set up Time Picker for Start Time
-        buttonPickStartTime.setOnClickListener(v -> {
-            showTimePicker((time, button) -> {
-                buttonPickStartTime.setText(time);
-                startTime = time;
-            });
-        });
+        buttonPickStartTime.setOnClickListener(v -> showTimePicker(time -> {
+            buttonPickStartTime.setText(time);
+            startTime = time;
+        }));
 
         // Set up Time Picker for End Time
-        buttonPickEndTime.setOnClickListener(v -> {
-            showTimePicker((time, button) -> {
-                buttonPickEndTime.setText(time);
-                endTime = time;
-            });
-        });
+        buttonPickEndTime.setOnClickListener(v -> showTimePicker(time -> {
+            buttonPickEndTime.setText(time);
+            endTime = time;
+        }));
 
         // Set up Next Button click
         nextButton.setOnClickListener(v -> {
-            String intervalStr = intervalEditText.getText().toString().trim();
+            String intervalStr = spinnerInterval.getSelectedItem().toString();
             String doseUnit = doseSpinner.getSelectedItem().toString();
             String doseQuantityStr = doseQuantityEditText.getText().toString().trim();
 
@@ -107,7 +112,7 @@ public class MedStep3IntervalFragment extends Fragment {
 
         TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(), (view, hourOfDay, minute1) -> {
             String time = String.format("%02d:%02d", hourOfDay, minute1);
-            callback.onTimePicked(time, buttonPickStartTime);
+            callback.onTimePicked(time);
         }, hour, minute, true);
         timePickerDialog.show();
     }
@@ -137,6 +142,6 @@ public class MedStep3IntervalFragment extends Fragment {
     }
 
     private interface TimePickerCallback {
-        void onTimePicked(String time, Button button);
+        void onTimePicked(String time);
     }
 }
