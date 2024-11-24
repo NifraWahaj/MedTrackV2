@@ -51,7 +51,29 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/blueMain"
-        android:layout_marginBottom="32dp" />
+        android:layout_marginBottom="20dp" />
+
+    <!-- Start Date Input Button -->
+    <Button
+        android:id="@+id/buttonPickStartDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select Start Date"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/rounded_button"
+        android:textColor="#FFFFFF"
+        android:elevation="4dp"/>
+
+    <!-- End Date Input Button -->
+    <Button
+        android:id="@+id/buttonPickEndDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select End Date"
+        android:layout_marginBottom="32dp"
+        android:background="@drawable/rounded_button"
+        android:textColor="#FFFFFF"
+        android:elevation="4dp"/>
 
     <!-- Use a spacer to push the button to the bottom -->
     <LinearLayout

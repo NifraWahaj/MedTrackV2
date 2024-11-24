@@ -102,4 +102,8 @@
     <string name="your_blogs">Your Blogs</string>
     <string name="search_blog_title">Search Blog Title...</string>
 
+    <string name="profile_picture">Profile Picture</string>
+    <string name="upload_picture">Upload Picture</string>
+
+
 </resources>

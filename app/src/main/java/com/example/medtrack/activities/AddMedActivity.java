@@ -27,7 +27,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class AddMedActivity extends AppCompatActivity {
     private static final String TAG = "AddMedActivity";
 
@@ -41,13 +40,21 @@ public class AddMedActivity extends AppCompatActivity {
     private String reminderTime;
     private int refillAmount;
     private int refillThreshold;
-
-    private String medicationFrequency;  // This should be properly set by MedStep2Fragment
+    private String startDate;
+    private String endDate;
+    private String medicationFrequency;
     private String firstIntakeDetails;
     private String secondIntakeDetails;
-
-    // List to store selected days for "Specific days of the week" option
     private List<String> selectedDays = new ArrayList<>();
+
+    // Setter methods for start and end date
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
 
     // Getter and Setter for medicationFrequency
     public void setMedicationFrequency(String medicationFrequency) {
@@ -196,20 +203,18 @@ public class AddMedActivity extends AppCompatActivity {
         Medication medication;
 
         if ("Twice daily".equalsIgnoreCase(medicationFrequency)) {
-            // Create medication object with twice daily details
             medication = new Medication(
                     medicationName,
                     medicationFrequency,
                     firstIntakeDetails,
                     secondIntakeDetails,
                     refillAmount,
-                    refillThreshold
+                    refillThreshold,
+                    startDate,
+                    endDate
             );
         } else if ("Specific days (e.g., Mon, Wed, Fri)".equalsIgnoreCase(medicationFrequency)) {
-            // Convert selectedDays list to a single string
             String selectedDaysString = String.join(", ", selectedDays);
-
-            // Create medication object with specific days details using the new constructor
             medication = new Medication(
                     medicationName,
                     medicationFrequency,
@@ -217,16 +222,19 @@ public class AddMedActivity extends AppCompatActivity {
                     selectedDaysString,
                     refillAmount,
                     refillThreshold,
-                    true // The dummy boolean field to distinguish this constructor
+                    true,
+                    startDate,
+                    endDate
             );
         } else {
-            // Create medication object with single dose or interval details
             medication = new Medication(
                     medicationName,
                     medicationFrequency,
                     reminderTime,
                     refillAmount,
-                    refillThreshold
+                    refillThreshold,
+                    startDate,
+                    endDate
             );
         }
 
@@ -248,7 +256,4 @@ public class AddMedActivity extends AppCompatActivity {
                     Toast.makeText(AddMedActivity.this, "Failed to save medication", Toast.LENGTH_SHORT).show();
                 });
     }
-
-
-
 }

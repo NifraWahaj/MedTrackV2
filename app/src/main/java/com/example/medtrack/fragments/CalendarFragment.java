@@ -17,6 +17,7 @@ import com.example.medtrack.adapters.CalendarAdapter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -37,15 +38,16 @@ public class CalendarFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         calendarRecyclerView.setLayoutManager(layoutManager);
 
-        // Get the calendar dates
-        List<String> dateList = getNextSevenDays();
+        // Get dates and timestamps
+        List<Long> timestampList = getNextSevenDaysTimestamps();
+        List<String> dateList = formatTimestampsToDates(timestampList);
 
         // Set the adapter with a callback listener
-        CalendarAdapter adapter = new CalendarAdapter(getContext(), dateList, new CalendarAdapter.OnDateSelectedListener() {
+        CalendarAdapter adapter = new CalendarAdapter(getContext(), dateList, timestampList, new CalendarAdapter.OnDateSelectedListener() {
             @Override
-            public void onDateSelected(String selectedDate) {
+            public void onDateSelected(String formattedDate, Long timestamp) {
                 // Update the selected date TextView when a date is selected
-                textViewSelectedDate.setText(selectedDate);
+                textViewSelectedDate.setText(formattedDate);
             }
         });
         calendarRecyclerView.setAdapter(adapter);
@@ -53,17 +55,28 @@ public class CalendarFragment extends Fragment {
         return view;
     }
 
-    // Function to get the next seven days
-    private List<String> getNextSevenDays() {
-        List<String> dateList = new ArrayList<>();
+    // Generate timestamps for the next 7 days
+    private List<Long> getNextSevenDaysTimestamps() {
+        List<Long> timestampList = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM", Locale.getDefault());
 
         for (int i = 0; i < 7; i++) {
-            dateList.add(dateFormat.format(calendar.getTime()));
+            timestampList.add(calendar.getTimeInMillis());
             calendar.add(Calendar.DAY_OF_YEAR, 1);
         }
 
-        return dateList;
+        return timestampList;
+    }
+
+    // Format timestamps into "EEE, d MMM" for display
+    private List<String> formatTimestampsToDates(List<Long> timestamps) {
+        List<String> formattedDates = new ArrayList<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM", Locale.getDefault());
+
+        for (Long timestamp : timestamps) {
+            formattedDates.add(dateFormat.format(new Date(timestamp)));
+        }
+
+        return formattedDates;
     }
 }

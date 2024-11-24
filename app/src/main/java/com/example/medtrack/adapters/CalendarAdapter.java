@@ -14,21 +14,24 @@ import java.util.List;
 
 public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder> {
 
-    private final List<String> dateList;
+    private final List<String> dateList; // Formatted dates for display
+    private final List<Long> timestampList; // Corresponding timestamps
     private final Context context;
     private int selectedPosition = 4; // Start with today as selected (position 4)
     private final OnDateSelectedListener dateSelectedListener;
 
     // Callback interface to communicate selected date
     public interface OnDateSelectedListener {
-        void onDateSelected(String selectedDate);
+        void onDateSelected(String formattedDate, Long timestamp);
     }
 
-    public CalendarAdapter(Context context, List<String> dateList, OnDateSelectedListener listener) {
+    public CalendarAdapter(Context context, List<String> dateList, List<Long> timestampList, OnDateSelectedListener listener) {
         this.context = context;
         this.dateList = dateList;
+        this.timestampList = timestampList;
         this.dateSelectedListener = listener;
     }
+
 
     @NonNull
     @Override
@@ -42,7 +45,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         String dateInfo = dateList.get(position);
         String[] splitInfo = dateInfo.split(", ");
         String dayName = splitInfo[0];  // e.g., Mon, Tue
-        String date = splitInfo[1];      // e.g., 12 Sept
+        String date = splitInfo[1];     // e.g., 12 Sept
 
         holder.textViewDayName.setText(dayName);
         holder.textViewDateNumber.setText(date.split(" ")[0]); // Extracting just the number
@@ -60,8 +63,8 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             int oldPosition = selectedPosition;
             selectedPosition = position;
 
-            // Notify HomeFragment of the newly selected date
-            dateSelectedListener.onDateSelected(dateInfo);
+            // Notify listener of the selected date and timestamp
+            dateSelectedListener.onDateSelected(dateInfo, timestampList.get(position));
 
             notifyItemChanged(oldPosition);
             notifyItemChanged(selectedPosition);

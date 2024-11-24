@@ -25,6 +25,25 @@
         android:textStyle="bold"
         android:layout_marginTop="16dp"/>
 
+    <!-- Medication RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/medicationRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textViewSelectedDate"
+        android:layout_marginTop="16dp"/>
+
+    <!-- No Medication Message -->
+    <TextView
+        android:id="@+id/textViewNoMedications"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No medications for this day."
+        android:layout_below="@id/textViewSelectedDate"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"/>
+
     <!-- Floating Action Button to add a new medication -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddMedication"
@@ -38,6 +57,4 @@
         android:backgroundTint="@color/blueMain"
         android:tint="@android:color/white"
         app:fabSize="normal" />
-
-
 </RelativeLayout>

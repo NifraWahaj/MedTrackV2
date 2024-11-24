@@ -11,7 +11,7 @@
     <dimen name="LogoImageMarginTop">-400dp</dimen>
 
     <dimen name="tvWelcomeToMedTrackMarginTop">20dp</dimen>
-    <dimen name="tvWelcomeToMedTrackTextSize">26sp</dimen>
+    <dimen name="tvWelcomeToMedTrackTextSize">22sp</dimen>
 
 
     <dimen name="etHeight">50dp</dimen>
