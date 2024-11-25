@@ -60,7 +60,6 @@ public class BlogContentActivity extends AppCompatActivity {
     private String blogId, title, reviewText, author,authorEmail, blogUserId;
     private float ratingFromDb;
     private ProgressBar progressBar;
-
     private ScrollView scrollView;
     private RatingBar ratingBar;
     private boolean isEdit;

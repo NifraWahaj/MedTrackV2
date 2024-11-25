@@ -8,8 +8,6 @@
     android:background="@color/bg_main"
     tools:context=".activities.LoginActivity">
 
-    <!--TODO: add height/width/margins to dimens file -->
-    <!-- Username EditText -->
 
     <Button
         android:id="@+id/btnLogin"

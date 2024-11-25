@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <!-- Add the required permissions for notifications -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -19,7 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="31">
-
+        <activity
+            android:name=".activities.ChangePassword"
+            android:exported="false" />
         <!-- Firebase Messaging Service -->
         <service
             android:name=".MyFirebaseMessagingService"
@@ -27,14 +28,10 @@
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
-        </service>
-
-        <!-- Register system notification services -->
+        </service> <!-- Register system notification services -->
         <receiver
             android:name="androidx.work.impl.background.systemjob.SystemJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-
-        <!-- Activities -->
+            android:permission="android.permission.BIND_JOB_SERVICE" /> <!-- Activities -->
         <activity
             android:name=".activities.RatedBlogsActivity"
             android:exported="false" />
@@ -67,6 +64,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -75,4 +73,5 @@
             android:exported="false"
             android:launchMode="singleTop" />
     </application>
+
 </manifest>

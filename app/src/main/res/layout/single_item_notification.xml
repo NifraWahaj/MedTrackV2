@@ -1,0 +1,38 @@
+<!-- res/layout/item_comment.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/userName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="John23 commented on your article"
+        android:textColor="#000"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+    <TextView
+        android:id="@+id/commentText"
+        android:layout_weight="0.8"
+        android:layout_height="wrap_content"
+        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit..."
+        android:textColor="#666"
+        android:textSize="14sp"  android:layout_width="0dp"/>
+
+    <TextView
+        android:id="@+id/timeAgo"
+        android:layout_weight="0.1"
+        android:layout_height="wrap_content"
+        android:text="1m ago."
+        android:textColor="#999"
+        android:textSize="12sp"
+        android:layout_width="0dp"/>
+    </LinearLayout>
+</LinearLayout>
