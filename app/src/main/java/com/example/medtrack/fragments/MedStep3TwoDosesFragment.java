@@ -62,19 +62,61 @@ public class MedStep3TwoDosesFragment extends Fragment {
 
         // Handle Next button click
         nextButton.setOnClickListener(v -> {
+            boolean isValid = true;
+
+            // Validate First Intake Time
             String firstTime = buttonPickTimeFirstIntake.getText().toString();
-            String firstQuantityStr = editTextQuantityFirstIntake.getText().toString();
-            String firstUnit = spinnerUnitFirstIntake.getSelectedItem().toString();
-
-            String secondTime = buttonPickTimeSecondIntake.getText().toString();
-            String secondQuantityStr = editTextQuantitySecondIntake.getText().toString();
-            String secondUnit = spinnerUnitSecondIntake.getSelectedItem().toString();
-
-            if (firstTime.equals("Select Time") || firstQuantityStr.isEmpty() || secondTime.equals("Select Time") || secondQuantityStr.isEmpty()) {
-                Toast.makeText(getActivity(), "Please fill in all fields for both intakes.", Toast.LENGTH_SHORT).show();
-                return;
+            if (firstTime.equals("Select Time")) { // Assuming "Select Time" is the default text
+                shakeView(buttonPickTimeFirstIntake); // Shake the First Intake button
+                Toast.makeText(getActivity(), "Please select the time for the first intake.", Toast.LENGTH_SHORT).show();
+                isValid = false;
             }
 
+            // Validate Second Intake Time
+            String secondTime = buttonPickTimeSecondIntake.getText().toString();
+            if (secondTime.equals("Select Time")) {
+                shakeView(buttonPickTimeSecondIntake); // Shake the Second Intake button
+                Toast.makeText(getActivity(), "Please select the time for the second intake.", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+
+            // Validate First Intake Quantity
+            String firstQuantityStr = editTextQuantityFirstIntake.getText().toString().trim();
+            if (firstQuantityStr.isEmpty()) {
+                shakeView(editTextQuantityFirstIntake); // Shake the First Intake Quantity field
+                editTextQuantityFirstIntake.setError("Quantity is required for the first intake.");
+                isValid = false;
+            }
+
+            // Validate Second Intake Quantity
+            String secondQuantityStr = editTextQuantitySecondIntake.getText().toString().trim();
+            if (secondQuantityStr.isEmpty()) {
+                shakeView(editTextQuantitySecondIntake); // Shake the Second Intake Quantity field
+                editTextQuantitySecondIntake.setError("Quantity is required for the second intake.");
+                isValid = false;
+            }
+
+            // Validate First Intake Unit Spinner
+            String firstUnit = spinnerUnitFirstIntake.getSelectedItem().toString();
+            if (firstUnit.equals("Select Unit")) { // Assuming "Select Unit" is the default option
+                shakeView(spinnerUnitFirstIntake); // TODO: DOES NOT WORK
+                Toast.makeText(getActivity(), "Please select a unit for the first intake.", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+
+            // Validate Second Intake Unit Spinner
+            String secondUnit = spinnerUnitSecondIntake.getSelectedItem().toString();
+            if (secondUnit.equals("Select Unit")) {
+                shakeView(spinnerUnitSecondIntake); // Shake the Second Unit Spinner
+                Toast.makeText(getActivity(), "Please select a unit for the second intake.", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return; // Prevent moving to the next step if there are errors
+            }
+
+            // Parse and validate quantities
             int firstQuantity, secondQuantity;
             try {
                 firstQuantity = Integer.parseInt(firstQuantityStr);
@@ -85,14 +127,22 @@ public class MedStep3TwoDosesFragment extends Fragment {
             }
 
             // Save data to activity
-            ((AddMedActivity) getActivity()).setFirstIntakeDetails(firstTime, firstQuantity + " " + firstUnit);
-            ((AddMedActivity) getActivity()).setSecondIntakeDetails(secondTime, secondQuantity + " " + secondUnit);
+            AddMedActivity activity = (AddMedActivity) getActivity();
+            if (activity != null) {
+                activity.setFirstIntakeDetails(firstTime, firstQuantity + " " + firstUnit);
+                activity.setSecondIntakeDetails(secondTime, secondQuantity + " " + secondUnit);
 
-            // Move to next step
-            ((AddMedActivity) getActivity()).goToNextStep();
+                // Move to the next step
+                activity.goToNextStep();
+            }
         });
 
+
         return view;
+    }
+    private void shakeView(View view) {
+        android.view.animation.Animation shake = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.shake);
+        view.startAnimation(shake);
     }
 
     private void showTimePicker(Button button) {

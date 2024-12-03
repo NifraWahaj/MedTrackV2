@@ -82,11 +82,18 @@ public class AddMedActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_med);
 
+
+
+
         // Setup ViewPager2
         viewPager = findViewById(R.id.viewPager);
         setupFragments(); // Create a list of initial fragments
         adapter = new MedPagerAdapter(this);
         viewPager.setAdapter(adapter);
+
+
+        // Disable swiping for ViewPager2
+        viewPager.setUserInputEnabled(false);
     }
 
     // Setup fragments for the ViewPager
@@ -406,6 +413,17 @@ public class AddMedActivity extends AppCompatActivity {
             default:
                 return -1;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        /*
+        if (viewPager.getCurrentItem() == 0) {
+            super.onBackPressed(); // Exit if it's the first fragment
+        } else {
+            viewPager.setCurrentItem(viewPager.getCurrentItem() - 1); // Go to the previous fragment
+        }*/
     }
 
 

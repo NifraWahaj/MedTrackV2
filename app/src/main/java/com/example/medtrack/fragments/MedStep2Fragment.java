@@ -62,31 +62,57 @@ public class MedStep2Fragment extends Fragment {
 
 
         nextButton.setOnClickListener(v -> {
+            boolean isValid = true;
+
+            // Check if a frequency is selected
             int selectedId = frequencyRadioGroup.getCheckedRadioButtonId();
+            if (selectedId == -1) { // No option selected
+                shakeView(frequencyRadioGroup); // Shake the RadioGroup
+                Toast.makeText(getActivity(), "Please select a frequency.", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+
+            // If "Specific days" is selected, ensure at least one day is selected
             if (selectedId != -1) {
                 RadioButton selectedRadioButton = view.findViewById(selectedId);
                 String frequency = selectedRadioButton.getText().toString();
 
-                AddMedActivity activity = (AddMedActivity) getActivity();
-                if (activity != null) {
-                    activity.setMedicationFrequency(frequency);
-
-                    if (frequency.equals("Specific days (e.g., Mon, Wed, Fri)")) {
-                        if (selectedDays.isEmpty()) {
-                            Toast.makeText(getActivity(), "Please select at least one day.", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        activity.setSelectedDays(new ArrayList<>(selectedDays)); // Ensure selected days are assigned to the activity
-                    }
-
-                    activity.updateFragmentsBasedOnFrequency();
-                    activity.goToNextStep();
+                if (frequency.equals("Specific days (e.g., Mon, Wed, Fri)") && selectedDays.isEmpty()) {
+                    shakeView(daysSelectionLayout); // Shake the days selection layout
+                    Toast.makeText(getActivity(), "Please select at least one day.", Toast.LENGTH_SHORT).show();
+                    isValid = false;
                 }
+            }
+
+            if (!isValid) {
+                return; // Prevent moving to the next step if there are errors
+            }
+
+            // Save data and proceed
+            RadioButton selectedRadioButton = view.findViewById(selectedId);
+            String frequency = selectedRadioButton.getText().toString();
+
+            AddMedActivity activity = (AddMedActivity) getActivity();
+            if (activity != null) {
+                activity.setMedicationFrequency(frequency);
+
+                if (frequency.equals("Specific days (e.g., Mon, Wed, Fri)")) {
+                    activity.setSelectedDays(new ArrayList<>(selectedDays)); // Save selected days
+                }
+
+                activity.updateFragmentsBasedOnFrequency();
+                activity.goToNextStep();
             }
         });
 
 
+
         return view;
     }
+    private void shakeView(View view) {
+        android.view.animation.Animation shake = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.shake);
+        view.startAnimation(shake);
+    }
+
 }
 

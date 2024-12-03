@@ -28,6 +28,8 @@ public class MedStep3IntervalFragment extends Fragment {
     private Spinner doseSpinner;
     private EditText doseQuantityEditText;
     private String startTime, endTime;
+    int startTotalMinutes ;
+    int endTotalMinutes ;
 
     @Nullable
     @Override
@@ -41,6 +43,8 @@ public class MedStep3IntervalFragment extends Fragment {
         doseSpinner = view.findViewById(R.id.spinnerDose);
         doseQuantityEditText = view.findViewById(R.id.editTextDoseQuantity);
         nextButton = view.findViewById(R.id.nextButton);
+
+
 
         // Populate Spinner with interval options
         List<String> intervalOptions = Arrays.asList("1", "2", "3", "4", "5", "6", "7","8","9","10","11");
@@ -72,15 +76,52 @@ public class MedStep3IntervalFragment extends Fragment {
 
         // Set up Next Button click
         nextButton.setOnClickListener(v -> {
-            String intervalStr = spinnerInterval.getSelectedItem().toString();
-            String doseUnit = doseSpinner.getSelectedItem().toString();
-            String doseQuantityStr = doseQuantityEditText.getText().toString().trim();
+            boolean isValid = true;
 
-            if (startTime == null || endTime == null || intervalStr.isEmpty() || doseQuantityStr.isEmpty()) {
-                Toast.makeText(getActivity(), "Please fill in all fields.", Toast.LENGTH_SHORT).show();
+            // Validate Start Time
+            if (startTime == null) {
+                shakeView(buttonPickStartTime); // Shake the Start Time button
+                Toast.makeText(getActivity(), "Please select a start time.", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+
+            // Validate End Time
+            if (endTime == null) {
+                shakeView(buttonPickEndTime); // Shake the End Time button
+                Toast.makeText(getActivity(), "Please select an end time.", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+
+            // Validate Interval Spinner
+            String intervalStr = spinnerInterval.getSelectedItem().toString();
+            if (intervalStr.isEmpty()) {
+                shakeView(spinnerInterval); // Shake the interval spinner
+                Toast.makeText(getActivity(), "Please select an interval.", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+
+            // Validate Dose Quantity
+            String doseQuantityStr = doseQuantityEditText.getText().toString().trim();
+            if (doseQuantityStr.isEmpty()) {
+                shakeView(doseQuantityEditText); // Shake the dose quantity field
+                doseQuantityEditText.setError("Dose quantity is required");
+                isValid = false;
+            }
+
+            // Validate Dose Spinner
+            String doseUnit = doseSpinner.getSelectedItem().toString();
+            if (doseUnit.isEmpty() || doseUnit.equals("Select Unit")) { // Assuming "Select Unit" is the default
+                shakeView(doseSpinner); // Shake the dose spinner
+                Toast.makeText(getActivity(), "Please select a dose unit.", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+
+            // Return if any validation failed
+            if (!isValid) {
                 return;
             }
 
+            // Parse interval and dose quantity
             int interval, doseQuantity;
             try {
                 interval = Integer.parseInt(intervalStr);
@@ -90,17 +131,25 @@ public class MedStep3IntervalFragment extends Fragment {
                 return;
             }
 
+            // Validate reminders count
             int remindersCount = calculateRemindersCount(startTime, endTime, interval);
-
             if (remindersCount == 0) {
                 Toast.makeText(getActivity(), "No reminders fit in the specified time frame.", Toast.LENGTH_SHORT).show();
                 return;
+            } else if (interval > (endTotalMinutes - startTotalMinutes) / 60) {
+                Toast.makeText(getActivity(), "Interval too large for the selected time range.", Toast.LENGTH_SHORT).show();
+                return;
             }
 
+            // Save data and proceed
             String reminderDetails = "Interval: " + interval + " hours, Start Time: " + startTime + ", End Time: " + endTime + ", Dose: " + doseQuantity + " " + doseUnit;
-            ((AddMedActivity) getActivity()).setReminderTime(reminderDetails);
-            ((AddMedActivity) getActivity()).goToNextStep();
+            AddMedActivity activity = (AddMedActivity) getActivity();
+            if (activity != null) {
+                activity.setReminderTime(reminderDetails);
+                activity.goToNextStep();
+            }
         });
+
 
         return view;
     }
@@ -128,8 +177,8 @@ public class MedStep3IntervalFragment extends Fragment {
         int endMinute = Integer.parseInt(endSplit[1]);
 
         // Calculate the total minutes for start and end times
-        int startTotalMinutes = startHour * 60 + startMinute;
-        int endTotalMinutes = endHour * 60 + endMinute;
+         startTotalMinutes = startHour * 60 + startMinute;
+         endTotalMinutes = endHour * 60 + endMinute;
 
         // Ensure start time is before end time
         if (endTotalMinutes <= startTotalMinutes) {
@@ -144,4 +193,11 @@ public class MedStep3IntervalFragment extends Fragment {
     private interface TimePickerCallback {
         void onTimePicked(String time);
     }
+
+    private void shakeView(View view) {
+        android.view.animation.Animation shake = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.shake);
+        view.startAnimation(shake);
+    }
+
+
 }
