@@ -108,6 +108,13 @@ public class BlogContentActivity extends AppCompatActivity {
            btnReviewList.setVisibility(View.VISIBLE);
 
         }
+     else{
+         tvRateThisBlog.setVisibility(View.VISIBLE);
+         tvWriteAReview.setVisibility(View.VISIBLE);
+         ratingBar.setVisibility(View.VISIBLE);
+         findViewById(R.id.tvRatingsAndReviews).setVisibility(View.VISIBLE);
+         btnReviewList.setVisibility(View.VISIBLE);
+     }
         // Set Listeners
         setupListeners();
 
