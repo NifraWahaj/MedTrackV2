@@ -11,7 +11,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/bluelight"
+        android:background="@color/bluelightest"
         android:padding="16dp">
 
         <!-- Medication Name -->
@@ -34,9 +34,11 @@
             android:text="Details about the medication will go here."
             android:textAppearance="?attr/textAppearanceBody2"
             android:layout_marginTop="8dp"
+            android:scrollbars="vertical"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textViewMedName"
             app:layout_constraintEnd_toEndOf="parent" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
