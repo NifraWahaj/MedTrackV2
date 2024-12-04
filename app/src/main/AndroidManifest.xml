@@ -19,9 +19,11 @@
         android:theme="@style/AppTheme"
         tools:targetApi="31">
         <activity
-            android:name=".activities.ChangePassword"
+            android:name=".activities.ForgotPasswordActivity"
             android:exported="false" />
-        <!-- Firebase Messaging Service -->
+        <activity
+            android:name=".activities.ChangePassword"
+            android:exported="false" /> <!-- Firebase Messaging Service -->
         <service
             android:name=".MyFirebaseMessagingService"
             android:exported="true">

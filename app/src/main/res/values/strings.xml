@@ -104,6 +104,7 @@
 
     <string name="profile_picture">Profile Picture</string>
     <string name="upload_picture">Upload Picture</string>
+    <string name="send_link">Send Link</string>
 
 
 </resources>
