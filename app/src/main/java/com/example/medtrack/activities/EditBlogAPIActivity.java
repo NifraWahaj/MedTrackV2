@@ -48,6 +48,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -147,17 +149,15 @@ public class EditBlogAPIActivity extends AppCompatActivity {
 
             }
             String title = etTitle.getText().toString().trim();
-            // Check if the title is empty, starts with a digit, or doesn't contain alphanumeric characters
+            // Check if the title is empty, starts with a digit
             if (title.isEmpty()) {
                 // Title is empty
                 etTitle.setError("Title cannot be empty");
             } else if (title.matches("^[0-9].*")) {
                 // Title starts with a digit
                 etTitle.setError("Title cannot start with a digit");
-            } else if (title.matches(".*[a-zA-Z0-9].*")) {
-                // Title doesn't contain any alphanumeric characters
-                etTitle.setError("Title must not contain alphanumeric characters");
-            } else {
+            }
+             else {
                 saveBlogToFirebase();
                 finish();
             }
@@ -492,7 +492,9 @@ public class EditBlogAPIActivity extends AppCompatActivity {
                     .addOnSuccessListener(aVoid -> Toast.makeText(this, "Blog updated successfully!", Toast.LENGTH_SHORT).show())
                     .addOnFailureListener(e -> Toast.makeText(this, "Failed to update blog", Toast.LENGTH_SHORT).show());
         } else {
+
             Map<String, Object> blogData = new HashMap<>();
+
             blogData.put("title", etTitle.getText().toString());
 
             blogData.put("userId", User.getCurrentUserId(this));
@@ -501,6 +503,13 @@ public class EditBlogAPIActivity extends AppCompatActivity {
             blogData.put("isApproved", false);
             blogData.put("reviews", new HashMap<>());
             blogData.put("ratings", new HashMap<>());
+            if(isEdit==false){
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String currentDate = sdf.format(new Date());
+                blogData.put("dateCreated", currentDate); // Add the current date
+
+
+            }
 
             blogsRef.push().setValue(blogData)
                     .addOnSuccessListener(aVoid -> Toast.makeText(this, "Blog saved to Firebase!", Toast.LENGTH_SHORT).show())
