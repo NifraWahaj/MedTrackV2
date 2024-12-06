@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:backgroundTint="@color/bg_main"
+    android:background="@drawable/rounded_dialog_background"
+
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="350dp"
+        android:layout_height="250dp"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:backgroundTint="#EDF2F2"
+        android:background="@drawable/rounded_dialog_background"
+        android:gravity="center">
+
+        <!-- Top row: Info icon and Delete icon -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/medInfoIcon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_info"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/medName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Medication Name"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:gravity="center"
+                android:layout_marginEnd="8dp" />
+
+            <ImageView
+                android:id="@+id/deleteMedIcon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_delete" />
+        </LinearLayout>
+
+        <!-- Scheduled Time -->
+        <TextView
+            android:id="@+id/scheduledTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Scheduled for: 8:00 AM, Today"
+            android:textSize="16sp"
+            android:gravity="center_horizontal" />
+
+        <!-- Dose Details -->
+        <TextView
+            android:id="@+id/doseDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Take 1 pill"
+            android:textSize="16sp"
+            android:gravity="center_horizontal" />
+
+        <!-- Button Container -->
+        <LinearLayout
+            android:id="@+id/buttonContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btnSkip"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="@color/black"
+                android:text="Skip"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/btnTake"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/blueMain"
+                android:text="Take"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -181,9 +181,11 @@ public class HomeFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(getActivity(), "Error fetching medications.", Toast.LENGTH_SHORT).show();
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "Firebase error: " + error.getMessage());
+                Toast.makeText(getActivity(), "Error fetching medications: " + error.getMessage(), Toast.LENGTH_LONG).show();
             }
+
         });
     }
 

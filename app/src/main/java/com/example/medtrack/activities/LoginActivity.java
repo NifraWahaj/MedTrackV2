@@ -7,9 +7,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +38,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button btnLogin;
     private TextView tvSignUp, tvForgotPassword;
 
+    private ProgressBar progressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +53,7 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         tvSignUp = findViewById(R.id.tvDontHaveAnAccountSignUp);
         tvForgotPassword = findViewById(R.id.tvForgotPassword);
+        progressBar = findViewById(R.id.progress_bar);
 
         // Set a click listener for the login button
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -58,16 +62,26 @@ public class LoginActivity extends AppCompatActivity {
                 String email = etEmail.getText().toString().trim();
                 String password = etPassword.getText().toString().trim();
 
-                if (email.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, "Email and Password can't be empty", Toast.LENGTH_SHORT).show();
+                if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    Toast.makeText(LoginActivity.this, "Invalid email format", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (password.length() < 6) {
+                    Toast.makeText(LoginActivity.this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                // Firebase authentication
+
+                // Show the ProgressBar before starting authentication
+                progressBar.setVisibility(View.VISIBLE);
+
                 mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
+                                // Always hide ProgressBar once the task is complete
+                                progressBar.setVisibility(View.GONE);
+
                                 if (task.isSuccessful()) {
                                     Log.d(TAG, "signInWithEmail:success");
                                     Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
@@ -85,6 +99,7 @@ public class LoginActivity extends AppCompatActivity {
                         });
             }
         });
+
 
         // Set up click listener for Sign-Up button to navigate to SignUpActivity
         tvSignUp.setOnClickListener(new View.OnClickListener() {
@@ -124,11 +139,12 @@ public class LoginActivity extends AppCompatActivity {
                                 // Fetch user data
                                 // Fetch user ID
                                   userId = snapshot.getKey(); // Get the unique user ID
-                                String name = snapshot.child("name").getValue(String.class);
-                                String email = snapshot.child("email").getValue(String.class);
+                                String name = dataSnapshot.child("name").getValue(String.class);
+                                String email = dataSnapshot.child("email").getValue(String.class);
+                                String base64Image = dataSnapshot.child("image").getValue(String.class);
 
                                 // Store user data in SharedPreferences
-                                storeUserInSharedPreferences(name, email);
+                                storeUserInSharedPreferences(name, email,base64Image);
 
                                 // Redirect to MainActivity after successful login
                                 Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
@@ -147,7 +163,7 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    private void storeUserInSharedPreferences(String name, String email) {
+    private void storeUserInSharedPreferences(String name, String email , String image) {
         SharedPreferences sharedPreferences = getSharedPreferences("user_pref", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         // Clear all stored preferences
@@ -156,6 +172,7 @@ public class LoginActivity extends AppCompatActivity {
         editor.putString("userId", userId); // Store user ID
 
         editor.putString("email", email);
+        editor.putString("image", image);
         editor.apply();
     }
 }

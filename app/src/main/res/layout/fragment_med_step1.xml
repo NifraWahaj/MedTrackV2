@@ -30,9 +30,18 @@
         android:layout_marginBottom="24dp"
         android:fontFamily="sans-serif-medium"
         android:textColor="@color/fontColormAIN" />
-
+    <Button
+        android:id="@+id/buttonAddMed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Medication"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone"
+        android:background="@drawable/rounded_button"
+        android:textColor="#FFFFFF"
+        android:elevation="4dp" />
     <!-- Medication Name Input with Bottom Line -->
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/editTextMedicationName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -46,6 +55,10 @@
         android:textColorHint="@color/greytext"
         android:textColor="@color/fontColormAIN"
         tools:ignore="TouchTargetSizeCheck,VisualLintTextFieldSize" />
+    <!-- Add this inside your existing LinearLayout -->
+
+
+
 
     <!-- Bottom Line for EditText -->
     <View
@@ -53,6 +66,7 @@
         android:layout_height="1dp"
         android:background="@color/blueMain"
         android:layout_marginBottom="20dp" />
+
 
     <!-- Start Date Input Button -->
     <Button

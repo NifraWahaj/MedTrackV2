@@ -49,6 +49,9 @@ dependencies {
     implementation ("com.google.firebase:firebase-auth:23.1.0")
     implementation ("com.google.firebase:firebase-database:21.0.0")
     implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
+    implementation("com.itextpdf:itext7-core:7.1.15") // For iText PDF library
+    implementation("com.itextpdf:font-asian:7.1.16") // for fonts and characters support
+
 
     // Retrofit dependency for networking
     implementation ("com.squareup.retrofit2:retrofit:2.9.0") // Use the latest stable version

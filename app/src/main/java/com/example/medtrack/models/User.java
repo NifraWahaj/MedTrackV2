@@ -8,7 +8,6 @@ public class User {
 
     String email;
     String name;
-    String userId;
 
     public String getEmail() {
         return email;

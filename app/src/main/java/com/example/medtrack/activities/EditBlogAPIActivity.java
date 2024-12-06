@@ -62,37 +62,43 @@ import okhttp3.Response;
 
 public class EditBlogAPIActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
-private  TextView tvusername;
+    private TextView tvusername;
     private RichEditor mEditor;
     private String blogId;
     private Bitmap bitmap;
-    private ImageButton btnPost,btnGoBack;
-    private String IMGBB_API_KEY="40c7d1f33a00acd8ecd5ed77b2bff4a9";
+    private ImageButton btnPost, btnGoBack;
+    private String IMGBB_API_KEY = "40c7d1f33a00acd8ecd5ed77b2bff4a9";
     private boolean isEdit = false;
-     private   ImageButton btnUndo, btnRedo,btnBold,btnItalic,btnStrikeThrough,btnUnderline,btnDiv,btnLeftAlign,
-        btnNumberingList,    btnColorPicker,btnCenterAlign,btnRightAlign,btnBlockQuote,btnBulletList,btnAddImage,btnAddLink;
+    private ImageButton btnUndo, btnRedo, btnBold, btnItalic, btnStrikeThrough, btnUnderline, btnDiv, btnLeftAlign,
+            btnNumberingList, btnColorPicker, btnCenterAlign, btnRightAlign, btnBlockQuote, btnBulletList, btnAddImage, btnAddLink;
 
     private EditText etTitle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_blog_apiactivity);
 
         Intent intent = getIntent();
-        isEdit = intent.getBooleanExtra("isEdit",false); // Default to false if not provided
-        // Load a sample bitmap in the background (not displayed in UI)
+        // Default to false if not provided
+        isEdit = intent.getBooleanExtra("isEdit", false);
+        // Load a sample bitmap in the background
+        // Bitmap is representation of the image in memory.
+      //  BitmapFactory helps convert image data into a Bitmap object.
         bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.color_palette);
 
         // Toolbar buttons
         setToolbarActions();
 
-         mEditor.setEditorHeight(200);
+        mEditor.setEditorHeight(200);
         mEditor.setEditorFontSize(22);
         mEditor.setEditorFontColor(Color.BLACK);
         mEditor.setPadding(10, 10, 10, 10);
         mEditor.setPlaceholder("Insert text here...");
-      tvusername.setText(User.getCurrentUserName(this));
-        if(isEdit==true) {
+
+        tvusername.setText(User.getCurrentUserName(this));
+
+        if (isEdit == true) {
             blogId = intent.getStringExtra("blogId");
             String blogTitle = intent.getStringExtra("blogTitle");
             String blogContent = intent.getStringExtra("blogContent");
@@ -100,24 +106,22 @@ private  TextView tvusername;
         }
 
 
-
-        // findViewById(R.id.btnGoBack).setOnClickListener(v-> fetchFromDB());
-    }
+     }
 
     private void setToolbarActions() {
-        etTitle= findViewById(R.id.etBlogTitle);
-          tvusername =findViewById(R.id.tvusername);
+        etTitle = findViewById(R.id.etBlogTitle);
+        tvusername = findViewById(R.id.tvusername);
         mEditor = findViewById(R.id.etBlogContent);
-        btnNumberingList=findViewById(R.id.btnNumberingList);
-        btnGoBack=findViewById(R.id.btnGoBack);
-        btnPost=findViewById(R.id.btnPost);
+        btnNumberingList = findViewById(R.id.btnNumberingList);
+        btnGoBack = findViewById(R.id.btnGoBack);
+        btnPost = findViewById(R.id.btnPost);
         btnUndo = findViewById(R.id.btnUndo);
-        btnRedo =findViewById(R.id.btnRedo);
-        btnBold= findViewById(R.id.btnBold);
-       btnItalic= findViewById(R.id.btnItalic);
-       btnStrikeThrough=findViewById(R.id.btnStrikeThrough);
-       btnUnderline=findViewById(R.id.btnUnderline) ;
-       btnDiv = findViewById(R.id.btnDiv);
+        btnRedo = findViewById(R.id.btnRedo);
+        btnBold = findViewById(R.id.btnBold);
+        btnItalic = findViewById(R.id.btnItalic);
+        btnStrikeThrough = findViewById(R.id.btnStrikeThrough);
+        btnUnderline = findViewById(R.id.btnUnderline);
+        btnDiv = findViewById(R.id.btnDiv);
         btnLeftAlign = findViewById(R.id.btnLeftAlign);
         btnCenterAlign = findViewById(R.id.btnCenterAlign);
         btnRightAlign = findViewById(R.id.btnRightAlign);
@@ -125,7 +129,9 @@ private  TextView tvusername;
         btnBulletList = findViewById(R.id.btnBulletList);
         btnAddImage = findViewById(R.id.btnAddImage);
         btnAddLink = findViewById(R.id.btnAddLink);
-        btnColorPicker=findViewById(R.id.btnColorPicker);
+        btnColorPicker = findViewById(R.id.btnColorPicker);
+
+        // Set onClickListeners for each button
         findViewById(R.id.btnNumberingList).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -133,36 +139,51 @@ private  TextView tvusername;
             }
         });
 
- // Set onClickListeners for each button
-        btnGoBack.setOnClickListener(v -> finish());
-        btnPost.setOnClickListener(v->
-        {  if(mEditor.getHtml().isEmpty()||mEditor.getHtml()==null || etTitle.getText().toString().isEmpty()|| etTitle.getText().toString()==null){
-            Toast.makeText(this,"Title or Content can't be empty",Toast.LENGTH_SHORT).show();
 
-        }
-        else{
-            saveBlogToFirebase();
-            finish();}} );
+        btnPost.setOnClickListener(v ->
+        {
+            if (mEditor.getHtml().isEmpty() || mEditor.getHtml() == null || etTitle.getText().toString().isEmpty() || etTitle.getText().toString() == null) {
+                Toast.makeText(this, "Title or Content can't be empty", Toast.LENGTH_SHORT).show();
 
-        btnColorPicker.setOnClickListener(v ->
+            }
+            String title = etTitle.getText().toString().trim();
+            // Check if the title is empty, starts with a digit, or doesn't contain alphanumeric characters
+            if (title.isEmpty()) {
+                // Title is empty
+                etTitle.setError("Title cannot be empty");
+            } else if (title.matches("^[0-9].*")) {
+                // Title starts with a digit
+                etTitle.setError("Title cannot start with a digit");
+            } else if (title.matches(".*[a-zA-Z0-9].*")) {
+                // Title doesn't contain any alphanumeric characters
+                etTitle.setError("Title must not contain alphanumeric characters");
+            } else {
+                saveBlogToFirebase();
+                finish();
+            }
+        });
+
+         btnColorPicker.setOnClickListener(v ->
         {
             showColorPickerDialog(bitmap);
-          });
+        });
 
+        btnGoBack.setOnClickListener(v -> finish());
         btnUndo.setOnClickListener(v -> mEditor.undo());
         btnRedo.setOnClickListener(v -> mEditor.redo());
         btnBold.setOnClickListener(v -> mEditor.setBold());
         btnItalic.setOnClickListener(v -> mEditor.setItalic());
         btnStrikeThrough.setOnClickListener(v -> mEditor.setStrikeThrough());
         btnUnderline.setOnClickListener(v -> mEditor.setUnderline());
-        btnDiv.setOnClickListener(v -> showDivPopupMenu(v));
+        btnDiv.setOnClickListener(this::showDivPopupMenu);
         btnLeftAlign.setOnClickListener(v -> mEditor.setAlignLeft());
         btnCenterAlign.setOnClickListener(v -> mEditor.setAlignCenter());
         btnRightAlign.setOnClickListener(v -> mEditor.setAlignRight());
         btnBlockQuote.setOnClickListener(v -> mEditor.setBlockquote());
         btnBulletList.setOnClickListener(v -> mEditor.setBullets());
         btnAddImage.setOnClickListener(v -> openImagePicker());
-        btnAddLink.setOnClickListener(v ->   showLinkDialog());    }
+        btnAddLink.setOnClickListener(v -> showLinkDialog());
+    }
 
     private void showDivPopupMenu(View v) {
         PopupMenu popupMenu = new PopupMenu(this, v);
@@ -184,6 +205,7 @@ private  TextView tvusername;
         });
         popupMenu.show();
     }
+
     private void showColorPickerDialog(Bitmap bitmap) {
         if (bitmap == null) {
             Log.e("ColorPicker", "Bitmap is null!");
@@ -202,7 +224,7 @@ private  TextView tvusername;
                 colorLayout.setOrientation(LinearLayout.HORIZONTAL);
                 colorLayout.setPadding(16, 16, 16, 16);
 
-                // Extract colors from the palette
+                // Extract colors from the palette : different color types
                 int[] colors = {
                         palette.getVibrantColor(0),
                         palette.getLightVibrantColor(0),
@@ -216,9 +238,10 @@ private  TextView tvusername;
                     Log.d("ColorPicker", "Extracted color: " + color);
                 }
 
-                // Add each color as a color swatch to the layout
+                // Add each color to the layout
                 for (int color : colors) {
-                    if (color != 0) { // Only add valid colors
+                    // Only add valid colors
+                    if (color != 0) {
                         View colorView = new View(this);
                         colorView.setBackgroundColor(color);
                         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100);
@@ -227,40 +250,27 @@ private  TextView tvusername;
 
                         // Set click listener to select color
                         colorView.setOnClickListener(v -> {
-                              if (mEditor != null) {  // Ensure mEditor is not null
-
-
-                                 mEditor.setEditorFontColor(color);
-
-                                Log.d("ColorPicker", "Color swatch clicked: " + color);
-
-                                // Dismiss the dialog
+                            if (mEditor != null) {
+                                mEditor.setEditorFontColor(color);
                                 if (builder != null && builder.create() != null) {
                                     builder.create().dismiss();
                                 }
                             }
                         });
-
                         colorLayout.addView(colorView);
                     }
                 }
-
                 // Set the layout for the dialog
                 builder.setView(colorLayout);
-
-                // Set "Cancel" button behavior
                 builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
-
-                // Show the dialog
                 AlertDialog dialog = builder.create();
                 dialog.show();
             }
         });
     }
 
-
     // Method to open the image picker
-
+    // pick images from devices external storage
     private void openImagePicker() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
@@ -280,6 +290,7 @@ private  TextView tvusername;
             }
         }
     }
+
     private void uploadImageToImgBB(Bitmap bitmap) {
         String url = "https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY;
 
@@ -417,9 +428,6 @@ private  TextView tvusername;
     }
 
 
-
-
-
     // Method to show the dialog for adding a link
     private void showLinkDialog() {
         // Create a layout for the dialog inputs
@@ -448,17 +456,17 @@ private  TextView tvusername;
                         Toast.makeText(this, "URL and text are required", Toast.LENGTH_SHORT).show();
                     } else {
                         // Insert the link into the editor
-                     String htmlContent=   mEditor.getHtml();
-                     if(htmlContent==null){
-                         mEditor.setHtml(" ");
-                     }
+                        String htmlContent = mEditor.getHtml();
+                        if (htmlContent == null) {
+                            mEditor.setHtml(" ");
+                        }
                         mEditor.insertLink(linkUrl, linkText);
 
                         // Optionally style the link color
                         String styledLinkHtml = "<a href='" + linkUrl + "' style='color:blue;'>" + linkText + "</a>";
                         mEditor.setHtml(mEditor.getHtml() + styledLinkHtml);
 
-                      }
+                    }
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                 .create()
@@ -466,17 +474,12 @@ private  TextView tvusername;
     }
 
 
-
-
-
-
-
     private void saveBlogToFirebase() {
         // Save the data to Firebase
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
         DatabaseReference blogsRef = database.getReference("blogs");
 
-        if(isEdit==true){
+        if (isEdit == true) {
             DatabaseReference blogRef = blogsRef.child(blogId);
             Map<String, Object> blogData = new HashMap<>();
             blogData.put("title", etTitle.getText().toString());
@@ -488,22 +491,22 @@ private  TextView tvusername;
             blogRef.updateChildren(blogData)
                     .addOnSuccessListener(aVoid -> Toast.makeText(this, "Blog updated successfully!", Toast.LENGTH_SHORT).show())
                     .addOnFailureListener(e -> Toast.makeText(this, "Failed to update blog", Toast.LENGTH_SHORT).show());
-        }
-        else{
+        } else {
             Map<String, Object> blogData = new HashMap<>();
             blogData.put("title", etTitle.getText().toString());
 
             blogData.put("userId", User.getCurrentUserId(this));
- 
+
             blogData.put("content", mEditor.getHtml()); // Store formatted text content as JSON
             blogData.put("isApproved", false);
-            blogData.put("reviews",new HashMap<>());
-            blogData.put("ratings",new HashMap<>());
+            blogData.put("reviews", new HashMap<>());
+            blogData.put("ratings", new HashMap<>());
 
             blogsRef.push().setValue(blogData)
                     .addOnSuccessListener(aVoid -> Toast.makeText(this, "Blog saved to Firebase!", Toast.LENGTH_SHORT).show())
                     .addOnFailureListener(e -> Toast.makeText(this, "Failed to save blog", Toast.LENGTH_SHORT).show());
-        }}
+        }
+    }
 
   /*  public void fetchFromDB() {
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");

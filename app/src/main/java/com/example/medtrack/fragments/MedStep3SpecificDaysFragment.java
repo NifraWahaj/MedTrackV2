@@ -55,6 +55,7 @@ public class MedStep3SpecificDaysFragment extends Fragment {
         doseAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         doseSpinner.setAdapter(doseAdapter);
 
+
         // Set up Time Picker for the intake time
         buttonPickTime.setOnClickListener(v -> {
             Calendar calendar = Calendar.getInstance();
@@ -69,30 +70,60 @@ public class MedStep3SpecificDaysFragment extends Fragment {
         });
 
         nextButton.setOnClickListener(v -> {
-            String time = buttonPickTime.getText().toString();
-            String quantityStr = editTextQuantity.getText().toString().trim();
-            String unit = doseSpinner.getSelectedItem().toString();
+            boolean isValid = true;
 
-            // Validate the inputs
-            if (time.equals("Select Time") || quantityStr.isEmpty()) {
-                Toast.makeText(getActivity(), "Please fill in all fields.", Toast.LENGTH_SHORT).show();
-                return;
+            // Validate Time Selection
+            String time = buttonPickTime.getText().toString();
+            if (time.equals("select")) { //TODO: NOT WORKING
+                shakeView(buttonPickTime); // Shake the "Select Time" button
+                Toast.makeText(getActivity(), "Please select a time.", Toast.LENGTH_SHORT).show();
+                isValid = false;
             }
 
+            // Validate Dose Quantity
+            String quantityStr = editTextQuantity.getText().toString().trim();
+            if (quantityStr.isEmpty()) {
+                //    shakeView(editTextQuantity); // Shake the dose quantity field
+                editTextQuantity.setError("Dose quantity is required");
+                isValid = false;
+            }
+
+            // Validate Spinner Selection
+            String unit = doseSpinner.getSelectedItem().toString();
+            if (unit.equals("Select Unit")) { // Assuming "Select Unit" is the default option
+                shakeView(doseSpinner); // Shake the dose spinner
+                Toast.makeText(getActivity(), "Please select a dose unit.", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return; // Prevent moving to the next step if there are errors
+            }
+
+            // Parse and validate dose quantity
             int quantity;
             try {
                 quantity = Integer.parseInt(quantityStr);
             } catch (NumberFormatException e) {
+                shakeView(editTextQuantity); // Shake the quantity field for invalid input
                 Toast.makeText(getActivity(), "Please enter a valid quantity.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
+
             // Save data to activity
-            String reminderDetails = "Time: " + time + ", Dosage: " + quantity + " " + unit;
+            String reminderDetails = time + ", Dosage: " + quantity + " " + unit;
             activity.setReminderTime(reminderDetails);
             activity.goToNextStep();
+
         });
+
 
         return view;
     }
+    private void shakeView(View view) {
+        android.view.animation.Animation shake = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.shake);
+        view.startAnimation(shake);
+    }
+
 }

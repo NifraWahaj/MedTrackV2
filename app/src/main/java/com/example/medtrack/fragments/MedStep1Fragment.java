@@ -20,7 +20,7 @@ import com.example.medtrack.activities.AddMedActivity;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
-
+import com.example.medtrack.utils.ValidationUtils;
 public class MedStep1Fragment extends Fragment {
 
     private EditText medicationNameEditText;
@@ -51,12 +51,42 @@ public class MedStep1Fragment extends Fragment {
 
         // Set click listener for the next button
         nextButton.setOnClickListener(v -> {
-            String name = medicationNameEditText.getText().toString().trim();
+            boolean isValid = true;
 
-            // Validate the inputs
-            if (name.isEmpty() || startDate == null || endDate == null) {
-                Toast.makeText(getActivity(), "Please fill in all fields.", Toast.LENGTH_SHORT).show();
-                return;
+            // Validate medication name
+            String name = medicationNameEditText.getText().toString().trim();
+            if (!ValidationUtils.isNonEmpty(name)) {
+                medicationNameEditText.setError("Medication name is required");
+                medicationNameEditText.requestFocus();
+                isValid = false;
+            } else {
+                medicationNameEditText.setError(null); // Clear any previous error
+            }
+
+            // Validate start date
+            if (startDate == null) {
+                shakeView(buttonPickStartDate); // Shake the button
+                Toast.makeText(getContext(), "Start Date is required", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+
+            // Validate end date
+            if (endDate == null) {
+                shakeView(buttonPickEndDate); // Shake the button
+                Toast.makeText(getContext(), "End Date is required", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+
+            // Check if startDate and endDate are valid
+            if (startDate != null && endDate != null && !ValidationUtils.isValidDateRange(startDate, endDate)) {
+                Toast.makeText(getActivity(), "Invalid date range.", Toast.LENGTH_SHORT).show();
+                shakeView(buttonPickStartDate);
+                shakeView(buttonPickEndDate);
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return; // Prevent moving to the next step if there are errors
             }
 
             // Save data to activity
@@ -66,10 +96,12 @@ public class MedStep1Fragment extends Fragment {
                 activity.setStartDate(startDate);
                 activity.setEndDate(endDate);
 
-                // Move to next step
+                // Move to the next step
                 activity.goToNextStep();
             }
         });
+
+
 
         return view;
     }
@@ -99,4 +131,9 @@ public class MedStep1Fragment extends Fragment {
     private interface OnDateSetListener {
         void onDateSet(String date);
     }
+    private void shakeView(View view) {
+        android.view.animation.Animation shake = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.shake);
+        view.startAnimation(shake);
+    }
+
 }

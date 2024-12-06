@@ -2,6 +2,7 @@ package com.example.medtrack.adapters;
 
 
 import android.content.Context;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,8 @@ import com.example.medtrack.R;
 import com.example.medtrack.models.Medication;
 
 import java.util.List;
-
+import android.text.Html;
+import android.text.Spanned;
 public class MedicationListAdapter extends RecyclerView.Adapter<MedicationListAdapter.MedicationViewHolder> {
 
     private final Context context;
@@ -30,25 +32,29 @@ public class MedicationListAdapter extends RecyclerView.Adapter<MedicationListAd
     public MedicationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_medication_list, parent, false);
         return new MedicationViewHolder(view);
+
+
     }
 
     @Override
     public void onBindViewHolder(@NonNull MedicationViewHolder holder, int position) {
         Medication medication = medicationList.get(position);
-
+        holder.textViewDetails.setMovementMethod(new ScrollingMovementMethod());
         holder.textViewName.setText(medication.getName());
+
+
         holder.textViewDetails.setText(
-                "Frequency: " + medication.getFrequency() + "\n" +
-                        "Start Date: " + medication.getStartDate() + "\n" +
-                        "End Date: " + medication.getEndDate() + "\n" +
-                        "Refill Amount: " + medication.getRefillAmount() + "\n" +
-                        "Refill Threshold: " + medication.getRefillThreshold() + "\n" +
-                        (medication.getReminderTime() != null ? "Reminder: " + medication.getReminderTime() : "") +
-                        (medication.getFirstIntakeDetails() != null ? "\nFirst Intake: " + medication.getFirstIntakeDetails() : "") +
-                        (medication.getSecondIntakeDetails() != null ? "\nSecond Intake: " + medication.getSecondIntakeDetails() : "") +
-                        (medication.getSelectedDays() != null && !medication.getSelectedDays().isEmpty()
-                                ? "\nSpecific Days: " + medication.getSelectedDays()
-                                : "")
+                Html.fromHtml(
+                         medication.getFrequency() +
+                                "<b>Start: </b> " + medication.getStartDate() + "<br>" +
+                                "<b>End: </b> " + medication.getEndDate() + "<br>" +
+                                (medication.getReminderTime() != null ? "<b>Reminder:</b> " + medication.getReminderTime() + "<br>" : "") +
+                                (medication.getFirstIntakeDetails() != null ? "<b>First Intake:</b> " + medication.getFirstIntakeDetails() + "<br>" : "") +
+                                (medication.getSecondIntakeDetails() != null ? "<b>Second Intake:</b> " + medication.getSecondIntakeDetails() + "<br>" : "") +
+                                (medication.getSelectedDays() != null && !medication.getSelectedDays().isEmpty()
+                                        ? "<b>Specific Days:</b> " + medication.getSelectedDays() + "<br>"
+                                        : "")
+                )
         );
     }
 

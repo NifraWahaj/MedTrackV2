@@ -64,29 +64,60 @@ public class MedStep3Fragment extends Fragment {
         });
 
         nextButton.setOnClickListener(v -> {
-            String time = reminderTimeTextView.getText().toString();
-            String quantityStr = editTextQuantity.getText().toString().trim();
-            String unit = unitSpinner.getSelectedItem().toString();
+            boolean isValid = true;
 
-            // Validate the inputs
-            if (time.equals("Select Time") || quantityStr.isEmpty()) {
-                Toast.makeText(getActivity(), "Please fill in all fields.", Toast.LENGTH_SHORT).show();
-                return;
+            // Validate the reminder time
+            String time = reminderTimeTextView.getText().toString();
+            if (time.equals("Select Time")) {
+                shakeView(pickTimeButton); // Shake the "Select Time" button
+                Toast.makeText(getActivity(), "Please select a time.", Toast.LENGTH_SHORT).show();
+                isValid = false;
             }
 
+            // Validate the quantity
+            String quantityStr = editTextQuantity.getText().toString().trim();
+            if (quantityStr.isEmpty()) {
+                shakeView(editTextQuantity); // Shake the quantity EditText
+                editTextQuantity.setError("Quantity is required");
+                isValid = false;
+            }
+
+            // Validate the spinner selection
+            String unit = unitSpinner.getSelectedItem().toString();
+            if (unit.equals("Select Unit")) { // Assuming "Select Unit" is the default unselected option
+                shakeView(unitSpinner); // Shake the spinner
+                Toast.makeText(getActivity(), "Please select a unit.", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return; // Prevent moving to the next step if there are errors
+            }
+
+            // Parse the quantity input
             int quantity;
             try {
                 quantity = Integer.parseInt(quantityStr);
             } catch (NumberFormatException e) {
+                shakeView(editTextQuantity); // Shake the quantity field for invalid input
                 Toast.makeText(getActivity(), "Please enter a valid quantity.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             // Save data to activity
-            ((AddMedActivity) getActivity()).setReminderTime(time + ", Dosage: " + quantity + " " + unit);
-            ((AddMedActivity) getActivity()).goToNextStep();
+            AddMedActivity activity = (AddMedActivity) getActivity();
+            if (activity != null) {
+                activity.setReminderTime(time + ", Dosage: " + quantity + " " + unit);
+                activity.goToNextStep();
+            }
         });
+
 
         return view;
     }
+    private void shakeView(View view) {
+        android.view.animation.Animation shake = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.shake);
+        view.startAnimation(shake);
+    }
+
 }

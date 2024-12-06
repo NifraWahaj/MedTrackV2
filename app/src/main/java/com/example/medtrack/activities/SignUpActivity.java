@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,7 +29,7 @@ public class SignUpActivity extends AppCompatActivity {
     private TextView tvLogin;
     private Button btnSignUp;
     private FirebaseAuth mAuth;
-
+    private ProgressBar progressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +45,7 @@ public class SignUpActivity extends AppCompatActivity {
         etName = findViewById(R.id.etName);
         btnSignUp = findViewById(R.id.btnSignUp);
         tvLogin = findViewById(R.id.tvAlreadyHaveAnAccountLogin);
+        progressBar = findViewById(R.id.progress_bar);
 
         // Set up Sign-Up button click listener
         btnSignUp.setOnClickListener(view -> {
@@ -55,40 +57,55 @@ public class SignUpActivity extends AppCompatActivity {
             // Validation checks
             if (TextUtils.isEmpty(name)) {
                 Toast.makeText(SignUpActivity.this, "Name can't be empty", Toast.LENGTH_SHORT).show();
+                progressBar.setVisibility(View.GONE); // Ensure progress bar is hidden
+
                 return;
             }
             if (TextUtils.isEmpty(email)) {
                 Toast.makeText(SignUpActivity.this, "Email can't be empty", Toast.LENGTH_SHORT).show();
+                progressBar.setVisibility(View.GONE); // Ensure progress bar is hidden
+
                 return;
             }
             if (TextUtils.isEmpty(password)) {
                 Toast.makeText(SignUpActivity.this, "Password can't be empty", Toast.LENGTH_SHORT).show();
+                progressBar.setVisibility(View.GONE); // Ensure progress bar is hidden
+
                 return;
             }
             if (!password.equals(confirmPassword)) {
                 Toast.makeText(SignUpActivity.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+                progressBar.setVisibility(View.GONE); // Ensure progress bar is hidden
+
                 return;
             }
+
+            btnSignUp.setEnabled(false); // Disable the button
+
+            // Show the ProgressBar before starting authentication
+            progressBar.setVisibility(View.VISIBLE);
 
             // Create new user with Firebase Authentication
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(SignUpActivity.this, task -> {
+                        progressBar.setVisibility(View.GONE); // Ensure it's hidden for all cases
                         if (task.isSuccessful()) {
                             Log.d(TAG, "createUserWithEmail:success");
                             Toast.makeText(SignUpActivity.this, "Sign-up successful", Toast.LENGTH_SHORT).show();
 
                             // Save user to the database
-                            saveUserToDatabase(name, email);
+                            saveUserToDatabase(name, email, null);
 
-                            // Redirect to MainActivity and finish this activity
+                            // Redirect to MainActivity
                             Intent i = new Intent(SignUpActivity.this, MainActivity.class);
                             startActivity(i);
-                            finish(); // Prevent navigating back to SignUpActivity
+                            finish();
                         } else {
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
                             Toast.makeText(SignUpActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
                     });
+
         });
 
         // Set up Login button click listener
@@ -99,13 +116,14 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
-    private void saveUserToDatabase(String name, String email) {
+    private void saveUserToDatabase(String name, String email , String image) {
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
         DatabaseReference userRef = database.getReference("users");
 
         Map<String, Object> userData = new HashMap<>();
         userData.put("name", name);
         userData.put("email", email);
+        userData.put("image", "");
 
         userRef.push().setValue(userData)
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "User saved to Firebase Database."))
