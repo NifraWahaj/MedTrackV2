@@ -1,5 +1,6 @@
 package com.example.medtrack.activities;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -9,9 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
-import androidx.work.Data;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
 
 import com.example.medtrack.fragments.MedStep1Fragment;
 import com.example.medtrack.fragments.MedStep2Fragment;
@@ -22,7 +20,6 @@ import com.example.medtrack.fragments.MedStep3TwoDosesFragment;
 import com.example.medtrack.fragments.MedStep4Fragment;
 import com.example.medtrack.R;
 import com.example.medtrack.models.Medication;
-import com.example.medtrack.utils.NotificationWorker;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -31,7 +28,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class AddMedActivity extends AppCompatActivity {
     private static final String TAG = "AddMedActivity";
@@ -269,106 +265,6 @@ public class AddMedActivity extends AppCompatActivity {
                     Toast.makeText(AddMedActivity.this, "Failed to save medication", Toast.LENGTH_SHORT).show();
                 });
     }
-    private void scheduleMedicationNotification(Medication medication) {
-        switch (medication.getFrequency()) {
-            case "Once daily":
-                scheduleOnceDaily(medication);
-                break;
-            case "Twice daily":
-                scheduleTwiceDaily(medication);
-                break;
-            case "Interval (e.g., every X hours)":
-                scheduleIntervalBased(medication);
-                break;
-            case "Specific days (e.g., Mon, Wed, Fri)":
-                scheduleSpecificDays(medication);
-                break;
-        }
-    }
-
-    private void scheduleOnceDaily(Medication medication) {
-        String[] timeSplit = medication.getReminderTime().split(",")[0].split(":");
-        int hour = Integer.parseInt(timeSplit[0]);
-        int minute = Integer.parseInt(timeSplit[1]);
-        scheduleNotification(medication, hour, minute);
-    }
-
-    private void scheduleTwiceDaily(Medication medication) {
-        scheduleNotificationFromDetails(medication, medication.getFirstIntakeDetails());
-        scheduleNotificationFromDetails(medication, medication.getSecondIntakeDetails());
-    }
-
-    private void scheduleIntervalBased(Medication medication) {
-        String[] timeParts = medication.getReminderTime().split(", ");
-        int interval = Integer.parseInt(timeParts[0].split(": ")[1].replace("hours", "").trim());
-        String startTime = timeParts[1].split(": ")[1].trim();
-        String endTime = timeParts[2].split(": ")[1].trim();
-
-        Calendar startCal = parseTime(startTime);
-        Calendar endCal = parseTime(endTime);
-
-        while (startCal.before(endCal)) {
-            scheduleNotification(medication, startCal.get(Calendar.HOUR_OF_DAY), startCal.get(Calendar.MINUTE));
-            startCal.add(Calendar.HOUR_OF_DAY, interval);
-        }
-    }
-
-    private void scheduleSpecificDays(Medication medication) {
-        String[] timeSplit = medication.getReminderTime().split(",")[0].split(":");
-        int hour = Integer.parseInt(timeSplit[0]);
-        int minute = Integer.parseInt(timeSplit[1]);
-        String[] days = medication.getSelectedDays().split(", ");
-
-        for (String day : days) {
-            Calendar calendar = convertDayToCalendar(day);
-            if (calendar != null) {
-                scheduleNotification(medication, hour, minute, calendar.getTimeInMillis());
-            }
-        }
-    }
-
-    private void scheduleNotificationFromDetails(Medication medication, String details) {
-        String[] timeSplit = details.split(",")[0].split(":");
-        int hour = Integer.parseInt(timeSplit[0]);
-        int minute = Integer.parseInt(timeSplit[1]);
-        scheduleNotification(medication, hour, minute);
-    }
-
-    private void scheduleNotification(Medication medication, int hour, int minute) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        calendar.set(Calendar.SECOND, 0);
-
-        if (calendar.before(Calendar.getInstance())) {
-            calendar.add(Calendar.DAY_OF_MONTH, 1);
-        }
-
-        scheduleNotification(medication, calendar.getTimeInMillis());
-    }
-
-    private void scheduleNotification(Medication medication, int hour, int minute, long timestamp) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(timestamp);
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        scheduleNotification(medication, calendar.getTimeInMillis());
-    }
-
-    private void scheduleNotification(Medication medication, long triggerTimeMillis) {
-        Data data = new Data.Builder()
-                .putString("medName", medication.getName())
-                .build();
-
-        long delay = triggerTimeMillis - System.currentTimeMillis();
-
-        OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(NotificationWorker.class)
-                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-                .setInputData(data)
-                .build();
-
-        WorkManager.getInstance(this).enqueue(workRequest);
-    }
 
     private Calendar parseTime(String time) {
         String[] timeSplit = time.split(":");
@@ -417,15 +313,16 @@ public class AddMedActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        /*
-        if (viewPager.getCurrentItem() == 0) {
-            super.onBackPressed(); // Exit if it's the first fragment
-        } else {
-            viewPager.setCurrentItem(viewPager.getCurrentItem() - 1); // Go to the previous fragment
-        }*/
+        // Show a confirmation dialog
+        new AlertDialog.Builder(this)
+                .setTitle("Discard Changes?")
+                .setMessage("Are you sure you want to exit? Your changes will not be saved.")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    AddMedActivity.super.onBackPressed();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .show();
     }
-
-
-
 }

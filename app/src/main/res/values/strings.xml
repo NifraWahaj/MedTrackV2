@@ -82,7 +82,7 @@
     <string name="sun">Sun</string>
     <string name="next">Next</string>
     <string name="when_would_you_like_to_be_reminded">When would you like to be reminded?</string>
-    <string name="select_time">Select Time</string>
+    <string name="select_time">Time</string>
     <string name="select">Select</string> <!-- if this changed, also update shake anim in frags-->
     <string name="quantity">Quantity</string>
     <string name="current_inventory">Current Inventory</string>
