@@ -71,8 +71,8 @@
     <string name="how_often_do_you_take_this_medication">How often do you take this medication?</string>
     <string name="once_daily">Once daily</string>
     <string name="twice_daily">Twice daily</string>
-    <string name="interval_e_g_every_x_hours">Interval (e.g., every X hours)</string>
-    <string name="specific_days_e_g_mon_wed_fri">Specific days (e.g., Mon, Wed, Fri)</string>
+    <string name="interval_e_g_every_x_hours">Interval</string>
+    <string name="specific_days_e_g_mon_wed_fri">Specific days</string>
     <string name="mon">Mon</string>
     <string name="tue">Tue</string>
     <string name="wed">Wed</string>

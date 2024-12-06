@@ -117,10 +117,10 @@ public class AddMedActivity extends AppCompatActivity {
         if ("Twice daily".equalsIgnoreCase(medicationFrequency)) {
             Log.d(TAG, "Adding MedStep3TwoDosesFragment for twice daily frequency");
             fragmentList.add(new MedStep3TwoDosesFragment());  // Step 3 for Two Doses
-        } else if ("Interval (e.g., every X hours)".equalsIgnoreCase(medicationFrequency)) {
+        } else if ("Interval".equalsIgnoreCase(medicationFrequency)) {
             Log.d(TAG, "Adding MedStep3IntervalFragment for interval frequency");
             fragmentList.add(new MedStep3IntervalFragment());  // Step 3 for Interval Doses
-        } else if ("Specific days (e.g., Mon, Wed, Fri)".equalsIgnoreCase(medicationFrequency)) {
+        } else if ("Specific days".equalsIgnoreCase(medicationFrequency)) {
             Log.d(TAG, "Adding MedStep3SpecificDaysFragment for specific days frequency");
             fragmentList.add(new MedStep3SpecificDaysFragment());  // Step 3 for Specific Days
         } else {
@@ -222,7 +222,7 @@ public class AddMedActivity extends AppCompatActivity {
                     startDate,
                     endDate
             );
-        } else if ("Specific days (e.g., Mon, Wed, Fri)".equalsIgnoreCase(medicationFrequency)) {
+        } else if ("Specific days".equalsIgnoreCase(medicationFrequency)) {
             String selectedDaysString = String.join(", ", selectedDays);
             medication = new Medication(
                     medicationName,

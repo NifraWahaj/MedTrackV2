@@ -158,7 +158,7 @@ public class HomeFragment extends Fragment {
                         Log.d(TAG, "Medication Retrieved: " + medication.getName());
                         Log.d(TAG, "Frequency: " + medication.getFrequency());
 
-                        if ("Interval (e.g., every X hours)".equalsIgnoreCase(medication.getFrequency())) {
+                        if ("Interval".equalsIgnoreCase(medication.getFrequency())) {
                             processIntervalMedication(medication, selectedTimestamp);
                         } else if ("Twice daily".equalsIgnoreCase(medication.getFrequency())) {
                             addTwiceDailyMedications(medication, selectedTimestamp);
@@ -206,8 +206,7 @@ public class HomeFragment extends Fragment {
                 return false;
             }
 
-            // Handle "Specific days (e.g., Mon, Wed, Fri)"
-            if ("Specific days (e.g., Mon, Wed, Fri)".equalsIgnoreCase(medication.getFrequency())) {
+            if ("Specific days".equalsIgnoreCase(medication.getFrequency())) {
                 List<String> selectedDays = getSelectedDaysFromMedication(medication);
                 String selectedDay = new SimpleDateFormat("EEE", Locale.getDefault()).format(new Date(selectedTimestamp));
                 return selectedDays.contains(selectedDay); // Check if the day matches

@@ -77,7 +77,7 @@ public class MedStep2Fragment extends Fragment {
                 RadioButton selectedRadioButton = view.findViewById(selectedId);
                 String frequency = selectedRadioButton.getText().toString();
 
-                if (frequency.equals("Specific days (e.g., Mon, Wed, Fri)") && selectedDays.isEmpty()) {
+                if (frequency.equals("Specific days") && selectedDays.isEmpty()) {
                     shakeView(daysSelectionLayout); // Shake the days selection layout
                     Toast.makeText(getActivity(), "Please select at least one day.", Toast.LENGTH_SHORT).show();
                     isValid = false;
@@ -96,7 +96,7 @@ public class MedStep2Fragment extends Fragment {
             if (activity != null) {
                 activity.setMedicationFrequency(frequency);
 
-                if (frequency.equals("Specific days (e.g., Mon, Wed, Fri)")) {
+                if (frequency.equals("Specific days")) {
                     activity.setSelectedDays(new ArrayList<>(selectedDays)); // Save selected days
                 }
 

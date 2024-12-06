@@ -78,7 +78,7 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
         medName.setText(medication.getName());
 
         // If the medication frequency is interval-based, calculate times between start and end
-        if ("Interval (e.g., every X hours)".equalsIgnoreCase(medication.getFrequency())) {
+        if ("Interval".equalsIgnoreCase(medication.getFrequency())) {
             Log.d(TAG, "Processing interval-based medication for: " + medication.getName());
 
             String reminderTime = medication.getReminderTime();

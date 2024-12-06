@@ -2,18 +2,17 @@ package com.example.medtrack.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.medtrack.R;
 import com.example.medtrack.activities.AddMedActivity;
@@ -28,14 +27,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MedFragment extends Fragment {
 
-    private RecyclerView medicationRecyclerView;
-    private MedicationListAdapter medicationAdapter;
-    private List<Medication> medicationList = new ArrayList<>();
+    private RecyclerView activeMedicationRecyclerView;
+    private RecyclerView inactiveMedicationRecyclerView;
+    private MedicationListAdapter activeMedicationAdapter;
+    private MedicationListAdapter inactiveMedicationAdapter;
+    private List<Medication> activeMedicationList = new ArrayList<>();
+    private List<Medication> inactiveMedicationList = new ArrayList<>();
     private static final String TAG = "MedFragment";
 
     public MedFragment() {
@@ -47,11 +53,17 @@ public class MedFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_med, container, false);
 
-        // Initialize RecyclerView
-        medicationRecyclerView = view.findViewById(R.id.medicationRecyclerView);
-        medicationRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        medicationAdapter = new MedicationListAdapter(getContext(), medicationList);
-        medicationRecyclerView.setAdapter(medicationAdapter);
+        // Initialize RecyclerView for active medications
+        activeMedicationRecyclerView = view.findViewById(R.id.activeMedicationRecyclerView);
+        activeMedicationRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        activeMedicationAdapter = new MedicationListAdapter(getContext(), activeMedicationList);
+        activeMedicationRecyclerView.setAdapter(activeMedicationAdapter);
+
+        // Initialize RecyclerView for inactive medications
+        inactiveMedicationRecyclerView = view.findViewById(R.id.inactiveMedicationRecyclerView);
+        inactiveMedicationRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        inactiveMedicationAdapter = new MedicationListAdapter(getContext(), inactiveMedicationList);
+        inactiveMedicationRecyclerView.setAdapter(inactiveMedicationAdapter);
 
         // Initialize FAB
         FloatingActionButton fab = view.findViewById(R.id.fab);
@@ -82,14 +94,28 @@ public class MedFragment extends Fragment {
         medsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                medicationList.clear();
+                activeMedicationList.clear();
+                inactiveMedicationList.clear();
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                Date currentDate = new Date();
+
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Medication medication = snapshot.getValue(Medication.class);
                     if (medication != null) {
-                        medicationList.add(medication);
+                        try {
+                            Date endDate = sdf.parse(medication.getEndDate());
+                            if (endDate != null && endDate.compareTo(currentDate) >= 0) {
+                                activeMedicationList.add(medication);
+                            } else {
+                                inactiveMedicationList.add(medication);
+                            }
+                        } catch (ParseException e) {
+                            Log.e(TAG, "Date parsing error: " + e.getMessage());
+                        }
                     }
                 }
-                medicationAdapter.notifyDataSetChanged();
+                activeMedicationAdapter.notifyDataSetChanged();
+                inactiveMedicationAdapter.notifyDataSetChanged();
             }
 
             @Override
