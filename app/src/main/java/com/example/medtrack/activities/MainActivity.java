@@ -1,6 +1,10 @@
 package com.example.medtrack.activities;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -15,6 +19,13 @@ import com.example.medtrack.adapters.ViewPagerAdapter;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -95,5 +106,58 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+            String email = currentUser.getEmail();
+           // Toast.makeText(this, "main activity email"+email, Toast.LENGTH_SHORT).show();
+            // Fetch additional user details if required
+            fetchUserFromDatabase(userId);
+        }
+
     }
+    private void fetchUserFromDatabase(String userId) {
+        // Reference to the "users" node in Firebase Database
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users");
+
+        // Query the database for the specific user ID
+        userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // Extract user details from the snapshot
+                    String name = dataSnapshot.child("name").getValue(String.class);
+                    String email = dataSnapshot.child("email").getValue(String.class);
+                    Toast.makeText(MainActivity.this, email+name+"thiss", Toast.LENGTH_SHORT).show();
+                    // Store user details in SharedPreferences
+                    storeUserInSharedPreferences(name, email,userId);
+
+                } else {
+                    // Handle case where user ID does not exist
+                    Toast.makeText(MainActivity.this, "User not found in the database.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle errors
+                Log.e("LoginActivity", "Database error: " + databaseError.getMessage());
+                Toast.makeText(MainActivity.this, "Failed to fetch user data.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void storeUserInSharedPreferences(String name, String email,String userId) {
+        SharedPreferences sharedPreferences = getSharedPreferences("user_pref", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        // Clear all stored preferences
+        editor.clear();
+        editor.putString("name", name);
+        editor.putString("userId", userId); // Store user ID
+
+        editor.putString("email", email);
+        editor.apply();
+    }
+
 }

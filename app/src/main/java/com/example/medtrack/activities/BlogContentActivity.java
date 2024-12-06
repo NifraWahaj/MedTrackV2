@@ -100,7 +100,8 @@ public class BlogContentActivity extends AppCompatActivity {
             blogId = getIntent().getStringExtra("blogId");
             blogUserId = getIntent().getStringExtra("userId");
         }
-     if(blogUserId.equals(User.getCurrentUserId(BlogContentActivity.this))){
+        tvAuthor.setText("bloguserid"+ blogUserId+ "curerntid"+User.getCurrentUserId(this)+ User.getCurrentUserEmail(this));
+      if(blogUserId.equals(User.getCurrentUserId(BlogContentActivity.this))){
            tvRateThisBlog.setVisibility(View.INVISIBLE);
          tvWriteAReview.setVisibility(View.INVISIBLE);
             ratingBar.setVisibility(View.INVISIBLE);

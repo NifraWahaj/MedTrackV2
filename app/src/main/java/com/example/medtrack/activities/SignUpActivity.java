@@ -30,6 +30,7 @@ public class SignUpActivity extends AppCompatActivity {
     private Button btnSignUp;
     private FirebaseAuth mAuth;
     private ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,15 +118,27 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void saveUserToDatabase(String name, String email) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
-        DatabaseReference userRef = database.getReference("users");
+        // Get the currently authenticated user's unique ID
+        String userId = mAuth.getCurrentUser().getUid();
 
+        // Reference to the "users" node in the Firebase Database
+        FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
+        DatabaseReference userRef = database.getReference("users").child(userId);
+
+        // Create a map of user data
         Map<String, Object> userData = new HashMap<>();
         userData.put("name", name);
         userData.put("email", email);
 
-        userRef.push().setValue(userData)
-                .addOnSuccessListener(aVoid -> Log.d(TAG, "User saved to Firebase Database."))
-                .addOnFailureListener(e -> Log.e(TAG, "Failed to save user: " + e.getMessage()));
+        // Save user data under their unique ID
+        userRef.setValue(userData)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "User saved to Firebase Database with ID: " + userId);
+                    Toast.makeText(SignUpActivity.this, "User saved successfully", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to save user: " + e.getMessage());
+                    Toast.makeText(SignUpActivity.this, "Failed to save user data.", Toast.LENGTH_SHORT).show();
+                });
     }
 }

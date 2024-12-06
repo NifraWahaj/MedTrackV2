@@ -85,7 +85,6 @@ public class LoginActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     Log.d(TAG, "signInWithEmail:success");
                                     Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                                    fetchUserFromDatabase(email);
 
                                     // Redirect to MainActivity
                                     Intent i = new Intent(LoginActivity.this, MainActivity.class);
@@ -124,53 +123,6 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void fetchUserFromDatabase(String email) {
-        // Get reference to users in Firebase Realtime Database
-        DatabaseReference userRef = FirebaseDatabase.getInstance()
-                .getReference("users");
 
-        // Query the users by email
-        userRef.orderByChild("email").equalTo(email)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                // Fetch user data
-                                // Fetch user ID
-                                  userId = snapshot.getKey(); // Get the unique user ID
-                                String name = snapshot.child("name").getValue(String.class);
-                                String email = snapshot.child("email").getValue(String.class);
 
-                                // Store user data in SharedPreferences
-                                storeUserInSharedPreferences(name, email);
-
-                                // Redirect to MainActivity after successful login
-                                Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
-                                startActivity(mainIntent);
-                                finish();
-                            }
-                        } else {
-                            Toast.makeText(LoginActivity.this, "No user found with this email.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Toast.makeText(LoginActivity.this, "Error fetching user data.", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-    private void storeUserInSharedPreferences(String name, String email) {
-        SharedPreferences sharedPreferences = getSharedPreferences("user_pref", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        // Clear all stored preferences
-        editor.clear();
-        editor.putString("name", name);
-        editor.putString("userId", userId); // Store user ID
-
-        editor.putString("email", email);
-        editor.apply();
-    }
 }
