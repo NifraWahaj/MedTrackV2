@@ -117,6 +117,7 @@ import java.util.List;
             intent.putExtra("blogId", blog.getId());
             intent.putExtra("blogTitle", blog.getTitle());
             intent.putExtra("blogContent", blog.getContent());
+            intent.putExtra("userId", blog.getUserId());
 
 
 

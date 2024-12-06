@@ -195,8 +195,7 @@ import java.util.List;
          intent.putExtra("blogContent", blog.getContent());
          intent.putExtra("userId", blog.getUserId());
 
-         // Display a Toast for debugging
-         Toast.makeText(getContext(), "Inside onBlogClick", Toast.LENGTH_SHORT).show();
+         // Toast.makeText(getContext(), "Inside onBlogClick", Toast.LENGTH_SHORT).show();
 
          // Hide the views
       /*   recyclerView.setVisibility(View.GONE);

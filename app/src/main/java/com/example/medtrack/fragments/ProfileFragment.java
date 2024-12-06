@@ -263,22 +263,27 @@ public class ProfileFragment extends Fragment {
     }
 
     public void storeImageInFirebase(Bitmap bitmap) {
+        // Convert bitmap to Base64 string
         String encodedImage = convertBitmapToBase64(bitmap);
+
+        // Get the current user's UID from Firebase Authentication
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Reference to the "images" node in Firebase Database
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
         DatabaseReference databaseRef = database.getReference("images");
 
-        String imageId = databaseRef.push().getKey();
-        if (imageId != null) {
-            databaseRef.child(imageId).setValue(encodedImage)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(getContext(), "Image saved successfully!", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(getContext(), "Failed to save image URL.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }
+        // Use the userId as the key
+        databaseRef.child(userId).setValue(encodedImage)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(getContext(), "Image saved successfully!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "Failed to save image.", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
+
 
     public String convertBitmapToBase64(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

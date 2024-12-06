@@ -99,9 +99,10 @@ public class BlogContentActivity extends AppCompatActivity {
         if (getIntent() != null) {
             blogId = getIntent().getStringExtra("blogId");
             blogUserId = getIntent().getStringExtra("userId");
+           User user=User.fetchUserFromDatabase(blogUserId);
+           tvAuthor.setText(user.getName());
         }
-        tvAuthor.setText("bloguserid"+ blogUserId+ "curerntid"+User.getCurrentUserId(this)+ User.getCurrentUserEmail(this));
-      if(blogUserId.equals(User.getCurrentUserId(BlogContentActivity.this))){
+       if(blogUserId.equals(User.getCurrentUserId(BlogContentActivity.this))){
            tvRateThisBlog.setVisibility(View.INVISIBLE);
          tvWriteAReview.setVisibility(View.INVISIBLE);
             ratingBar.setVisibility(View.INVISIBLE);
@@ -135,7 +136,7 @@ public class BlogContentActivity extends AppCompatActivity {
                 intent.putExtra("userRating", rating);
                 intent.putExtra("blogTitle", title);
                 intent.putExtra("blogId", blogId);
-                intent.putExtra("editMode", true);
+                intent.putExtra("editMode",isEdit);
 
                 if (isEdit) {
                     intent.putExtra("reviewText", reviewText);
@@ -169,13 +170,13 @@ public class BlogContentActivity extends AppCompatActivity {
         // Review List Button
         btnReviewList.setOnClickListener(v -> {
             Intent intent = new Intent(BlogContentActivity.this, RatingsReviewsListActivity.class);
-            Toast.makeText(this, "button  reviews clicked", Toast.LENGTH_SHORT).show();
+         //   Toast.makeText(this, "button  reviews clicked", Toast.LENGTH_SHORT).show();
             intent.putExtra("blogId", blogId);
 
 
 
             startActivity(intent);
-            Toast.makeText(this, "button start activity", Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(this, "button start activity", Toast.LENGTH_SHORT).show();
         });
     }
 
