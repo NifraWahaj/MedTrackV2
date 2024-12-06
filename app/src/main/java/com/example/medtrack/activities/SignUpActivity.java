@@ -30,7 +30,6 @@ public class SignUpActivity extends AppCompatActivity {
     private Button btnSignUp;
     private FirebaseAuth mAuth;
     private ProgressBar progressBar;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,10 +81,11 @@ public class SignUpActivity extends AppCompatActivity {
             }
 
             btnSignUp.setEnabled(false); // Disable the button
-btnSignUp.setVisibility(View.GONE);
+
             // Show the ProgressBar before starting authentication
             progressBar.setVisibility(View.VISIBLE);
-             // Create new user with Firebase Authentication
+
+            // Create new user with Firebase Authentication
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(SignUpActivity.this, task -> {
                         progressBar.setVisibility(View.GONE); // Ensure it's hidden for all cases
@@ -94,16 +94,13 @@ btnSignUp.setVisibility(View.GONE);
                             Toast.makeText(SignUpActivity.this, "Sign-up successful", Toast.LENGTH_SHORT).show();
 
                             // Save user to the database
-                            saveUserToDatabase(name, email);
+                            saveUserToDatabase(name, email, null);
 
                             // Redirect to MainActivity
                             Intent i = new Intent(SignUpActivity.this, MainActivity.class);
                             startActivity(i);
                             finish();
                         } else {
-                            btnSignUp.setVisibility(View.VISIBLE);
-
-                            btnSignUp.setEnabled(true);
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
                             Toast.makeText(SignUpActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
@@ -119,28 +116,17 @@ btnSignUp.setVisibility(View.GONE);
         });
     }
 
-    private void saveUserToDatabase(String name, String email) {
-        // Get the currently authenticated user's unique ID
-        String userId = mAuth.getCurrentUser().getUid();
-
-        // Reference to the "users" node in the Firebase Database
+    private void saveUserToDatabase(String name, String email , String image) {
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
-        DatabaseReference userRef = database.getReference("users").child(userId);
+        DatabaseReference userRef = database.getReference("users");
 
-        // Create a map of user data
         Map<String, Object> userData = new HashMap<>();
         userData.put("name", name);
         userData.put("email", email);
+        userData.put("image", "");
 
-        // Save user data under their unique ID
-        userRef.setValue(userData)
-                .addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "User saved to Firebase Database with ID: " + userId);
-                    Toast.makeText(SignUpActivity.this, "User saved successfully", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Failed to save user: " + e.getMessage());
-                    Toast.makeText(SignUpActivity.this, "Failed to save user data.", Toast.LENGTH_SHORT).show();
-                });
+        userRef.push().setValue(userData)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "User saved to Firebase Database."))
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to save user: " + e.getMessage()));
     }
 }

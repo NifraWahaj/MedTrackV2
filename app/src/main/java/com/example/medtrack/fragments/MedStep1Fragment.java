@@ -20,7 +20,9 @@ import com.example.medtrack.activities.AddMedActivity;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+
 import com.example.medtrack.utils.ValidationUtils;
+
 public class MedStep1Fragment extends Fragment {
 
     private EditText medicationNameEditText;
@@ -102,7 +104,6 @@ public class MedStep1Fragment extends Fragment {
         });
 
 
-
         return view;
     }
 
@@ -131,6 +132,7 @@ public class MedStep1Fragment extends Fragment {
     private interface OnDateSetListener {
         void onDateSet(String date);
     }
+
     private void shakeView(View view) {
         android.view.animation.Animation shake = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.shake);
         view.startAnimation(shake);

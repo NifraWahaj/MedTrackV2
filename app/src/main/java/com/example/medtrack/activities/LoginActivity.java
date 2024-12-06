@@ -74,7 +74,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 // Show the ProgressBar before starting authentication
                 progressBar.setVisibility(View.VISIBLE);
-btnLogin.setVisibility(View.GONE);
+                btnLogin.setVisibility(View.GONE);
                 mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
@@ -116,11 +116,8 @@ btnLogin.setVisibility(View.GONE);
         tvForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              //  Intent forgotPasswordIntent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
-             //   startActivity(forgotPasswordIntent);
-
-                Intent tempLogin = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(tempLogin);
+                  Intent forgotPasswordIntent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+                  startActivity(forgotPasswordIntent);
                 finish();
             }
         });

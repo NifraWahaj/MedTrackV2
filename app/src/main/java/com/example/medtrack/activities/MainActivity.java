@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -16,6 +17,8 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.medtrack.R;
 import com.example.medtrack.adapters.ViewPagerAdapter;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -26,6 +29,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,12 +38,34 @@ public class MainActivity extends AppCompatActivity {
     ViewPagerAdapter adapter;
     int count = 0;
     boolean flag = false;
-
+    EditText etToken; // this field is set width 0 s0 it wont show
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+        etToken = findViewById(R.id.token_id);
+
+        //NOTIFICATION
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            System.out.println("Fetching FCM registration token failed");
+                            return;
+                        }
+                        // Get new FCM registration token
+                        String token = task.getResult();
+                        // Log and toast
+                        Toast.makeText(MainActivity.this, "Your device registration token is" + token
+                                , Toast.LENGTH_SHORT).show();
+                        Log.d("FCM Token", token);
+                        etToken.setText(token);
+                    }
+                });
+
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -111,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         if (currentUser != null) {
             String userId = currentUser.getUid();
             String email = currentUser.getEmail();
-           // Toast.makeText(this, "main activity email"+email, Toast.LENGTH_SHORT).show();
+            // Toast.makeText(this, "main activity email"+email, Toast.LENGTH_SHORT).show();
             // Fetch additional user details if required
             fetchUserFromDatabase(userId);
         }

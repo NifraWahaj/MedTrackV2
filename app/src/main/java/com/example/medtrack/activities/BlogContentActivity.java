@@ -99,24 +99,24 @@ public class BlogContentActivity extends AppCompatActivity {
         if (getIntent() != null) {
             blogId = getIntent().getStringExtra("blogId");
             blogUserId = getIntent().getStringExtra("userId");
-           User user=User.fetchUserFromDatabase(blogUserId);
-           tvAuthor.setText(user.getName());
+            User user=User.fetchUserFromDatabase(blogUserId);
+            tvAuthor.setText(user.getName());
         }
-       if(blogUserId.equals(User.getCurrentUserId(BlogContentActivity.this))){
-           tvRateThisBlog.setVisibility(View.INVISIBLE);
-         tvWriteAReview.setVisibility(View.INVISIBLE);
+        if(blogUserId.equals(User.getCurrentUserId(BlogContentActivity.this))){
+            tvRateThisBlog.setVisibility(View.INVISIBLE);
+            tvWriteAReview.setVisibility(View.INVISIBLE);
             ratingBar.setVisibility(View.INVISIBLE);
-           findViewById(R.id.tvRatingsAndReviews).setVisibility(View.VISIBLE);
-           btnReviewList.setVisibility(View.VISIBLE);
+            findViewById(R.id.tvRatingsAndReviews).setVisibility(View.VISIBLE);
+            btnReviewList.setVisibility(View.VISIBLE);
 
         }
-     else{
-         tvRateThisBlog.setVisibility(View.VISIBLE);
-         tvWriteAReview.setVisibility(View.VISIBLE);
-         ratingBar.setVisibility(View.VISIBLE);
-         findViewById(R.id.tvRatingsAndReviews).setVisibility(View.VISIBLE);
-         btnReviewList.setVisibility(View.VISIBLE);
-     }
+        else{
+            tvRateThisBlog.setVisibility(View.VISIBLE);
+            tvWriteAReview.setVisibility(View.VISIBLE);
+            ratingBar.setVisibility(View.VISIBLE);
+            findViewById(R.id.tvRatingsAndReviews).setVisibility(View.VISIBLE);
+            btnReviewList.setVisibility(View.VISIBLE);
+        }
         // Set Listeners
         setupListeners();
 
@@ -170,13 +170,13 @@ public class BlogContentActivity extends AppCompatActivity {
         // Review List Button
         btnReviewList.setOnClickListener(v -> {
             Intent intent = new Intent(BlogContentActivity.this, RatingsReviewsListActivity.class);
-         //   Toast.makeText(this, "button  reviews clicked", Toast.LENGTH_SHORT).show();
+            //   Toast.makeText(this, "button  reviews clicked", Toast.LENGTH_SHORT).show();
             intent.putExtra("blogId", blogId);
 
 
 
             startActivity(intent);
-          //  Toast.makeText(this, "button start activity", Toast.LENGTH_SHORT).show();
+            //  Toast.makeText(this, "button start activity", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -244,7 +244,7 @@ public class BlogContentActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     // Retrieve the review and rating for the current user
                     Log.d("BlogContent", "Review and rating found!");
-                      reviewText = snapshot.child("review").getValue(String.class);
+                    reviewText = snapshot.child("review").getValue(String.class);
                     Float existingRating = snapshot.child("rating").getValue(Float.class);
                     isEdit=true;
 

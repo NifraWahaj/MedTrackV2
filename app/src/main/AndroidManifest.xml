@@ -3,10 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools">
     <!-- Add the required permissions for notifications -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -24,16 +24,8 @@
         <activity
             android:name=".activities.ChangePassword"
             android:exported="false" /> <!-- Firebase Messaging Service -->
-        <service
-            android:name=".MyFirebaseMessagingService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service> <!-- Register system notification services -->
-        <receiver
-            android:name="androidx.work.impl.background.systemjob.SystemJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE" /> <!-- Activities -->
+
+
         <activity
             android:name=".activities.RatedBlogsActivity"
             android:exported="false" />
@@ -74,6 +66,16 @@
             android:name=".activities.MainActivity"
             android:exported="false"
             android:launchMode="singleTop" />
+
+        <service
+            android:name=".utils.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+
     </application>
 
 </manifest>

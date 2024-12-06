@@ -1,15 +1,6 @@
 package com.example.medtrack.activities;
 
 import android.os.Bundle;
-
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,6 +11,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.medtrack.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class ChangePassword extends AppCompatActivity {
 
@@ -28,11 +21,15 @@ public class ChangePassword extends AppCompatActivity {
     private TextView tvWelcomeToMedTrac;
     public EditText etEmail, etNewPassword, etCnewPassword;
     private Button btnLogin;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_password);
+
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
 
         // Initialize view hooks
         logo = findViewById(R.id.logo);
@@ -51,12 +48,11 @@ public class ChangePassword extends AppCompatActivity {
      */
     private void handleChangePassword() {
         // Retrieve input values
-        String oldPassword = etEmail.getText().toString().trim();
         String newPassword = etNewPassword.getText().toString().trim();
         String confirmNewPassword = etCnewPassword.getText().toString().trim();
 
         // Validate inputs
-        if (oldPassword.isEmpty() || newPassword.isEmpty() || confirmNewPassword.isEmpty()) {
+        if (newPassword.isEmpty() || confirmNewPassword.isEmpty()) {
             Toast.makeText(this, "All fields are required!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -66,7 +62,18 @@ public class ChangePassword extends AppCompatActivity {
             return;
         }
 
-        // TODO: Implement backend logic for changing the password
-        Toast.makeText(this, "Password changed successfully!", Toast.LENGTH_SHORT).show();
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            user.updatePassword(newPassword)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(this, "Password changed successfully!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(this, "Failed to change password!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        } else {
+            Toast.makeText(this, "No authenticated user found!", Toast.LENGTH_SHORT).show();
+        }
     }
 }

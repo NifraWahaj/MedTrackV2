@@ -86,7 +86,7 @@ public class EditBlogAPIActivity extends AppCompatActivity {
         isEdit = intent.getBooleanExtra("isEdit", false);
         // Load a sample bitmap in the background
         // Bitmap is representation of the image in memory.
-      //  BitmapFactory helps convert image data into a Bitmap object.
+        //  BitmapFactory helps convert image data into a Bitmap object.
         bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.color_palette);
 
         // Toolbar buttons
@@ -108,7 +108,7 @@ public class EditBlogAPIActivity extends AppCompatActivity {
         }
 
 
-     }
+    }
 
     private void setToolbarActions() {
         etTitle = findViewById(R.id.etBlogTitle);
@@ -157,13 +157,13 @@ public class EditBlogAPIActivity extends AppCompatActivity {
                 // Title starts with a digit
                 etTitle.setError("Title cannot start with a digit");
             }
-             else {
+            else {
                 saveBlogToFirebase();
                 finish();
             }
         });
 
-         btnColorPicker.setOnClickListener(v ->
+        btnColorPicker.setOnClickListener(v ->
         {
             showColorPickerDialog(bitmap);
         });

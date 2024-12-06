@@ -3,9 +3,11 @@ package com.example.medtrack.fragments;
 import static android.app.Activity.RESULT_OK;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -32,6 +34,7 @@ import android.widget.Toast;
 import com.example.medtrack.R;
 import com.example.medtrack.activities.ChangePassword;
 import com.example.medtrack.activities.LoginActivity;
+import com.example.medtrack.models.Medication;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -39,10 +42,19 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class ProfileFragment extends Fragment {
 
@@ -54,6 +66,7 @@ public class ProfileFragment extends Fragment {
     private TextView profileName, profileEmail, registrationInfo;
     private LinearLayout LL_Report, LL_CPassword, LL_About, LL_Terms, LL_Logout;
     private DatabaseReference userRef;
+    private List<Medication> medicationList = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -82,6 +95,8 @@ public class ProfileFragment extends Fragment {
             startActivity(intent);
         });
 
+        LL_Report.setOnClickListener(view -> GetReport());
+
         LL_Logout.setOnClickListener(view -> logout());
         LL_About.setOnClickListener(v1 -> showAboutUsDialog());
         LL_Terms.setOnClickListener(v1 -> showTermsDialog());
@@ -93,6 +108,102 @@ public class ProfileFragment extends Fragment {
 
         return v;
     }
+    private void GetReport(){
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(getActivity(), "User not logged in", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String userId = currentUser.getUid();
+
+        DatabaseReference medsRef = FirebaseDatabase.getInstance()
+                .getReference("medications")
+                .child(userId);
+
+        medsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                medicationList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Medication medication = snapshot.getValue(Medication.class);
+                    if (medication != null) {
+                        medicationList.add(medication);
+                    }
+                }
+
+                // After retrieving data, create PDF report
+                generatePDFReport(medicationList);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Firebase", "Failed to retrieve data: " + databaseError.getMessage());
+            }
+        });
+    }
+    public void generatePDFReport(List<Medication> medicationList) {
+        try {
+            // Get the context and external files directory
+            Context context = getContext();
+            if (context != null) {
+                // Create the file for the PDF
+                File pdfFile = new File(context.getExternalFilesDir(null), "medication_report.pdf");
+
+                // Create a PdfWriter instance for the PDF file
+                PdfWriter writer = new PdfWriter(new FileOutputStream(pdfFile));
+
+                // Create a PdfDocument instance
+                PdfDocument pdfDoc = new PdfDocument(writer);
+
+                // Create a Document instance with the PdfDocument and page size (optional)
+                Document document = new Document(pdfDoc, PageSize.A4);
+
+                // Add content to the document
+                document.add(new Paragraph("Medication Report").setFontSize(18).setBold());
+
+                // Add a new line for spacing
+                document.add(new Paragraph("\n"));
+
+                // Iterate over the medication list and add details
+                for (Medication medication : medicationList) {
+                    document.add(new Paragraph("Medication Name: " + medication.getName()));
+                    document.add(new Paragraph("Frequency: " + medication.getFrequency()));
+                    document.add(new Paragraph("Reminder Time: " + medication.getReminderTime()));
+                    if ("Twice Daily".equals(medication.getFrequency())) {
+                        document.add(new Paragraph("First Intake Details: " + medication.getFirstIntakeDetails()));
+                        document.add(new Paragraph("Second Intake Details: " + medication.getSecondIntakeDetails()));
+                    }
+                    if (medication.getSelectedDays() != null && !medication.getSelectedDays().isEmpty()) {
+                        document.add(new Paragraph("Selected Days: " + medication.getSelectedDays()));
+                    }
+                    document.add(new Paragraph("Start Date: " + medication.getStartDate()));
+                    document.add(new Paragraph("End Date: " + medication.getEndDate()));
+                    document.add(new Paragraph("Refill Amount: " + medication.getRefillAmount()));
+                    document.add(new Paragraph("Refill Threshold: " + medication.getRefillThreshold()));
+                    document.add(new Paragraph("\n"));
+                }
+
+                // Close the document
+                document.close();
+
+                // Log success or notify the user
+                Log.d("PDF", "Medication report generated successfully.");
+            } else {
+                Log.e("Fragment", "Context is null, cannot generate PDF.");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e("PDF", "Error generating report: " + e.getMessage());
+        }
+    }
+    private String sanitizeString(String input) {
+        if (input == null) {
+            return "N/A"; // Return a default value if null
+        }
+        return input.replaceAll("[^\\x20-\\x7e]", "");  // Remove non-ASCII characters
+    }
+
 
     private void fetchUserInfoFromDatabase() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -117,12 +228,31 @@ public class ProfileFragment extends Fragment {
                                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                                     String name = userSnapshot.child("name").getValue(String.class);
                                     String userEmail = userSnapshot.child("email").getValue(String.class);
+                                    String userimage = userSnapshot.child("image").getValue(String.class);
 
                                     if (name != null) {
                                         profileName.setText(name);
                                     }
                                     if (userEmail != null) {
                                         profileEmail.setText(userEmail);
+                                    }
+                                    // Decode and set the image if it exists
+                                    if (userimage != "") {
+                                        Log.d("Firebase", "Base64 Image String: " + userimage);
+                                        Bitmap decodedImage = decodeBase64ToBitmap(userimage);
+                                        if (decodedImage != null) {
+                                            Log.d("Firebase", "Bitmap decoded successfully.");
+
+                                            // Update the ImageView on the main thread
+                                            getActivity().runOnUiThread(() -> profilePicture.setImageBitmap(decodedImage));
+                                        } else {
+                                            Log.e("Firebase", "Bitmap decoding failed.");
+                                            profilePicture.setImageResource(R.drawable.boy);
+                                        }
+
+                                    } else {
+                                        // Set a placeholder image if no image is found
+                                        profilePicture.setImageResource(R.drawable.boy);
                                     }
 
                                     userRef = userSnapshot.getRef(); // Save reference to update the name later
@@ -263,27 +393,48 @@ public class ProfileFragment extends Fragment {
     }
 
     public void storeImageInFirebase(Bitmap bitmap) {
-        // Convert bitmap to Base64 string
+        // Convert the Bitmap to a Base64 string
         String encodedImage = convertBitmapToBase64(bitmap);
 
-        // Get the current user's UID from Firebase Authentication
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        Log.d("Firebase", "Encoded Image: " + encodedImage);  // Log the encoded image
 
-        // Reference to the "images" node in Firebase Database
+        // Decode and set the image
+        Bitmap decodedImage = decodeBase64ToBitmap(encodedImage);
+        Log.d("Firebase", "decoded Image: " + encodedImage);  // Log the encoded image
+
+        if (decodedImage != null) {
+            // Apply the decoded image to ImageView
+            profilePicture.setImageBitmap(decodedImage);
+        } else {
+            // Handle the error when decoding fails
+            Log.e("DecodeError", "Failed to decode the Base64 image.");
+        }
+
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
+
+        if (currentUser != null) {
+            String userId = currentUser.getUid(); // Get the unique user ID
+            Log.d("Firebase", "Current user ID: " + userId);
+        } else {
+            Log.e("Firebase", "No user is currently logged in.");
+            return;
+        }
+        // Reference the Firebase Realtime Database
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
-        DatabaseReference databaseRef = database.getReference("images");
-
-        // Use the userId as the key
-        databaseRef.child(userId).setValue(encodedImage)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(getContext(), "Image saved successfully!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getContext(), "Failed to save image.", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        DatabaseReference userRef = database.getReference("Users").child(currentUser.getUid()); // Use the current user's ID
+        Log.d("Firebase", "Encoded Image: " + encodedImage);
+        // Update the "image" field in the user's node
+        userRef.child("image").setValue(encodedImage).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Log.d("Firebase", "Image updated successfully.");
+                Toast.makeText(requireContext(), "Image updated successfully.", Toast.LENGTH_SHORT).show();
+            } else {
+                Log.e("Firebase", "Failed to update image: " + task.getException().getMessage());
+                Toast.makeText(requireContext(), "Failed to update image.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
-
 
     public String convertBitmapToBase64(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -308,4 +459,23 @@ public class ProfileFragment extends Fragment {
             getActivity().finish();
         }
     }
+    // Decode Base64 string into Bitmap
+    public Bitmap decodeBase64ToBitmap(String base64Image) {
+        try {
+            // Decode the Base64 string into a byte array
+            byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
+
+            // Decode the byte array into a Bitmap
+            return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        } catch (IllegalArgumentException e) {
+            // Handle the error if Base64 string is invalid
+            e.printStackTrace();
+            return null;
+        } catch (OutOfMemoryError e) {
+            // Handle the error if the image is too large
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

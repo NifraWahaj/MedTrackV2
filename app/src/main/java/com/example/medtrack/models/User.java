@@ -19,7 +19,6 @@ public class User {
     String email;
     String name;
 
-
     public String getEmail() {
         return email;
     }
@@ -54,34 +53,31 @@ public class User {
     public static User fetchUserFromDatabase(String userId){
         User user= new User();
 
-             // Reference to the "users" node in Firebase Database
-            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users");
+        // Reference to the "users" node in Firebase Database
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users");
 
-            // Query the database for the specific user ID
-            userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        // Extract user details from the snapshot
-                        String name = dataSnapshot.child("name").getValue(String.class);
-                        String email = dataSnapshot.child("email").getValue(String.class);
-                       user.setName(name);
-                      user.setEmail(email);
-                        Log.d("this", name +email + user.getEmail());
-                    } else {
-                        // Handle case where user ID does not exist
-                     }
+        // Query the database for the specific user ID
+        userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // Extract user details from the snapshot
+                    String name = dataSnapshot.child("name").getValue(String.class);
+                    String email = dataSnapshot.child("email").getValue(String.class);
+                    user.setName(name);
+                    user.setEmail(email);
+                    Log.d("this", name +email + user.getEmail());
+                } else {
+                    // Handle case where user ID does not exist
                 }
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    // Handle errors
-                    Log.e("LoginActivity", "Database error: " + databaseError.getMessage());
-                 }
-            });
-    return user;
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle errors
+                Log.e("LoginActivity", "Database error: " + databaseError.getMessage());
+            }
+        });
+        return user;
     }
-
-
-
 }
