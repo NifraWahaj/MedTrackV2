@@ -84,7 +84,7 @@
         android:layout_height="@dimen/loginButtonheight"
         android:layout_marginTop="@dimen/loginButtonMarginTop"
         android:layout_marginBottom="@dimen/loginButtonMarginBottom"
-        android:backgroundTint="@color/blueMain"
+        android:backgroundTint="@color/blueDark"
         android:text="@string/login"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -134,17 +134,19 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/logo" />
+
     <ProgressBar
         android:id="@+id/progress_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/loginButtonWidth"
+        android:layout_height="45dp"
+        android:layout_marginBottom="224dp"
+        android:background="@color/blueDark"
+
+        android:indeterminateTint="@color/white"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/tvDontHaveAnAccountSignUp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        android:indeterminateTint="@color/blueDark"/>
-
-
+        app:layout_constraintHorizontal_bias="0.558"
+        app:layout_constraintStart_toStartOf="parent"></ProgressBar>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

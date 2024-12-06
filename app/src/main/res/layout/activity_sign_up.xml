@@ -93,6 +93,8 @@
         android:ems="15"
         android:hint="@string/enter_your_name"
         android:importantForAutofill="no"
+        android:singleLine="true"
+
         android:textSize="@dimen/etTextSize"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.505"
@@ -163,13 +165,16 @@
 
     <ProgressBar
         android:id="@+id/progress_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/loginButtonWidth"
+        android:layout_height="45dp"
+        android:layout_marginBottom="176dp"
+        android:background="@color/blueDark"
+
+        android:indeterminateTint="@color/white"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/tvDontHaveAnAccount"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        android:indeterminateTint="@color/blueDark"/>
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

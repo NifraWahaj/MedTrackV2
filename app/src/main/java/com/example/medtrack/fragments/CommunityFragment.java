@@ -40,7 +40,7 @@ import java.util.List;
      private List<Blog> filteredBlogList = new ArrayList<>();
      private Button   btnSearch;
      private EditText etSearch;
-     private ProgressBar progressBar;  // Declare ProgressBar
+     private ProgressBar progressBar;
 
      private LinearLayout linearLayoutCommunity;
     private Chip chipYourBlogs ,

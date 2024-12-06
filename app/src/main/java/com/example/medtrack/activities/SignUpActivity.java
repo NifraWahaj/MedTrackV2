@@ -82,11 +82,10 @@ public class SignUpActivity extends AppCompatActivity {
             }
 
             btnSignUp.setEnabled(false); // Disable the button
-
+btnSignUp.setVisibility(View.GONE);
             // Show the ProgressBar before starting authentication
             progressBar.setVisibility(View.VISIBLE);
-
-            // Create new user with Firebase Authentication
+             // Create new user with Firebase Authentication
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(SignUpActivity.this, task -> {
                         progressBar.setVisibility(View.GONE); // Ensure it's hidden for all cases
@@ -102,6 +101,9 @@ public class SignUpActivity extends AppCompatActivity {
                             startActivity(i);
                             finish();
                         } else {
+                            btnSignUp.setVisibility(View.VISIBLE);
+
+                            btnSignUp.setEnabled(true);
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
                             Toast.makeText(SignUpActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }

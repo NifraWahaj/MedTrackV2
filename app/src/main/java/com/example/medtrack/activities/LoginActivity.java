@@ -74,7 +74,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 // Show the ProgressBar before starting authentication
                 progressBar.setVisibility(View.VISIBLE);
-
+btnLogin.setVisibility(View.GONE);
                 mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
@@ -83,6 +83,8 @@ public class LoginActivity extends AppCompatActivity {
                                 progressBar.setVisibility(View.GONE);
 
                                 if (task.isSuccessful()) {
+                                    btnLogin.setVisibility(View.VISIBLE);
+
                                     Log.d(TAG, "signInWithEmail:success");
                                     Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
 
@@ -91,6 +93,7 @@ public class LoginActivity extends AppCompatActivity {
                                     startActivity(i);
                                     finish();
                                 } else {
+                                    btnLogin.setVisibility(View.VISIBLE);
                                     Log.w(TAG, "signInWithEmail:failure", task.getException());
                                     Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                                 }
