@@ -467,7 +467,7 @@ public class ProfileFragment extends Fragment {
         }
     }
     // Decode Base64 string into Bitmap
-    public Bitmap decodeBase64ToBitmap(String base64Image) {
+    public static Bitmap decodeBase64ToBitmap(String base64Image) {
         try {
             // Decode the Base64 string into a byte array
             byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);

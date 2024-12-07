@@ -30,6 +30,7 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
@@ -42,8 +43,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.example.medtrack.R;
+import com.example.medtrack.fragments.ProfileFragment;
 import com.example.medtrack.models.FormattedText;
 import com.example.medtrack.models.User;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -64,8 +68,9 @@ public class BlogContentActivity extends AppCompatActivity {
     private RatingBar ratingBar;
     private boolean isEdit;
     private RatingBar.OnRatingBarChangeListener ratingBarChangeListener;
-    private ImageButton backButton, btnReviewList, ivProfilePic;
+    private ImageButton backButton, btnReviewList;
     private WebView webViewContent;
+    private ImageView ivProfilePic;
 
 
     @Override
@@ -79,6 +84,7 @@ public class BlogContentActivity extends AppCompatActivity {
         webViewContent.getSettings().setJavaScriptEnabled(true);  // If you need JavaScript support
         webViewContent.getSettings().setLoadsImagesAutomatically(true);  // Ensure images load automatically
 
+        ivProfilePic=findViewById(R.id.ivProfilePic);
         ratingBar = findViewById(R.id.rating);
         scrollView = findViewById(R.id.ScrollViewBlogContent);
         backButton = findViewById(R.id.backButton);
@@ -119,9 +125,10 @@ public class BlogContentActivity extends AppCompatActivity {
         }
         // Set Listeners
         setupListeners();
-
         // Fetch Blog Content
         fetchBlogContent(blogId);
+
+        loadImageFromFirebase();
 
         // Check if the current user has reviewed this blog
         checkIfUserHasReviewed(blogId);
@@ -192,7 +199,7 @@ public class BlogContentActivity extends AppCompatActivity {
 
                     // Fetch the author's name and email from the User class using the userId
                     fetchAuthorDetails(userId);
-
+                      etTitle.setText(title);
 
                     if (html != null) {
                         webViewContent.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
@@ -268,5 +275,41 @@ public class BlogContentActivity extends AppCompatActivity {
             }
         });
     }
+    public void loadImageFromFirebase() {
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
+        DatabaseReference userRef = database.getReference("profileImages").child(blogUserId).child("image");
+
+        userRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                String base64Image = task.getResult().getValue(String.class);
+
+                if (base64Image != null) {
+                    Bitmap decodedBitmap = ProfileFragment.decodeBase64ToBitmap(base64Image);
+
+                    if (decodedBitmap != null) {
+                        // Set the decoded Bitmap to the ImageView
+                        ivProfilePic.setImageBitmap(decodedBitmap);
+                        Toast.makeText(this, "Image loaded successfully.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.e("DecodeError", "Failed to decode Base64 image.");
+                        setDefaultImage();
+                    }
+                } else {
+                    Log.e("Firebase", "No image found for user.");
+                    setDefaultImage();
+                }
+            } else {
+                Log.e("Firebase", "Failed to fetch image: " + task.getException().getMessage());
+                setDefaultImage();
+            }
+        });
+    }
+    private void setDefaultImage() {
+        ivProfilePic.setImageResource(R.drawable.user_profile); // Replace `default_image` with your drawable resource name
+        Toast.makeText(this, "Default image set.", Toast.LENGTH_SHORT).show();
+    }
+
+
 
 }
