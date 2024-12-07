@@ -43,8 +43,8 @@ public class MedStep3Fragment extends Fragment {
 
         // Populate the Spinner with the list of units
         String[] units = {
-                "Tablet(s)", "Capsule(s)", "mL (milliliters)", "tsp (teaspoon)",
-                "Drop(s)", "Puff(s)", "mg (milligrams)", "Application(s)"
+                "Tablet(s)", "Capsule(s)", "mL", "tsp",
+                "Drop(s)", "Puff(s)", "mg", "Application(s)"
         };
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, units);

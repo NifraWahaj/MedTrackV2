@@ -57,7 +57,10 @@ public class MedStep3IntervalFragment extends Fragment {
         spinnerInterval.setAdapter(adapter);
 
         // Set up Spinner with dose units
-        String[] doses = {"Tablet(s)", "Capsule(s)", "mL (milliliters)", "Drop(s)", "Puff(s)", "mg (milligrams)", "tsp (teaspoon)", "Application(s)"};
+        String[] doses = {
+                "Tablet(s)", "Capsule(s)", "mL", "tsp",
+                "Drop(s)", "Puff(s)", "mg", "Application(s)"
+        };
         ArrayAdapter<String> doseAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, doses);
         doseAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         doseSpinner.setAdapter(doseAdapter);

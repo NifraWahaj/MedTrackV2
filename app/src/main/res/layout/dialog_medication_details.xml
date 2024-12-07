@@ -46,7 +46,7 @@
                 android:id="@+id/deleteMedIcon"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/ic_delete" />
+                android:src="@drawable/delete" />
         </LinearLayout>
 
         <!-- Scheduled Time -->

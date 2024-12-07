@@ -12,7 +12,7 @@ public class Medication {
     private int refillAmount;
     private int refillThreshold;
     private String doseLabel; // New field to distinguish "First Intake", "Second Intake"
-    
+
     // Default constructor required for calls to DataSnapshot.getValue(Medication.class)
     public Medication() {
     }
