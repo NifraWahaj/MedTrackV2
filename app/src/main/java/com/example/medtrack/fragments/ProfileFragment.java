@@ -35,6 +35,7 @@ import com.example.medtrack.R;
 import com.example.medtrack.activities.ChangePassword;
 import com.example.medtrack.activities.LoginActivity;
 import com.example.medtrack.models.Medication;
+import com.example.medtrack.models.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -86,6 +87,10 @@ public class ProfileFragment extends Fragment {
         LL_About = v.findViewById(R.id.LL_About);
         LL_Terms = v.findViewById(R.id.LL_Terms);
         LL_Logout = v.findViewById(R.id.LL_Logout);
+
+
+        profileName.setText(User.getCurrentUserName(getContext()));
+        profileEmail.setText(User.getCurrentUserName(getContext()));
 
         // Set up event listeners
         btnAddPicture.setOnClickListener(view -> openImagePicker());
@@ -228,32 +233,34 @@ public class ProfileFragment extends Fragment {
                                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                                     String name = userSnapshot.child("name").getValue(String.class);
                                     String userEmail = userSnapshot.child("email").getValue(String.class);
-                                    String userimage = userSnapshot.child("image").getValue(String.class);
 
-                                    if (name != null) {
-                                        profileName.setText(name);
-                                    }
-                                    if (userEmail != null) {
-                                        profileEmail.setText(userEmail);
-                                    }
-                                    // Decode and set the image if it exists
-                                    if (userimage != "") {
-                                        Log.d("Firebase", "Base64 Image String: " + userimage);
-                                        Bitmap decodedImage = decodeBase64ToBitmap(userimage);
-                                        if (decodedImage != null) {
-                                            Log.d("Firebase", "Bitmap decoded successfully.");
 
-                                            // Update the ImageView on the main thread
-                                            getActivity().runOnUiThread(() -> profilePicture.setImageBitmap(decodedImage));
-                                        } else {
-                                            Log.e("Firebase", "Bitmap decoding failed.");
-                                            profilePicture.setImageResource(R.drawable.boy);
-                                        }
-
-                                    } else {
-                                        // Set a placeholder image if no image is found
-                                        profilePicture.setImageResource(R.drawable.boy);
-                                    }
+//                                    String userimage = userSnapshot.child("image").getValue(String.class);
+//
+//                                    if (name != null) {
+//                                        profileName.setText(name);
+//                                    }
+//                                    if (userEmail != null) {
+//                                        profileEmail.setText(userEmail);
+//                                    }
+//                                    // Decode and set the image if it exists
+//                                    if (userimage != "") {
+//                                        Log.d("Firebase", "Base64 Image String: " + userimage);
+//                                        Bitmap decodedImage = decodeBase64ToBitmap(userimage);
+//                                        if (decodedImage != null) {
+//                                            Log.d("Firebase", "Bitmap decoded successfully.");
+//
+//                                            // Update the ImageView on the main thread
+//                                            getActivity().runOnUiThread(() -> profilePicture.setImageBitmap(decodedImage));
+//                                        } else {
+//                                            Log.e("Firebase", "Bitmap decoding failed.");
+//                                            profilePicture.setImageResource(R.drawable.boy);
+//                                        }
+//
+//                                    } else {
+//                                        // Set a placeholder image if no image is found
+                                    profilePicture.setImageResource(R.drawable.boy);
+//                                    }
 
                                     userRef = userSnapshot.getRef(); // Save reference to update the name later
 
@@ -422,7 +429,7 @@ public class ProfileFragment extends Fragment {
         }
         // Reference the Firebase Realtime Database
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
-        DatabaseReference userRef = database.getReference("Users").child(currentUser.getUid()); // Use the current user's ID
+        DatabaseReference userRef = database.getReference("profileImages").child(currentUser.getUid()); // Use the current user's ID
         Log.d("Firebase", "Encoded Image: " + encodedImage);
         // Update the "image" field in the user's node
         userRef.child("image").setValue(encodedImage).addOnCompleteListener(task -> {

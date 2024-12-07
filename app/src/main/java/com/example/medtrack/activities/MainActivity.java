@@ -45,6 +45,17 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+
+        adapter = new ViewPagerAdapter(this);
+        vp2 = findViewById(R.id.viewpager2);
+        vp2.setAdapter(adapter);
+        tabLayout = findViewById(R.id.tabLayout);
         etToken = findViewById(R.id.token_id);
 
         //NOTIFICATION
@@ -65,19 +76,6 @@ public class MainActivity extends AppCompatActivity {
                         etToken.setText(token);
                     }
                 });
-
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
-
-        adapter = new ViewPagerAdapter(this);
-        vp2 = findViewById(R.id.viewpager2);
-        vp2.setAdapter(adapter);
-        tabLayout = findViewById(R.id.tabLayout);
 
         TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(tabLayout, vp2, new TabLayoutMediator.TabConfigurationStrategy() {
             @Override
@@ -134,10 +132,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(this, "CURR USER:", Toast.LENGTH_SHORT).show();
+        }
         if (currentUser != null) {
             String userId = currentUser.getUid();
             String email = currentUser.getEmail();
-            // Toast.makeText(this, "main activity email"+email, Toast.LENGTH_SHORT).show();
+             Toast.makeText(this, "main activity userId"+userId, Toast.LENGTH_SHORT).show();
             // Fetch additional user details if required
             fetchUserFromDatabase(userId);
         }
@@ -172,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Failed to fetch user data.", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 
     private void storeUserInSharedPreferences(String name, String email,String userId) {
