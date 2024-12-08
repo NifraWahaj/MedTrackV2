@@ -39,7 +39,8 @@ public class RatingsReviewsListActivity extends AppCompatActivity {
     private RatingBar reviewRatingBar;
     private ImageButton backButton;
 
-String blogId;
+    String blogId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,10 +52,10 @@ String blogId;
         tvReviews = findViewById(R.id.tvReviews);
         reviewRatingBar = findViewById(R.id.reviewRatingBar);
         backButton = findViewById(R.id.backButton);
-             Intent i= getIntent();
+        Intent i = getIntent();
         Toast.makeText(this, "inside  reviews clicked", Toast.LENGTH_SHORT).show();
 
-        blogId=     i.getStringExtra("blogId");
+        blogId = i.getStringExtra("blogId");
         // Set up RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -70,9 +71,9 @@ String blogId;
         adapter = new RatingReviewAdapter(this, reviewList);
         recyclerView.setAdapter(adapter);
         backButton.setOnClickListener(v -> finish());
-         // Fetch Reviews from Firebase
+        // Fetch Reviews from Firebase
         getAllReviewsAndRatings(blogId);
-     }
+    }
 
     private void getAllReviewsAndRatings(String blogId) {
         DatabaseReference blogRef = FirebaseDatabase.getInstance().getReference("blogs").child(blogId);
@@ -122,7 +123,7 @@ String blogId;
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-             }
+            }
         });
     }
 
@@ -149,7 +150,7 @@ String blogId;
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                 callback.onUserNamesFetched(new HashMap<>()); // Return empty map on error
+                callback.onUserNamesFetched(new HashMap<>()); // Return empty map on error
             }
         });
     }
@@ -160,16 +161,14 @@ String blogId;
     }
 
 
-
-
     private void calculateRatingsAverage() {
         if (reviewList == null || reviewList.isEmpty()) {
             reviewRatingBar.setRating(0.0f);
-            Toast.makeText(this," no reviews   "+ reviewList.size(),Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, " no reviews   " + reviewList.size(), Toast.LENGTH_SHORT).show();
 
             return; // Return if there are no reviews
         }
-Toast.makeText(this," ratign avaregr "+ reviewList.size(),Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, " ratign avaregr " + reviewList.size(), Toast.LENGTH_SHORT).show();
         float sum = 0.0f;
         for (Review review : reviewList) {
             sum += review.getRating();

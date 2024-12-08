@@ -25,9 +25,9 @@ public class RatingReviewAdapter extends RecyclerView.Adapter<RatingReviewAdapte
     private List<Review> reviewList;
     private final Context context;
 
-    public RatingReviewAdapter(Context c,List<Review> reviewList) {
+    public RatingReviewAdapter(Context c, List<Review> reviewList) {
         this.reviewList = reviewList;
-        this.context=c;
+        this.context = c;
     }
 
     @NonNull

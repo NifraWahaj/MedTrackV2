@@ -2,41 +2,18 @@ package com.example.medtrack.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
-import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
-import android.graphics.text.LineBreaker;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.Html;
-import android.text.Layout;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.TextPaint;
-import android.text.method.LinkMovementMethod;
-import android.text.style.AlignmentSpan;
-import android.text.style.ClickableSpan;
-import android.text.style.ImageSpan;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StrikethroughSpan;
-import android.text.style.StyleSpan;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,24 +21,17 @@ import androidx.core.content.ContextCompat;
 
 import com.example.medtrack.R;
 import com.example.medtrack.fragments.ProfileFragment;
-import com.example.medtrack.models.FormattedText;
 import com.example.medtrack.models.User;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
-import java.util.List;
 public class BlogContentActivity extends AppCompatActivity {
 
     private TextView etTitle, etBlogContent, tvRateThisBlog, tvWriteAReview, tvAuthor;
-    private String blogId, title, reviewText, author,authorEmail, blogUserId;
+    private String blogId, title, reviewText, author, authorEmail, blogUserId;
     private float ratingFromDb;
     private ProgressBar progressBar;
     private ScrollView scrollView;
@@ -84,7 +54,7 @@ public class BlogContentActivity extends AppCompatActivity {
         webViewContent.getSettings().setJavaScriptEnabled(true);  // If you need JavaScript support
         webViewContent.getSettings().setLoadsImagesAutomatically(true);  // Ensure images load automatically
 
-        ivProfilePic=findViewById(R.id.ivProfilePic);
+        ivProfilePic = findViewById(R.id.ivProfilePic);
         ratingBar = findViewById(R.id.rating);
         scrollView = findViewById(R.id.ScrollViewBlogContent);
         backButton = findViewById(R.id.backButton);
@@ -105,18 +75,17 @@ public class BlogContentActivity extends AppCompatActivity {
         if (getIntent() != null) {
             blogId = getIntent().getStringExtra("blogId");
             blogUserId = getIntent().getStringExtra("userId");
-            User user=User.fetchUserFromDatabase(blogUserId);
+            User user = User.fetchUserFromDatabase(blogUserId);
             tvAuthor.setText(user.getName());
         }
-        if(blogUserId.equals(User.getCurrentUserId(BlogContentActivity.this))){
+        if (blogUserId.equals(User.getCurrentUserId(BlogContentActivity.this))) {
             tvRateThisBlog.setVisibility(View.INVISIBLE);
             tvWriteAReview.setVisibility(View.INVISIBLE);
             ratingBar.setVisibility(View.INVISIBLE);
             findViewById(R.id.tvRatingsAndReviews).setVisibility(View.VISIBLE);
             btnReviewList.setVisibility(View.VISIBLE);
 
-        }
-        else{
+        } else {
             tvRateThisBlog.setVisibility(View.VISIBLE);
             tvWriteAReview.setVisibility(View.VISIBLE);
             ratingBar.setVisibility(View.VISIBLE);
@@ -143,7 +112,7 @@ public class BlogContentActivity extends AppCompatActivity {
                 intent.putExtra("userRating", rating);
                 intent.putExtra("blogTitle", title);
                 intent.putExtra("blogId", blogId);
-                intent.putExtra("editMode",isEdit);
+                intent.putExtra("editMode", isEdit);
 
                 if (isEdit) {
                     intent.putExtra("reviewText", reviewText);
@@ -165,7 +134,7 @@ public class BlogContentActivity extends AppCompatActivity {
             intent.putExtra("editMode", isEdit);
             intent.putExtra("editMode", isEdit);
             intent.putExtra("userRating", ratingBar.getRating());
-            intent.putExtra("reviewText",reviewText );
+            intent.putExtra("reviewText", reviewText);
             intent.putExtra("author", author);
             intent.putExtra("reviewText", reviewText);
             startActivity(intent);
@@ -177,13 +146,10 @@ public class BlogContentActivity extends AppCompatActivity {
         // Review List Button
         btnReviewList.setOnClickListener(v -> {
             Intent intent = new Intent(BlogContentActivity.this, RatingsReviewsListActivity.class);
-            //   Toast.makeText(this, "button  reviews clicked", Toast.LENGTH_SHORT).show();
-            intent.putExtra("blogId", blogId);
-
+             intent.putExtra("blogId", blogId);
 
 
             startActivity(intent);
-            //  Toast.makeText(this, "button start activity", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -199,7 +165,7 @@ public class BlogContentActivity extends AppCompatActivity {
 
                     // Fetch the author's name and email from the User class using the userId
                     fetchAuthorDetails(userId);
-                      etTitle.setText(title);
+                    etTitle.setText(title);
 
                     if (html != null) {
                         webViewContent.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
@@ -213,8 +179,9 @@ public class BlogContentActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError error) {
                 progressBar.setVisibility(View.GONE);  // Hide progress bar on failure
-                Toast.makeText(BlogContentActivity.this, "Failed to load blog content", Toast.LENGTH_SHORT).show();
-            }
+                Log.e("BlogContentActivity","Failed to load blog content");
+
+             }
         });
     }
 
@@ -235,8 +202,8 @@ public class BlogContentActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(BlogContentActivity.this, "Failed to fetch author details", Toast.LENGTH_SHORT).show();
-            }
+                Log.e("BlogContentActivity","Failed to fetch author details");
+             }
         });
     }
 
@@ -253,7 +220,7 @@ public class BlogContentActivity extends AppCompatActivity {
                     Log.d("BlogContent", "Review and rating found!");
                     reviewText = snapshot.child("review").getValue(String.class);
                     Float existingRating = snapshot.child("rating").getValue(Float.class);
-                    isEdit=true;
+                    isEdit = true;
 
                     if (existingRating != null) {
                         ratingBar.setRating(existingRating);  // Set the existing rating in the RatingBar
@@ -271,10 +238,12 @@ public class BlogContentActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(BlogContentActivity.this, "Failed to check review status", Toast.LENGTH_SHORT).show();
-            }
+                Log.e("BlogContentActivity","Failed to check review  details");
+
+             }
         });
     }
+
     public void loadImageFromFirebase() {
 
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
@@ -290,8 +259,7 @@ public class BlogContentActivity extends AppCompatActivity {
                     if (decodedBitmap != null) {
                         // Set the decoded Bitmap to the ImageView
                         ivProfilePic.setImageBitmap(decodedBitmap);
-                        Toast.makeText(this, "Image loaded successfully.", Toast.LENGTH_SHORT).show();
-                    } else {
+                     } else {
                         Log.e("DecodeError", "Failed to decode Base64 image.");
                         setDefaultImage();
                     }
@@ -305,11 +273,10 @@ public class BlogContentActivity extends AppCompatActivity {
             }
         });
     }
+
     private void setDefaultImage() {
         ivProfilePic.setImageResource(R.drawable.user_profile); // Replace `default_image` with your drawable resource name
-        Toast.makeText(this, "Default image set.", Toast.LENGTH_SHORT).show();
-    }
-
+     }
 
 
 }

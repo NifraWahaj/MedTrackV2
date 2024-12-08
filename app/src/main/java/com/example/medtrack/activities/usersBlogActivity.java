@@ -1,4 +1,3 @@
-
 package com.example.medtrack.activities;
 
 import android.app.Activity;
@@ -37,28 +36,29 @@ public class usersBlogActivity extends Activity implements BlogAdapter.OnBlogCli
     private BlogAdapter blogAdapter;
     private List<Blog> blogList = new ArrayList<>();
     private Button btnAddBlog, btnSearch;
-     private LinearLayout linearLayoutYourBlogs;
+    private LinearLayout linearLayoutYourBlogs;
     ImageButton btnGoBack;
     private ProgressBar progressBar;  // Declare ProgressBar
 
     FloatingActionButton fabWriteBlog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_users_blog); // Replace with your activity layout
         btnGoBack = findViewById(R.id.backButton);
-        fabWriteBlog=findViewById(R.id.fabWriteBlog);
+        fabWriteBlog = findViewById(R.id.fabWriteBlog);
         recyclerViewYourBlogs = findViewById(R.id.recyclerViewYourBlogs);
         recyclerViewYourBlogs.setLayoutManager(new LinearLayoutManager(this));
         progressBar = findViewById(R.id.progressBar); // Initialize ProgressBar
 
         // Initialize the BlogAdapter and pass the OnBlogClickListener
-        blogAdapter = new BlogAdapter(this, blogList, this,true);
+        blogAdapter = new BlogAdapter(this, blogList, this, true);
         recyclerViewYourBlogs.setAdapter(blogAdapter);
-        btnGoBack.setOnClickListener(v ->{
+        btnGoBack.setOnClickListener(v -> {
 
             finish();
-        }  );
+        });
         fabWriteBlog.setOnClickListener(v -> {
             // For example, open a new activity (AddBlogActivity)
             Intent i = new Intent(usersBlogActivity.this, EditBlogAPIActivity.class);
@@ -97,6 +97,7 @@ public class usersBlogActivity extends Activity implements BlogAdapter.OnBlogCli
                     // Check if the blog belongs to the current user and is approved
                     if (userId != null && userId.equals(currentUserId) && Boolean.TRUE.equals(isApproved)) {
                         Blog blog = new Blog(blogId, userId, title, content, isApproved);
+
                         blogList.add(blog);
                         Log.d("YourBlogActivity", "Fetched blog: " + title);
                     }
@@ -133,6 +134,7 @@ public class usersBlogActivity extends Activity implements BlogAdapter.OnBlogCli
             // Pass data to the activity
             intent.putExtra("blogId", blog.getId());
             intent.putExtra("blogTitle", blog.getTitle());
+
             intent.putExtra("blogContent", blog.getContent());
             intent.putExtra("isEdit", true);
 
@@ -147,36 +149,29 @@ public class usersBlogActivity extends Activity implements BlogAdapter.OnBlogCli
     @Override
     public void onDeleteBlog(Blog blog) {
         // Create a confirmation dialog
-        new AlertDialog.Builder(usersBlogActivity.this)
-                .setTitle("Delete Blog")
-                .setMessage("Are you sure you want to delete this blog?")
-                .setPositiveButton("Yes", (dialog, which) -> {
-                    // If the user confirms, delete the blog
-                    String blogId = blog.getId();  // Get the unique ID of the blog to delete
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("blogs");
+        new AlertDialog.Builder(usersBlogActivity.this).setTitle("Delete Blog").setMessage("Are you sure you want to delete this blog?").setPositiveButton("Yes", (dialog, which) -> {
+            // If the user confirms, delete the blog
+            String blogId = blog.getId();  // Get the unique ID of the blog to delete
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("blogs");
 
-                    // Delete the blog from Firebase
-                    databaseReference.child(blogId).removeValue()
-                            .addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(usersBlogActivity.this, "Blog deleted successfully", Toast.LENGTH_SHORT).show();
-                                    // Optionally, remove the blog from your local list and notify the adapter
-                                    blogList.remove(blog);
-                                    blogAdapter.notifyDataSetChanged();  // Refresh the adapter
-                                } else {
-                                    Toast.makeText(usersBlogActivity.this, "Failed to delete blog", Toast.LENGTH_SHORT).show();
-                                }
-                            })
-                            .addOnFailureListener(e -> {
-                                Log.e("YourBlogActivity", "Failed to delete blog: " + e.getMessage());
-                                Toast.makeText(usersBlogActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            });
-                })
-                .setNegativeButton("No", (dialog, which) -> {
-                    // If the user cancels, do nothing (close the dialog)
-                    dialog.dismiss();
-                })
-                .show();  // Show the dialog
+            // Delete the blog from Firebase
+            databaseReference.child(blogId).removeValue().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(usersBlogActivity.this, "Blog deleted successfully", Toast.LENGTH_SHORT).show();
+                    // Optionally, remove the blog from your local list and notify the adapter
+                    blogList.remove(blog);
+                    blogAdapter.notifyDataSetChanged();  // Refresh the adapter
+                } else {
+                    Toast.makeText(usersBlogActivity.this, "Failed to delete blog", Toast.LENGTH_SHORT).show();
+                }
+            }).addOnFailureListener(e -> {
+                Log.e("YourBlogActivity", "Failed to delete blog: " + e.getMessage());
+                Toast.makeText(usersBlogActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+        }).setNegativeButton("No", (dialog, which) -> {
+            // If the user cancels, do nothing (close the dialog)
+            dialog.dismiss();
+        }).show();  // Show the dialog
     }
 
 }

@@ -40,6 +40,7 @@ public class User {
         SharedPreferences sharedPreferences = context.getSharedPreferences("user_pref", Context.MODE_PRIVATE);
         return sharedPreferences.getString("name", ""); // Returns default empty string if name doesn't exist
     }
+
     public static String getCurrentUserId(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("user_pref", Context.MODE_PRIVATE);
         return sharedPreferences.getString("userId", null); // Returns default null string if id doesn't exist
@@ -50,8 +51,8 @@ public class User {
         return sharedPreferences.getString("email", ""); // Returns default empty string if email doesn't exist
     }
 
-    public static User fetchUserFromDatabase(String userId){
-        User user= new User();
+    public static User fetchUserFromDatabase(String userId) {
+        User user = new User();
 
         // Reference to the "users" node in Firebase Database
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users");
@@ -66,7 +67,7 @@ public class User {
                     String email = dataSnapshot.child("email").getValue(String.class);
                     user.setName(name);
                     user.setEmail(email);
-                    Log.d("this", name +email + user.getEmail());
+                    Log.d("this", name + email + user.getEmail());
                 } else {
                     // Handle case where user ID does not exist
                 }

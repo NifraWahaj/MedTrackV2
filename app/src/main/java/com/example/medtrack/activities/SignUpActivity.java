@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -54,60 +55,84 @@ public class SignUpActivity extends AppCompatActivity {
             String password = etPassword.getText().toString().trim();
             String confirmPassword = etConfirmPassword.getText().toString().trim();
             String name = etName.getText().toString().trim();
-
+            etConfirmPassword.setError(null);
+            etPassword.setError(null);
+            etName.setError(null);
+            etEmail.setError(null);
             // Validation checks
             if (TextUtils.isEmpty(name)) {
-                Toast.makeText(SignUpActivity.this, "Name can't be empty", Toast.LENGTH_SHORT).show();
-                progressBar.setVisibility(View.GONE); // Ensure progress bar is hidden
+                etName.setError("Required field");
+                 progressBar.setVisibility(View.GONE); // Ensure progress bar is hidden
 
                 return;
             }
             if (TextUtils.isEmpty(email)) {
-                Toast.makeText(SignUpActivity.this, "Email can't be empty", Toast.LENGTH_SHORT).show();
-                progressBar.setVisibility(View.GONE); // Ensure progress bar is hidden
+                etEmail.setError("Required field");
+
+                 progressBar.setVisibility(View.GONE); // Ensure progress bar is hidden
 
                 return;
             }
+
+// Check if email format is valid
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                etEmail.setError("Invalid email field");
+
+                 progressBar.setVisibility(View.GONE); // Ensure progress bar is hidden
+                return;
+            }
             if (TextUtils.isEmpty(password)) {
-                Toast.makeText(SignUpActivity.this, "Password can't be empty", Toast.LENGTH_SHORT).show();
-                progressBar.setVisibility(View.GONE); // Ensure progress bar is hidden
+                etPassword.setError("Required field");
+                 progressBar.setVisibility(View.GONE); // Ensure progress bar is hidden
+
+                return;
+            }
+            if (TextUtils.isEmpty(confirmPassword)) {
+                etPassword.setError("Required field");
+                 progressBar.setVisibility(View.GONE); // Ensure progress bar is hidden
 
                 return;
             }
             if (!password.equals(confirmPassword)) {
-                Toast.makeText(SignUpActivity.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
-                progressBar.setVisibility(View.GONE); // Ensure progress bar is hidden
+                etPassword.setError("Passwords do not match ");
+                etConfirmPassword.setError("Passwords do not match ");
+
+                 progressBar.setVisibility(View.GONE); // Ensure progress bar is hidden
 
                 return;
             }
+            if (password.length() < 6) {
+                etPassword.setError("Password must be at least 6 characters long ");
 
+                 progressBar.setVisibility(View.GONE); // Ensure progress bar is hidden
+                return;
+            }
             btnSignUp.setEnabled(false); // Disable the button
             btnSignUp.setVisibility(View.GONE);
             // Show the ProgressBar before starting authentication
             progressBar.setVisibility(View.VISIBLE);
             // Create new user with Firebase Authentication
-            mAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(SignUpActivity.this, task -> {
-                        progressBar.setVisibility(View.GONE); // Ensure it's hidden for all cases
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "createUserWithEmail:success");
-                            Toast.makeText(SignUpActivity.this, "Sign-up successful", Toast.LENGTH_SHORT).show();
+            mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(SignUpActivity.this, task -> {
+                progressBar.setVisibility(View.GONE); // Ensure it's hidden for all cases
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "createUserWithEmail:success");
+                    Toast.makeText(SignUpActivity.this, "Sign-up successful", Toast.LENGTH_SHORT).show();
 
-                            // Save user to the database
-                            saveUserToDatabase(name, email);
+                    // Save user to the database
+                    saveUserToDatabase(name, email);
 
-                            // Redirect to MainActivity
-                            Intent i = new Intent(SignUpActivity.this, MainActivity.class);
-                            startActivity(i);
-                            finish();
-                        } else {
-                            btnSignUp.setVisibility(View.VISIBLE);
+                    // Redirect to MainActivity
+                    Intent i = new Intent(SignUpActivity.this, MainActivity.class);
+                    startActivity(i);
+                    finish();
+                } else {
+                    btnSignUp.setVisibility(View.VISIBLE);
 
-                            btnSignUp.setEnabled(true);
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(SignUpActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    btnSignUp.setEnabled(true);
+                    Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                    Toast.makeText(SignUpActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                }
+            });
 
         });
 
@@ -131,16 +156,16 @@ public class SignUpActivity extends AppCompatActivity {
         Map<String, Object> userData = new HashMap<>();
         userData.put("name", name);
         userData.put("email", email);
+        userData.put("fcmToken", "");
+
 
         // Save user data under their unique ID
-        userRef.setValue(userData)
-                .addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "User saved to Firebase Database with ID: " + userId);
-                    Toast.makeText(SignUpActivity.this, "User saved successfully", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Failed to save user: " + e.getMessage());
-                    Toast.makeText(SignUpActivity.this, "Failed to save user data.", Toast.LENGTH_SHORT).show();
-                });
+        userRef.setValue(userData).addOnSuccessListener(aVoid -> {
+            Log.d(TAG, "User saved to Firebase Database with ID: " + userId);
+            Toast.makeText(SignUpActivity.this, "User saved successfully", Toast.LENGTH_SHORT).show();
+        }).addOnFailureListener(e -> {
+            Log.e(TAG, "Failed to save user: " + e.getMessage());
+            Toast.makeText(SignUpActivity.this, "Failed to save user data.", Toast.LENGTH_SHORT).show();
+        });
     }
 }

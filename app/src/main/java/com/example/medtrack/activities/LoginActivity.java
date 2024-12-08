@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.medtrack.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -39,6 +40,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextView tvSignUp, tvForgotPassword;
 
     private ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,16 +61,19 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                etEmail.setError(null);
+                etPassword.setError(null);
                 String email = etEmail.getText().toString().trim();
                 String password = etPassword.getText().toString().trim();
 
                 if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    Toast.makeText(LoginActivity.this, "Invalid email format", Toast.LENGTH_SHORT).show();
-                    return;
+                    etEmail.setError("Invalid email format");
+                     return;
                 }
                 if (password.length() < 6) {
-                    Toast.makeText(LoginActivity.this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
-                    return;
+                    etPassword.setError("Minimum Password length required is 6 characters");
+
+                     return;
                 }
 
 
@@ -95,8 +100,11 @@ public class LoginActivity extends AppCompatActivity {
                                 } else {
                                     btnLogin.setVisibility(View.VISIBLE);
                                     Log.w(TAG, "signInWithEmail:failure", task.getException());
-                                    Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
-                                }
+                                    etEmail.setError("Make sure you enter correct email");
+                                    etPassword.setError("Make sure you enter correct password");
+  Snackbar.make(findViewById(android.R.id.content), "Authentication failed. Please try again.", Snackbar.LENGTH_SHORT).show();
+
+                                 }
                             }
                         });
             }
@@ -116,13 +124,12 @@ public class LoginActivity extends AppCompatActivity {
         tvForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                  Intent forgotPasswordIntent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
-                  startActivity(forgotPasswordIntent);
+                Intent forgotPasswordIntent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+                startActivity(forgotPasswordIntent);
                 finish();
             }
         });
     }
-
 
 
 }

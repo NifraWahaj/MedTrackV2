@@ -1,42 +1,37 @@
 package com.example.medtrack.adapters;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-import com.example.medtrack.models.NotificationModel;
-import java.util.List;
-
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.medtrack.R;
-import com.example.medtrack.models.Medication;
+import com.example.medtrack.models.Notification;
 
 import java.util.List;
 
+public class CommunityNotificationAdapter extends RecyclerView.Adapter<CommunityNotificationAdapter.CommentViewHolder> {
 
+    private List<Notification> notifications;
+    private OnBlogClickListener onBlogClickListener;
+    private Context context;
 
-//Not used by Community Notifications
-public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.CommentViewHolder> {
-
-    private List<NotificationModel> notifications;
-
-    // Constructor to initialize the list of notifications
-    public NotificationAdapter(List<NotificationModel> notifications) {
-        this.notifications = notifications;
+    public interface OnBlogClickListener {
+        void onBlogClick(String blogId);
     }
 
-    // ViewHolder class to hold references to the views for each item
+    public CommunityNotificationAdapter(List<Notification> notifications, Context c, OnBlogClickListener listener) {
+        this.notifications = notifications;
+        this.context = c;
+        this.onBlogClickListener = listener;
+    }
+
     public static class CommentViewHolder extends RecyclerView.ViewHolder {
         TextView userName;
         TextView commentText;
@@ -53,28 +48,36 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     @NonNull
     @Override
     public CommentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Inflate the item layout
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_item_notification, parent, false);
         return new CommentViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
-        // Get the notification item at the current position
-        NotificationModel notification = notifications.get(position);
+        Notification notification = notifications.get(position);
         Log.d("NotificationAdapter", "Binding item at position: " + position);
         Log.d("NotificationAdapter", "UserName: " + notification.getUserName());
         Log.d("NotificationAdapter", "Comment: " + notification.getCommentText());
         Log.d("NotificationAdapter", "TimeAgo: " + notification.getTimeAgo());
-        // Bind data to the views
+
         holder.userName.setText(notification.getUserName());
         holder.commentText.setText(notification.getCommentText());
         holder.timeAgo.setText(notification.getTimeAgo());
+
+        holder.itemView.setOnClickListener(v -> {
+            if (onBlogClickListener != null) {
+                Toast.makeText(context, "item clicked", Toast.LENGTH_SHORT).show();
+                onBlogClickListener.onBlogClick(notification.getBlogId());
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        // Return the size of the notification list
         return notifications.size();
+    }
+
+    public void setOnBlogClickListener(OnBlogClickListener listener) {
+        this.onBlogClickListener = listener;
     }
 }

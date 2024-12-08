@@ -105,6 +105,7 @@ public class EditBlogAPIActivity extends AppCompatActivity {
             String blogTitle = intent.getStringExtra("blogTitle");
             String blogContent = intent.getStringExtra("blogContent");
             mEditor.setHtml(blogContent);
+            etTitle.setText(blogTitle);
         }
 
 
@@ -156,8 +157,7 @@ public class EditBlogAPIActivity extends AppCompatActivity {
             } else if (title.matches("^[0-9].*")) {
                 // Title starts with a digit
                 etTitle.setError("Title cannot start with a digit");
-            }
-            else {
+            } else {
                 saveBlogToFirebase();
                 finish();
             }
@@ -500,15 +500,19 @@ public class EditBlogAPIActivity extends AppCompatActivity {
             blogData.put("userId", User.getCurrentUserId(this));
 
             blogData.put("content", mEditor.getHtml()); // Store formatted text content as JSON
-            blogData.put("isApproved", false);
-            blogData.put("reviews", new HashMap<>());
+             blogData.put("reviews", new HashMap<>());
             blogData.put("ratings", new HashMap<>());
-            if(isEdit==false){
+            if (isEdit == false) {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String currentDate = sdf.format(new Date());
                 blogData.put("dateCreated", currentDate); // Add the current date
+                blogData.put("isApproved", false);
 
 
+            }
+            else{
+                blogData.put("isApproved", true);
+ 
             }
 
             blogsRef.push().setValue(blogData)
@@ -517,26 +521,5 @@ public class EditBlogAPIActivity extends AppCompatActivity {
         }
     }
 
-  /*  public void fetchFromDB() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
-        DatabaseReference blogsRef = database.getReference("content");
-        mEditor.setHtml("");  // Clear the editor
 
-        blogsRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot blogSnapshot : dataSnapshot.getChildren()) {
-                    String title = blogSnapshot.child("title").getValue(String.class);
-                    String content = blogSnapshot.child("content").getValue(String.class);
-                    String userName = blogSnapshot.child("userName").getValue(String.class);
-                    mEditor.setHtml(content);  // Populate the editor with the fetched content
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("EditBlogAPIActivity", "Error fetching blog data: " + databaseError.getMessage());
-            }
-        });
-    }*/
 }

@@ -38,7 +38,9 @@ public class MainActivity extends AppCompatActivity {
     ViewPagerAdapter adapter;
     int count = 0;
     boolean flag = false;
+    String token;
     EditText etToken; // this field is set width 0 s0 it wont show
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,12 +70,34 @@ public class MainActivity extends AppCompatActivity {
                             return;
                         }
                         // Get new FCM registration token
-                        String token = task.getResult();
+                        token = task.getResult();
+
+
                         // Log and toast
-                        Toast.makeText(MainActivity.this, "Your device registration token is" + token
-                                , Toast.LENGTH_SHORT).show();
+                    //    Toast.makeText(MainActivity.this, "Your device registration token is" + token
+                    //            , Toast.LENGTH_SHORT).show();
                         Log.d("FCM Token", token);
                         etToken.setText(token);
+                        // Proceed only if the token is valid
+                        if (token != null) {
+                            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                            if (currentUser != null) {
+                                String userId = currentUser.getUid();
+                                DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+
+                                // Store token in the Firebase Realtime Database
+                                userRef.child("fcmToken").setValue(token)
+                                        .addOnSuccessListener(aVoid -> Log.d("FCM Token", "Token saved successfully"))
+                                        .addOnFailureListener(e -> Log.e("FCM Token", "Failed to save token", e));
+
+                                // Optionally, fetch additional user data
+                                fetchUserFromDatabase(userId);
+                            } else {
+                                // Handle case where FirebaseAuth user is not available
+                                Log.e("FCM Token", "FirebaseAuth user is null");
+                            }
+                        }
+
                     }
                 });
 
@@ -131,19 +155,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser == null) {
-            Toast.makeText(this, "CURR USER:", Toast.LENGTH_SHORT).show();
-        }
-        if (currentUser != null) {
-            String userId = currentUser.getUid();
-            String email = currentUser.getEmail();
-             Toast.makeText(this, "main activity userId"+userId, Toast.LENGTH_SHORT).show();
-            // Fetch additional user details if required
-            fetchUserFromDatabase(userId);
-        }
 
     }
+
     private void fetchUserFromDatabase(String userId) {
         // Reference to the "users" node in Firebase Database
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users");
@@ -156,27 +170,25 @@ public class MainActivity extends AppCompatActivity {
                     // Extract user details from the snapshot
                     String name = dataSnapshot.child("name").getValue(String.class);
                     String email = dataSnapshot.child("email").getValue(String.class);
-                    Toast.makeText(MainActivity.this, email+name+"thiss", Toast.LENGTH_SHORT).show();
-                    // Store user details in SharedPreferences
-                    storeUserInSharedPreferences(name, email,userId);
+                     // Store user details in SharedPreferences
+                    storeUserInSharedPreferences(name, email, userId);
 
                 } else {
                     // Handle case where user ID does not exist
-                    Toast.makeText(MainActivity.this, "User not found in the database.", Toast.LENGTH_SHORT).show();
-                }
+                    Log.e("MainActivity","User not found in the database");
+                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 // Handle errors
                 Log.e("LoginActivity", "Database error: " + databaseError.getMessage());
-                Toast.makeText(MainActivity.this, "Failed to fetch user data.", Toast.LENGTH_SHORT).show();
-            }
+             }
         });
 
     }
 
-    private void storeUserInSharedPreferences(String name, String email,String userId) {
+    private void storeUserInSharedPreferences(String name, String email, String userId) {
         SharedPreferences sharedPreferences = getSharedPreferences("user_pref", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         // Clear all stored preferences

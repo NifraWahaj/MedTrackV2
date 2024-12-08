@@ -17,11 +17,11 @@ public class Blog {
     private Map<String, String> reviews; // User ID to Review
 
     // Constructor
-    public Blog(String id,String userId, String title, String content, boolean isApproved) {
+    public Blog(String id, String userId, String title, String content, boolean isApproved) {
         this.id = id;
         this.title = title;
         this.content = content;
-        this.userId=userId;
+        this.userId = userId;
         this.isApproved = isApproved;
         this.ratings = new HashMap<>();
         this.reviews = new HashMap<>();

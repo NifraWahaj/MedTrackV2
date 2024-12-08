@@ -1,5 +1,6 @@
 package com.example.medtrack.models;
 
+//not used by community Notificaitons
 public class NotificationModel {
     // Private fields for encapsulation
     private String userName;
