@@ -114,6 +114,7 @@ public class WriteReviewActivity extends AppCompatActivity {
             // Show failure message
             Toast.makeText(this, "Failed to delete review and rating", Toast.LENGTH_SHORT).show();
         });
+
     }
 
 
