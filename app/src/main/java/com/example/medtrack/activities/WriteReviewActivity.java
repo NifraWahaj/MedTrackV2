@@ -186,7 +186,7 @@ public class WriteReviewActivity extends AppCompatActivity {
                 if (isEditMode) {
                     Log.d("notifyBlogAuthor", "Edit mode is true");
                     sendNotificationToAuthor(fcmToken, "New Review", " edited their review on your blog ");
-                } else {
+                 } else {
                     sendNotificationToAuthor(fcmToken, "New Review", User.getCurrentUserName(WriteReviewActivity.this) + " reviewed your blog ");
                 }
 

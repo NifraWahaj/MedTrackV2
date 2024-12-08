@@ -14,9 +14,11 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
-import com.example.medtrack.R;
+ import com.example.medtrack.R;
 import com.example.medtrack.activities.MainActivity;
 import com.example.medtrack.activities.WriteReviewActivity;
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -88,40 +90,48 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     // For sending notifications to users : Community uses this function
 
     public static void sendNotification(Context context, String messageBody) {
-        if (context == null) {
-            Log.e("MyFirebaseMessagingService", "Context is null, cannot send notification");
-            return;
+        try {
+            Log.d("Notification", "Preparing to send notification...");
+            if (context == null) {
+                Log.e("MyFirebaseMessagingService", "Context is null, cannot send notification");
+                return;
+            }
+
+            Intent intent = new Intent(context, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 /* Request code */, intent,
+                    PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+
+            String channelId = "My channel ID";
+            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            NotificationCompat.Builder notificationBuilder =
+                    new NotificationCompat.Builder(context, channelId)
+                            .setSmallIcon(R.drawable.logo_launcher)
+                            .setContentTitle("My new notification")
+                            .setContentText(messageBody)
+                            .setAutoCancel(true)
+                            .setSound(defaultSoundUri)
+                            .setContentIntent(pendingIntent);
+
+            NotificationManager notificationManager =
+                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                Log.d("Notification", "Creating notification channel...");
+                NotificationChannel channel = new NotificationChannel(channelId,
+                        "Channel human readable title",
+                        NotificationManager.IMPORTANCE_HIGH);
+                notificationManager.createNotificationChannel(channel);
+            }
+
+            notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+            Log.d("Notification", "Notification sent successfully!");
+
+        } catch (Exception e) {
+            Log.e("Notification", "Failed to send notification", e);
         }
-
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
-
-        String channelId = "My channel ID";
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder =
-                new NotificationCompat.Builder(context, channelId)
-                        .setSmallIcon(R.drawable.logo_launcher)
-                        .setContentTitle("My new notification")
-                        .setContentText(messageBody)
-                        .setAutoCancel(true)
-                        .setSound(defaultSoundUri)
-                        .setContentIntent(pendingIntent);
-
-        NotificationManager notificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        // Since android Oreo notification channel is needed.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(channelId,
-                    "Channel human readable title",
-                    NotificationManager.IMPORTANCE_DEFAULT);
-            notificationManager.createNotificationChannel(channel);
-        }
-
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
+
 }
 
 
