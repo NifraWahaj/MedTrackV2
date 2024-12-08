@@ -91,7 +91,8 @@ public class MedFragment extends Fragment {
                 .getReference("medications")
                 .child(userId);
 
-        medsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        // Add real-time listener
+        medsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 activeMedicationList.clear();
@@ -102,18 +103,33 @@ public class MedFragment extends Fragment {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Medication medication = snapshot.getValue(Medication.class);
                     if (medication != null) {
-                        try {
-                            Date endDate = sdf.parse(medication.getEndDate());
-                            if (endDate != null && endDate.compareTo(currentDate) >= 0) {
-                                activeMedicationList.add(medication);
-                            } else {
-                                inactiveMedicationList.add(medication);
+                        String key = snapshot.getKey(); // Retrieve the key from Firebase
+                        medication.setKey(key); // Set the key in the medication object
+
+                        Log.d(TAG, "Medication Key: " + key + ", Name: " + medication.getName());
+
+                        String endDateStr = medication.getEndDate();
+                        if (endDateStr != null && !endDateStr.isEmpty()) {
+                            try {
+                                Date endDate = sdf.parse(endDateStr);
+                                if (endDate != null && endDate.compareTo(currentDate) >= 0) {
+                                    activeMedicationList.add(medication);
+                                } else {
+                                    inactiveMedicationList.add(medication);
+                                }
+                            } catch (ParseException e) {
+                                Log.e(TAG, "Date parsing error: " + e.getMessage());
                             }
-                        } catch (ParseException e) {
-                            Log.e(TAG, "Date parsing error: " + e.getMessage());
+                        } else {
+                            Log.e(TAG, "End date is null or empty for medication: " + medication.getName());
+                            inactiveMedicationList.add(medication); // Default to inactive if date is missing
                         }
                     }
                 }
+
+
+
+                // Update the adapters
                 activeMedicationAdapter.notifyDataSetChanged();
                 inactiveMedicationAdapter.notifyDataSetChanged();
             }
@@ -124,4 +140,5 @@ public class MedFragment extends Fragment {
             }
         });
     }
+
 }

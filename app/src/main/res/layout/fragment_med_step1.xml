@@ -30,42 +30,29 @@
         android:layout_marginBottom="24dp"
         android:fontFamily="sans-serif-medium"
         android:textColor="@color/fontColormAIN" />
-    <Button
-        android:id="@+id/buttonAddMed"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add Medication"
-        android:layout_marginBottom="16dp"
-        android:visibility="gone"
-        android:background="@drawable/rounded_button"
-        android:textColor="#FFFFFF"
-        android:elevation="4dp" />
-    <!-- Medication Name Input with Bottom Line -->
-    <AutoCompleteTextView
-        android:id="@+id/editTextMedicationName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/med_name"
-        android:importantForAutofill="no"
-        android:textSize="@dimen/addmedfrag_nonQuestiontextSize"
-        android:padding="16dp"
-        android:background="@android:color/transparent"
-        android:layout_marginBottom="8dp"
-        android:inputType="text"
-        android:textColorHint="@color/greytext"
-        android:textColor="@color/fontColormAIN"
-        tools:ignore="TouchTargetSizeCheck,VisualLintTextFieldSize" />
+        android:orientation="horizontal">
+
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteMedicationName"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:hint="Enter medication name"
+            android:inputType="text"
+            android:completionThreshold="1" />
+
+        <Button
+            android:id="@+id/buttonEnter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter" />
+    </LinearLayout>
+
     <!-- Add this inside your existing LinearLayout -->
 
 
-
-
-    <!-- Bottom Line for EditText -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/blueMain"
-        android:layout_marginBottom="20dp" />
 
 
     <!-- Start Date Input Button -->
@@ -75,6 +62,7 @@
         android:layout_height="wrap_content"
         android:text="Select Start Date"
         android:layout_marginBottom="16dp"
+        android:layout_marginTop="30dp"
         android:background="@drawable/rounded_button"
         android:textColor="#FFFFFF"
         android:elevation="4dp"/>

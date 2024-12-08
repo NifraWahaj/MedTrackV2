@@ -1,5 +1,6 @@
 package com.example.medtrack.adapters;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.util.Log;
@@ -16,6 +17,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.medtrack.R;
 import com.example.medtrack.models.Medication;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Calendar;
 import java.util.List;
@@ -41,8 +48,36 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MedicationViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MedicationViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Medication medication = medicationList.get(position);
+        Log.d(TAG, "adapMedication Name: " + medication.getName() + ", Key: " + medication.getKey());
+// Retrieve the key from Firebase if it is null
+        if (medication.getKey() == null) {
+            DatabaseReference medsRef = FirebaseDatabase.getInstance()
+                    .getReference("medications")
+                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+            medsRef.orderByChild("name").equalTo(medication.getName())
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                String key = snapshot.getKey();
+                                medication.setKey(key);
+                                Log.d(TAG, "Key fetched: " + key + " for medication: " + medication.getName());
+                            }
+                            // Update UI after key is set
+                            notifyItemChanged(position);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Log.e(TAG, "Failed to fetch key for medication: " + medication.getName() + " Error: " + error.getMessage());
+                        }
+                    });
+        }        Log.d(TAG, "adappppMedication Name: " + medication.getName() + ", Key: " + medication.getKey());
+
+
 
         Log.d("MedicationAdapter", "Medication Name: " + medication.getName());
         Log.d("MedicationAdapter", "Frequency: " + medication.getFrequency());
@@ -57,11 +92,10 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
         }
 
         // Add the click listener here
-        holder.itemView.setOnClickListener(v -> showMedicationDetailsDialog(medication));
+        holder.itemView.setOnClickListener(v -> showMedicationDetailsDialog(medication, position));
     }
 
-
-    private void showMedicationDetailsDialog(Medication medication) {
+    private void showMedicationDetailsDialog(Medication medication, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater inflater = LayoutInflater.from(context);
         View dialogView = inflater.inflate(R.layout.dialog_medication_details, null);
@@ -77,124 +111,61 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
         // Set medication name
         medName.setText(medication.getName());
 
-        // If the medication frequency is interval-based, calculate times between start and end
-        if ("Interval".equalsIgnoreCase(medication.getFrequency())) {
-            Log.d(TAG, "Processing interval-based medication for: " + medication.getName());
-
-            String reminderTime = medication.getReminderTime();
-            if (reminderTime != null) {
-                Log.d(TAG, "Reminder time details: " + reminderTime);
-
-                String[] parts = reminderTime.split(", ");
-                int intervalHours = 0;
-                String startTimeStr = null;
-                String endTimeStr = null;
-                String dose = "";
-
-                // Extract details from the reminderTime field
-                for (String part : parts) {
-                    if (part.startsWith("Interval:")) {
-                        intervalHours = Integer.parseInt(part.split(": ")[1].replace("hours", "").trim());
-                        Log.d(TAG, "Extracted interval hours: " + intervalHours);
-                    } else if (part.startsWith("Start Time:")) {
-                        startTimeStr = part.split(": ")[1].trim();
-                        Log.d(TAG, "Extracted start time: " + startTimeStr);
-                    } else if (part.startsWith("End Time:")) {
-                        endTimeStr = part.split(": ")[1].trim();
-                        Log.d(TAG, "Extracted end time: " + endTimeStr);
-                    } else if (part.startsWith("Dose:")) {
-                        dose = part.split(": ")[1].trim();
-                        Log.d(TAG, "Extracted dose: " + dose);
-                    }
-                }
-
-                if (intervalHours > 0 && startTimeStr != null && endTimeStr != null) {
-                    try {
-                        // Parse start and end times
-                        String[] startSplit = startTimeStr.split(":");
-                        String[] endSplit = endTimeStr.split(":");
-
-                        int startHour = Integer.parseInt(startSplit[0]);
-                        int startMinute = Integer.parseInt(startSplit[1]);
-                        int endHour = Integer.parseInt(endSplit[0]);
-                        int endMinute = Integer.parseInt(endSplit[1]);
-
-                        Log.d(TAG, "Start time: " + startHour + ":" + startMinute);
-                        Log.d(TAG, "End time: " + endHour + ":" + endMinute);
-
-                        Calendar startCalendar = Calendar.getInstance();
-                        startCalendar.set(Calendar.HOUR_OF_DAY, startHour);
-                        startCalendar.set(Calendar.MINUTE, startMinute);
-
-                        Calendar endCalendar = (Calendar) startCalendar.clone();
-                        endCalendar.set(Calendar.HOUR_OF_DAY, endHour);
-                        endCalendar.set(Calendar.MINUTE, endMinute);
-
-                        StringBuilder calculatedTimes = new StringBuilder();
-
-                        // Calculate the times at which reminders should occur
-                        while (startCalendar.before(endCalendar) || startCalendar.equals(endCalendar)) {
-                            String time = String.format(Locale.getDefault(), "%02d:%02d", startCalendar.get(Calendar.HOUR_OF_DAY), startCalendar.get(Calendar.MINUTE));
-                            Log.d(TAG, "Calculated reminder time: " + time);
-                            calculatedTimes.append(time).append("\n");
-                            startCalendar.add(Calendar.HOUR_OF_DAY, intervalHours);
-                        }
-
-                        scheduledTime.setText("Scheduled Times:\n" + calculatedTimes.toString().trim());
-                        doseDetails.setText("Dose: " + dose);
-                    } catch (Exception e) {
-                        Log.e(TAG, "Error while calculating interval times: " + e.getMessage());
-                        scheduledTime.setText("Time: Unavailable");
-                        doseDetails.setText("Dose: Unavailable");
-                    }
-                } else {
-                    Log.w(TAG, "Invalid interval hours or start/end time. Cannot calculate reminders.");
-                    scheduledTime.setText("Time: Unavailable");
-                    doseDetails.setText("Dose: Unavailable");
-                }
-            } else {
-                Log.w(TAG, "Reminder time is null for interval-based medication.");
-                scheduledTime.setText("Time: Unavailable");
-                doseDetails.setText("Dose: Unavailable");
-            }
-        } else {
-            // Extract time and dosage for non-interval-based medications
-            String reminderDetails = medication.getReminderTime() != null ? medication.getReminderTime() : medication.getFirstIntakeDetails();
-            Log.d(TAG, "Processing non-interval-based medication for: " + medication.getName());
-
-            if (reminderDetails != null) {
-                String[] detailsArray = reminderDetails.split(", ");
-                if (detailsArray.length == 2) {
-                    String time = detailsArray[0]; // e.g., "11:24"
-                    String dosage = detailsArray[1]; // e.g., "Dosage: 11 Tablet(s)"
-
-                    Log.d(TAG, "Extracted time: " + time);
-                    Log.d(TAG, "Extracted dosage: " + dosage);
-
-                    scheduledTime.setText("Scheduled for: " + time);
-                    doseDetails.setText(dosage);
-                } else {
-                    Log.w(TAG, "Reminder details format is incorrect.");
-                    scheduledTime.setText("Time: Unavailable");
-                    doseDetails.setText("Dosage: Unavailable");
-                }
-            } else {
-                Log.w(TAG, "Reminder details are null for non-interval-based medication.");
-                scheduledTime.setText("Time: Unavailable");
-                doseDetails.setText("Dosage: Unavailable");
-            }
-        }
+        // Extract dosage details
+        String doseInfo = extractDoseInfo(medication);
+        scheduledTime.setText("Scheduled Time: " + (medication.getReminderTime() != null ? medication.getReminderTime() : "N/A"));
+        doseDetails.setText(doseInfo);
 
         // Set Take button click listener
         btnTake.setOnClickListener(v -> {
             Log.d(TAG, medication.getName() + " marked as taken.");
             Toast.makeText(context, medication.getName() + " taken!", Toast.LENGTH_SHORT).show();
+
+            int dosageTaken = extractDosageAmount(medication);
+            if (dosageTaken > 0) {
+                int newRefillAmount = medication.getRefillAmount() - dosageTaken;
+                if (newRefillAmount < 0) {
+                    Toast.makeText(context, "Not enough medication left.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Update local object
+                medication.setRefillAmount(newRefillAmount);
+                notifyItemChanged(position);
+
+                String key = medication.getKey();
+                if (key == null) {
+                    Log.e(TAG, "Medication key is null for: " + medication.getName());
+                    Toast.makeText(context, "Unable to update medication. Key is missing.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                DatabaseReference medsRef = FirebaseDatabase.getInstance()
+                        .getReference("medications")
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+                medsRef.child(key).child("refillAmount").setValue(newRefillAmount)
+                        .addOnSuccessListener(aVoid -> {
+                            Log.d(TAG, "Updated refillAmount successfully.");
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e(TAG, "Failed to update refillAmount: " + e.getMessage());
+                        });
+
+
+            }
+
+            // Hide buttons after action
+            btnTake.setVisibility(View.GONE);
+            btnSkip.setVisibility(View.GONE);
         });
 
         // Set Skip button click listener
         btnSkip.setOnClickListener(v -> {
             Log.d(TAG, medication.getName() + " marked as skipped.");
             Toast.makeText(context, medication.getName() + " skipped.", Toast.LENGTH_SHORT).show();
+            btnTake.setVisibility(View.GONE);
+            btnSkip.setVisibility(View.GONE);
         });
 
         // Set Delete button click listener
@@ -221,5 +192,33 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
             textViewMedName = itemView.findViewById(R.id.textViewMedName);
             textViewMedDetails = itemView.findViewById(R.id.textViewMedDetails);
         }
+    }
+
+    private String extractDoseInfo(Medication medication) {
+        try {
+            if ("Interval".equalsIgnoreCase(medication.getFrequency())) {
+                return "Dose: " + medication.getReminderTime().split("Dose:")[1].trim();
+            } else if (medication.getReminderTime() != null && medication.getReminderTime().contains("Dosage:")) {
+                return "Dosage: " + medication.getReminderTime().split("Dosage:")[1].trim();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error extracting dose info: " + e.getMessage());
+        }
+        return "Dose Info: Unavailable";
+    }
+
+    private int extractDosageAmount(Medication medication) {
+        try {
+            if ("Interval".equalsIgnoreCase(medication.getFrequency())) {
+                String dosePart = medication.getReminderTime().split("Dose:")[1].trim();
+                return Integer.parseInt(dosePart.split(" ")[0]);
+            } else if (medication.getReminderTime() != null && medication.getReminderTime().contains("Dosage:")) {
+                String dosagePart = medication.getReminderTime().split("Dosage:")[1].trim();
+                return Integer.parseInt(dosagePart.split(" ")[0]);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error extracting dosage amount: " + e.getMessage());
+        }
+        return 0;
     }
 }
