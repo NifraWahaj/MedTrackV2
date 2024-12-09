@@ -50,7 +50,7 @@ public class MedFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         View view = inflater.inflate(R.layout.fragment_med, container, false);
 
         // Initialize RecyclerView for active medications
@@ -65,7 +65,7 @@ public class MedFragment extends Fragment {
         inactiveMedicationAdapter = new MedicationListAdapter(getContext(), inactiveMedicationList);
         inactiveMedicationRecyclerView.setAdapter(inactiveMedicationAdapter);
 
-        // Initialize FAB
+        //  FAB
         FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
          //   Toast.makeText(getActivity(), "FAB Clicked!", Toast.LENGTH_SHORT).show();
@@ -73,7 +73,6 @@ public class MedFragment extends Fragment {
             startActivity(intent);
         });
 
-        // Fetch medications from Firebase
         fetchMedicationsFromFirebase();
 
         return view;
@@ -91,7 +90,7 @@ public class MedFragment extends Fragment {
                 .getReference("medications")
                 .child(userId);
 
-        medsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        medsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 activeMedicationList.clear();

@@ -1,103 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:backgroundTint="@color/bg_main"
-    android:background="@drawable/rounded_dialog_background"
+    android:background="@drawable/rounded_dialog_background">
 
-    android:orientation="vertical">
-
-    <LinearLayout
+    <!-- Inner Container -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="350dp"
         android:layout_height="250dp"
-        android:orientation="vertical"
-        android:padding="16dp"
+        android:padding="30dp"
         android:backgroundTint="#EDF2F2"
         android:background="@drawable/rounded_dialog_background"
-        android:gravity="center">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+>
 
         <!-- Top row: Info icon and Delete icon -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/medInfoIcon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_refill"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:id="@+id/medName"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:text="Medication Name"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/medInfoIcon"
+            app:layout_constraintEnd_toStartOf="@id/deleteMedIcon"
+            android:gravity="center" />
 
-            <ImageView
-                android:id="@+id/medInfoIcon"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_refill"
-                android:layout_marginEnd="8dp" />
-
-            <TextView
-                android:id="@+id/medName"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Medication Name"
-                android:textStyle="bold"
-                android:textSize="20sp"
-                android:gravity="center"
-                android:layout_marginEnd="8dp" />
-
-            <ImageView
-                android:id="@+id/deleteMedIcon"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/delete" />
-        </LinearLayout>
+        <ImageView
+            android:id="@+id/deleteMedIcon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/delete"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Scheduled Time -->
         <TextView
             android:id="@+id/scheduledTime"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:text="Scheduled for: 8:00 AM, Today"
             android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/medName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"
             android:gravity="center_horizontal" />
 
         <!-- Dose Details -->
         <TextView
             android:id="@+id/doseDetails"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="8dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
             android:text="Take 1 pill"
             android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/scheduledTime"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp"
             android:gravity="center_horizontal" />
 
         <!-- Button Container -->
-        <LinearLayout
-            android:id="@+id/buttonContainer"
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/btnSkip"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="@color/black"
+            android:text="Skip"
+            android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@id/doseDetails"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnTake"
+            android:layout_marginTop="24dp" />
 
-            <Button
-                android:id="@+id/btnSkip"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                android:backgroundTint="@color/black"
-                android:text="Skip"
-                android:textColor="@android:color/white" />
+        <Button
+            android:id="@+id/btnTake"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/blueMain"
+            android:text="Take"
+            android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@id/doseDetails"
+            app:layout_constraintStart_toEndOf="@id/btnSkip"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="24dp" />
 
-            <Button
-                android:id="@+id/btnTake"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:backgroundTint="@color/blueMain"
-                android:text="Take"
-                android:textColor="@android:color/white" />
-        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </LinearLayout>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -154,7 +154,7 @@ public class HomeFragment extends Fragment {
                 .getReference("medications")
                 .child(userId);
 
-        medsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        medsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 medicationList.clear();

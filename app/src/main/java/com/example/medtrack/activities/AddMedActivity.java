@@ -196,19 +196,15 @@ public class AddMedActivity extends AppCompatActivity {
 
     // Method to save medication data to Firebase
     public void saveMedicationToFirebase() {
-        // Get the current user
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {
-            // User is not authenticated, handle the error
             Toast.makeText(this, "Error: User is not authenticated. Please log in first.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Create a Firebase reference
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://medtrack-68ec9-default-rtdb.asia-southeast1.firebasedatabase.app");
         DatabaseReference medsRef = database.getReference("medications");
 
-        // Create a medication object to save
         Medication medication;
 
         if ("Twice daily".equalsIgnoreCase(medicationFrequency)) {
@@ -247,7 +243,6 @@ public class AddMedActivity extends AppCompatActivity {
             );
         }
 
-        // Save the medication object to Firebase
         String userId = currentUser.getUid();
         Log.d(TAG, "Saving Medication with Name: " + medicationName);
         Log.d(TAG, "Frequency: " + medicationFrequency);
@@ -256,12 +251,10 @@ public class AddMedActivity extends AppCompatActivity {
 
         medsRef.child(userId).push().setValue(medication)
                 .addOnSuccessListener(aVoid -> {
-                    // Show a success message
                     Toast.makeText(AddMedActivity.this, "Medication saved successfully", Toast.LENGTH_SHORT).show();
-                    finish(); // Close the activity after saving
+                    finish();
                 })
                 .addOnFailureListener(e -> {
-                    // Show an error message
                     Toast.makeText(AddMedActivity.this, "Failed to save medication", Toast.LENGTH_SHORT).show();
                 });
     }
