@@ -160,8 +160,6 @@ The admin panel for approving blogs and viewing analytical reports is built usin
 
 ## Screenshots
 
-## Screenshots
-
 <img src="/medtrack%20screenshots/medtrack15.jpeg" alt="Screenshot 1" width="300">
 <img src="/medtrack%20screenshots/medtrack8.jpeg" alt="Screenshot 2" width="300">
 <img src="/medtrack%20screenshots/medtrack3.jpeg" alt="Screenshot 3" width="300">
