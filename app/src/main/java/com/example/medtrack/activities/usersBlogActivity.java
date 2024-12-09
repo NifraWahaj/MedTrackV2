@@ -107,8 +107,7 @@ public class usersBlogActivity extends Activity implements BlogAdapter.OnBlogCli
                 blogAdapter.notifyDataSetChanged();
                 progressBar.setVisibility(View.GONE);
                 recyclerViewYourBlogs.setVisibility(View.VISIBLE);
-                Toast.makeText(usersBlogActivity.this, "Fetched " + blogList.size() + " blogs.", Toast.LENGTH_SHORT).show();
-            }
+             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {

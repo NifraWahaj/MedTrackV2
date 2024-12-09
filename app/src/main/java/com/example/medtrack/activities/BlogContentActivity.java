@@ -280,6 +280,8 @@ public class BlogContentActivity extends AppCompatActivity {
     private void setDefaultImage() {
         ivProfilePic.setImageResource(R.drawable.user_profile); // Replace `default_image` with your drawable resource name
      }
+     //bitmap 2D array of pixels
+    //base64 binary-to-text encoding scheme.
     public static Bitmap decodeBase64ToBitmap(String base64Image) {
         try {
             // Decode the Base64 string into a byte array

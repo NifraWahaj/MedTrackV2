@@ -144,7 +144,7 @@ public class WriteReviewActivity extends AppCompatActivity {
                 storeNotificationInCommunity(blogId, userId, "New Review", " reviewed your blog");
             }
 
-            Toast.makeText(this, "Review and Rating added to Firebase!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Your Review and Rating have been submitted!", Toast.LENGTH_SHORT).show();
         }).addOnFailureListener(e -> Toast.makeText(this, "Failed to add review and rating", Toast.LENGTH_SHORT).show());
     }
 

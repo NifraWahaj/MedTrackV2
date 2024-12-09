@@ -70,6 +70,7 @@ public class BlogAdapter extends RecyclerView.Adapter<BlogAdapter.BlogViewHolder
             }
 
             // Display the limited content in the TextView, formatted as HTML
+            //The legacy mode supports basic HTML tags
             holder.contentTextView.setText(Html.fromHtml(limitedContent.toString(), Html.FROM_HTML_MODE_LEGACY));
         }
 

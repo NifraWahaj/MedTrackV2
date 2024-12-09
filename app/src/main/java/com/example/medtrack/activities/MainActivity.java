@@ -73,9 +73,7 @@ public class MainActivity extends AppCompatActivity {
                         token = task.getResult();
 
 
-                        // Log and toast
-                    //    Toast.makeText(MainActivity.this, "Your device registration token is" + token
-                    //            , Toast.LENGTH_SHORT).show();
+                        //FCM (Firebase Cloud Messaging) token
                         Log.d("FCM Token", token);
                         etToken.setText(token);
                         // Proceed only if the token is valid
