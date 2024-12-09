@@ -160,21 +160,21 @@ The admin panel for approving blogs and viewing analytical reports is built usin
 
 ## Screenshots
 
-![Alt Text](/medtrack%20screenshots/medtrack15.jpeg)
-![Alt Text](/medtrack%20screenshots/medtrack8.jpeg)
-![Alt Text](/medtrack%20screenshots/medtrack3.jpeg)
-![Alt Text](/medtrack%20screenshots/medtrack2.jpeg)
-![Alt Text](/medtrack%20screenshots/medtrack.jpeg)
-![Alt Text](/medtrack%20screenshots/medtrack13.jpeg)
-![Alt Text](/medtrack%20screenshots/medtrack14.jpeg)
-![Alt Text](/medtrack%20screenshots/medtrack11.jpeg)
-![Alt Text](/medtrack%20screenshots/medtrack10.jpeg)
-![Alt Text](/medtrack%20screenshots/medtrack9.jpeg)
-![Alt Text](/medtrack%20screenshots/medtrack8.jpeg)
-![Alt Text](/medtrack%20screenshots/medtrack5.jpeg)
-![Alt Text](/medtrack%20screenshots/medtrack4.jpeg)
+## Screenshots
 
-
+<img src="/medtrack%20screenshots/medtrack15.jpeg" alt="Screenshot 1" width="300">
+<img src="/medtrack%20screenshots/medtrack8.jpeg" alt="Screenshot 2" width="300">
+<img src="/medtrack%20screenshots/medtrack3.jpeg" alt="Screenshot 3" width="300">
+<img src="/medtrack%20screenshots/medtrack2.jpeg" alt="Screenshot 4" width="300">
+<img src="/medtrack%20screenshots/medtrack.jpeg" alt="Screenshot 5" width="300">
+<img src="/medtrack%20screenshots/medtrack13.jpeg" alt="Screenshot 6" width="300">
+<img src="/medtrack%20screenshots/medtrack14.jpeg" alt="Screenshot 7" width="300">
+<img src="/medtrack%20screenshots/medtrack11.jpeg" alt="Screenshot 8" width="300">
+<img src="/medtrack%20screenshots/medtrack10.jpeg" alt="Screenshot 9" width="300">
+<img src="/medtrack%20screenshots/medtrack9.jpeg" alt="Screenshot 10" width="300">
+<img src="/medtrack%20screenshots/medtrack8.jpeg" alt="Screenshot 11" width="300">
+<img src="/medtrack%20screenshots/medtrack5.jpeg" alt="Screenshot 12" width="300">
+<img src="/medtrack%20screenshots/medtrack4.jpeg" alt="Screenshot 13" width="300">
 
 
 
