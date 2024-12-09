@@ -3,6 +3,7 @@ package com.example.medtrack.fragments;
 import static android.app.Activity.RESULT_OK;
 
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
@@ -53,9 +55,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import com.itextpdf.kernel.colors.Color;
+import com.itextpdf.kernel.colors.DeviceRgb;
+import com.itextpdf.layout.borders.Border;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Table;
 
 public class ProfileFragment extends Fragment {
 
@@ -89,8 +103,11 @@ public class ProfileFragment extends Fragment {
         LL_Logout = v.findViewById(R.id.LL_Logout);
 
 
+        LinearLayout LL_Delete = v.findViewById(R.id.LL_Delete);
+        LL_Delete.setOnClickListener(view -> confirmAndDeleteAccount());
+
         profileName.setText(User.getCurrentUserName(getContext()));
-        profileEmail.setText(User.getCurrentUserName(getContext()));
+        profileEmail.setText(User.getCurrentUserEmail(getContext()));
 
         // Set up event listeners
         btnAddPicture.setOnClickListener(view -> openImagePicker());
@@ -100,7 +117,11 @@ public class ProfileFragment extends Fragment {
             startActivity(intent);
         });
 
-        LL_Report.setOnClickListener(view -> GetReport());
+        LL_Report.setOnClickListener(view -> {
+            Log.d("ProfileFragment", "Report button clicked");
+            GetReport();
+        });
+
 
         LL_Logout.setOnClickListener(view -> logout());
         LL_About.setOnClickListener(v1 -> showAboutUsDialog());
@@ -113,22 +134,23 @@ public class ProfileFragment extends Fragment {
 
         return v;
     }
-    private void GetReport(){
+    private void GetReport() {
+        Log.d("ProfileFragment", "GetReport() called");
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {
+            Log.d("ProfileFragment", "No user logged in");
             Toast.makeText(getActivity(), "User not logged in", Toast.LENGTH_SHORT).show();
             return;
         }
 
         String userId = currentUser.getUid();
+        Log.d("ProfileFragment", "Fetching data for user: " + userId);
 
-        DatabaseReference medsRef = FirebaseDatabase.getInstance()
-                .getReference("medications")
-                .child(userId);
-
+        DatabaseReference medsRef = FirebaseDatabase.getInstance().getReference("medications").child(userId);
         medsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d("Firebase", "Data snapshot received: " + dataSnapshot.toString());
                 medicationList.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Medication medication = snapshot.getValue(Medication.class);
@@ -136,9 +158,25 @@ public class ProfileFragment extends Fragment {
                         medicationList.add(medication);
                     }
                 }
+                Log.d("ProfileFragment", "Number of medications retrieved: " + medicationList.size());
+                DatabaseReference medsRef = FirebaseDatabase.getInstance().getReference("medications").child(userId);
+                medsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            generatePDFReportFromSnapshot(dataSnapshot);
+                        } else {
+                            Log.d("Firebase", "No medications found for user.");
+                            Toast.makeText(getContext(), "No medications to generate a report.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
 
-                // After retrieving data, create PDF report
-                generatePDFReport(medicationList);
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.e("Firebase", "Failed to fetch data: " + databaseError.getMessage());
+                    }
+                });
+
             }
 
             @Override
@@ -147,53 +185,101 @@ public class ProfileFragment extends Fragment {
             }
         });
     }
-    public void generatePDFReport(List<Medication> medicationList) {
+
+
+
+    public void generatePDFReportFromSnapshot(DataSnapshot snapshot) {
+        List<Medication> medicationList = new ArrayList<>();
+
+        // Parse the DataSnapshot into a list of medications
+        for (DataSnapshot medicationSnapshot : snapshot.getChildren()) {
+            Medication medication = medicationSnapshot.getValue(Medication.class);
+            if (medication != null) {
+                medicationList.add(medication);
+            }
+        }
+
+        // Now generate the report using the parsed list
+        Log.d("ProfileFragment", "generatePDFReport called with " + medicationList.size() + " medications");
+
         try {
-            // Get the context and external files directory
             Context context = getContext();
             if (context != null) {
-                // Create the file for the PDF
                 File pdfFile = new File(context.getExternalFilesDir(null), "medication_report.pdf");
-
-                // Create a PdfWriter instance for the PDF file
                 PdfWriter writer = new PdfWriter(new FileOutputStream(pdfFile));
-
-                // Create a PdfDocument instance
                 PdfDocument pdfDoc = new PdfDocument(writer);
-
-                // Create a Document instance with the PdfDocument and page size (optional)
                 Document document = new Document(pdfDoc, PageSize.A4);
 
-                // Add content to the document
-                document.add(new Paragraph("Medication Report").setFontSize(18).setBold());
+                // Styling
+                DeviceRgb blueColor = new DeviceRgb(0, 102, 204);
+                DeviceRgb grayColor = new DeviceRgb(64, 64, 64);
 
-                // Add a new line for spacing
+                // Title Section
+                document.add(new Paragraph("Medication Report")
+                        .setFontSize(24)
+                        .setBold()
+                        .setFontColor(blueColor)
+                        .setTextAlignment(com.itextpdf.layout.property.TextAlignment.CENTER));
+                document.add(new Paragraph("Generated by MedTrack").setFontSize(14).setTextAlignment(com.itextpdf.layout.property.TextAlignment.CENTER));
+                document.add(new Paragraph("Date: " + new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date()))
+                        .setFontSize(12)
+                        .setTextAlignment(com.itextpdf.layout.property.TextAlignment.CENTER));
+                document.add(new Paragraph("\n\n")); // Spacer
+
+                // Analytics Section
+                document.add(new Paragraph("Analytics")
+                        .setFontSize(16)
+                        .setBold()
+                        .setFontColor(blueColor));
+                document.add(new Paragraph("Total Medications: " + medicationList.size()));
+                document.add(new Paragraph("Most Common Frequency: " + getMostCommonFrequency(medicationList)));
+                document.add(new Paragraph("Longest Active Medication: " + getLongestActiveMedication(medicationList)));
                 document.add(new Paragraph("\n"));
 
-                // Iterate over the medication list and add details
+                // Medication Table
+                float[] columnWidths = {150, 100, 150, 150}; // Adjust column widths
+                Table table = new Table(columnWidths);
+                table.addHeaderCell(new Cell().add(new Paragraph("Medication Name").setBold().setFontColor(blueColor)));
+                table.addHeaderCell(new Cell().add(new Paragraph("Frequency").setBold().setFontColor(blueColor)));
+                table.addHeaderCell(new Cell().add(new Paragraph("Start Date").setBold().setFontColor(blueColor)));
+                table.addHeaderCell(new Cell().add(new Paragraph("End Date").setBold().setFontColor(blueColor)));
+
+                // Populate Table Rows
                 for (Medication medication : medicationList) {
-                    document.add(new Paragraph("Medication Name: " + medication.getName()));
-                    document.add(new Paragraph("Frequency: " + medication.getFrequency()));
-                    document.add(new Paragraph("Reminder Time: " + medication.getReminderTime()));
-                    if ("Twice Daily".equals(medication.getFrequency())) {
-                        document.add(new Paragraph("First Intake Details: " + medication.getFirstIntakeDetails()));
-                        document.add(new Paragraph("Second Intake Details: " + medication.getSecondIntakeDetails()));
-                    }
-                    if (medication.getSelectedDays() != null && !medication.getSelectedDays().isEmpty()) {
-                        document.add(new Paragraph("Selected Days: " + medication.getSelectedDays()));
-                    }
-                    document.add(new Paragraph("Start Date: " + medication.getStartDate()));
-                    document.add(new Paragraph("End Date: " + medication.getEndDate()));
-                    document.add(new Paragraph("Refill Amount: " + medication.getRefillAmount()));
-                    document.add(new Paragraph("Refill Threshold: " + medication.getRefillThreshold()));
-                    document.add(new Paragraph("\n"));
+                    table.addCell(new Cell().add(new Paragraph(medication.getName())));
+                    table.addCell(new Cell().add(new Paragraph(medication.getFrequency())));
+                    table.addCell(new Cell().add(new Paragraph(medication.getStartDate())));
+                    table.addCell(new Cell().add(new Paragraph(medication.getEndDate())));
                 }
 
-                // Close the document
+                document.add(table);
+
+                // Footer Section
+                document.add(new Paragraph("\n"));
+                document.add(new Paragraph("This report is generated automatically by MedTrack.")
+                        .setFontSize(10)
+                        .setFontColor(grayColor)
+                        .setTextAlignment(com.itextpdf.layout.property.TextAlignment.CENTER));
+                document.add(new Paragraph("For inquiries, contact support@medtrack.com.")
+                        .setFontSize(10)
+                        .setFontColor(grayColor)
+                        .setTextAlignment(com.itextpdf.layout.property.TextAlignment.CENTER));
+
+                // Close Document
                 document.close();
 
-                // Log success or notify the user
                 Log.d("PDF", "Medication report generated successfully.");
+                Uri contentUri = FileProvider.getUriForFile(context, "com.example.medtrack.fileprovider", pdfFile);
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(contentUri, "application/pdf");
+                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                Intent chooser = Intent.createChooser(intent, "Open Report");
+                try {
+                    context.startActivity(chooser);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(context, "No application found to open PDF", Toast.LENGTH_SHORT).show();
+                }
+
             } else {
                 Log.e("Fragment", "Context is null, cannot generate PDF.");
             }
@@ -202,6 +288,36 @@ public class ProfileFragment extends Fragment {
             Log.e("PDF", "Error generating report: " + e.getMessage());
         }
     }
+
+
+    private String getMostCommonFrequency(List<Medication> medications) {
+        Map<String, Integer> frequencyCount = new HashMap<>();
+        for (Medication medication : medications) {
+            frequencyCount.put(medication.getFrequency(), frequencyCount.getOrDefault(medication.getFrequency(), 0) + 1);
+        }
+        return Collections.max(frequencyCount.entrySet(), Map.Entry.comparingByValue()).getKey();
+    }
+
+    private String getLongestActiveMedication(List<Medication> medications) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        long maxDuration = 0;
+        String longestMedication = "";
+        for (Medication medication : medications) {
+            try {
+                Date startDate = dateFormat.parse(medication.getStartDate());
+                Date endDate = dateFormat.parse(medication.getEndDate());
+                long duration = endDate.getTime() - startDate.getTime();
+                if (duration > maxDuration) {
+                    maxDuration = duration;
+                    longestMedication = medication.getName();
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return longestMedication;
+    }
+
     private String sanitizeString(String input) {
         if (input == null) {
             return "N/A"; // Return a default value if null
@@ -484,5 +600,54 @@ public class ProfileFragment extends Fragment {
             return null;
         }
     }
+    private void confirmAndDeleteAccount() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (currentUser == null) {
+            Toast.makeText(getActivity(), "No user is logged in.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Show confirmation dialog
+        new AlertDialog.Builder(getContext())
+                .setTitle("Delete Account")
+                .setMessage("Are you sure you want to permanently delete your account? This action cannot be undone.")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    // Proceed with account deletion
+                    deleteAccount(currentUser);
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .create()
+                .show();
+    }
+
+    private void deleteAccount(FirebaseUser currentUser) {
+        // Delete user-related data from Firebase Realtime Database
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(currentUser.getUid());
+        userRef.removeValue().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                // Remove user authentication account
+                currentUser.delete().addOnCompleteListener(deleteTask -> {
+                    if (deleteTask.isSuccessful()) {
+                        Toast.makeText(getActivity(), "Account deleted successfully.", Toast.LENGTH_SHORT).show();
+
+                        // Redirect to Login or Home screen
+                        Intent intent = new Intent(getActivity(), LoginActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+
+                        if (getActivity() != null) {
+                            getActivity().finish();
+                        }
+                    } else {
+                        Toast.makeText(getActivity(), "Failed to delete account: " + deleteTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                Toast.makeText(getActivity(), "Failed to delete user data: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
 }

@@ -69,6 +69,7 @@ dependencies {
     annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
     implementation ("androidx.work:work-runtime:2.8.1")
     implementation ("com.google.firebase:firebase-messaging:24.1.0")
+    implementation ("androidx.work:work-runtime-ktx:2.8.1")
 
 
 

@@ -208,6 +208,32 @@
                 android:textSize="16sp" />
         </LinearLayout>
 
+        <!-- Delete Account -->
+        <LinearLayout
+            android:id="@+id/LL_Delete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:layout_marginBottom="5dp">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:contentDescription="Delete Icon"
+                android:src="@drawable/delete" />
+
+            <TextView
+                android:id="@+id/btnDelete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:text="Delete Account"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
+        </LinearLayout>
+
         <!-- Logout -->
         <LinearLayout
             android:id="@+id/LL_Logout"

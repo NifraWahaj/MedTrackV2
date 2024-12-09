@@ -28,7 +28,7 @@
                 android:id="@+id/medInfoIcon"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/ic_info"
+                android:src="@drawable/ic_refill"
                 android:layout_marginEnd="8dp" />
 
             <TextView
@@ -62,8 +62,8 @@
         <!-- Dose Details -->
         <TextView
             android:id="@+id/doseDetails"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_marginTop="8dp"
             android:text="Take 1 pill"
             android:textSize="16sp"

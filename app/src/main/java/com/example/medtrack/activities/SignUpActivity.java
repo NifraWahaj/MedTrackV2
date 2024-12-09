@@ -19,8 +19,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.medtrack.R;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -142,6 +144,20 @@ public class SignUpActivity extends AppCompatActivity {
             startActivity(loginIntent);
             finish(); // Prevent navigating back to SignUpActivity
         });
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String userId = user.getUid();
+            FirebaseMessaging.getInstance().subscribeToTopic(userId)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.d("FCM", "Subscribed to topic: " + userId);
+                        } else {
+                            Log.e("FCM", "Failed to subscribe: ", task.getException());
+                        }
+                    });
+        }
+
     }
 
     private void saveUserToDatabase(String name, String email) {
@@ -168,4 +184,5 @@ public class SignUpActivity extends AppCompatActivity {
             Toast.makeText(SignUpActivity.this, "Failed to save user data.", Toast.LENGTH_SHORT).show();
         });
     }
+
 }

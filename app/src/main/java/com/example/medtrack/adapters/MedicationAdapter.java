@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -107,14 +108,47 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
         Button btnTake = dialogView.findViewById(R.id.btnTake);
         Button btnSkip = dialogView.findViewById(R.id.btnSkip);
         ImageView deleteMedIcon = dialogView.findViewById(R.id.deleteMedIcon);
+        ImageView refillMedIcon = dialogView.findViewById(R.id.medInfoIcon);
+
 
         // Set medication name
         medName.setText(medication.getName());
+// In showMedicationDetailsDialog method
+        // Handle interval-specific details
+        if ("Interval".equalsIgnoreCase(medication.getFrequency())) {
+            try {
+                String reminderTime = medication.getReminderTime();
+                String[] parts = reminderTime.split(", ");
+
+                if (parts.length >= 4) {
+                    int intervalHours = Integer.parseInt(parts[0].split(": ")[1].replace("hours", "").trim());
+                    String startTimeStr = parts[1].split(": ")[1].trim();
+                    String endTimeStr = parts[2].split(": ")[1].trim();
+                    String doseDetails2 = parts[3].split(": ")[1].trim();
+
+                    String intervalInfo = "Interval: " + intervalHours + " hours, Start: " + startTimeStr +
+                            ", End: " + endTimeStr;
+                    scheduledTime.setText(intervalInfo);
+                } else {
+                    scheduledTime.setText("Incomplete interval details");
+                    Log.e(TAG, "Invalid reminderTime format for interval medication: " + reminderTime);
+                }
+            } catch (Exception e) {
+                scheduledTime.setText("Error parsing interval details");
+                Log.e(TAG, "Error parsing interval details: " + e.getMessage());
+            }
+        } else {
+            // Handle non-interval medications
+            scheduledTime.setText("Scheduled Time: " +
+                    (medication.getReminderTime() != null ? medication.getReminderTime() : "N/A"));
+        }
+
+        doseDetails.setText(extractDoseInfo(medication));
 
         // Extract dosage details
-        String doseInfo = extractDoseInfo(medication);
-        scheduledTime.setText("Scheduled Time: " + (medication.getReminderTime() != null ? medication.getReminderTime() : "N/A"));
-        doseDetails.setText(doseInfo);
+        //    String doseInfo = extractDoseInfo(medication);
+        //  scheduledTime.setText("Scheduled Time: " + (medication.getReminderTime() != null ? medication.getReminderTime() : "N/A"));
+        // doseDetails.setText(doseInfo);
 
         // Set Take button click listener
         btnTake.setOnClickListener(v -> {
@@ -154,7 +188,6 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
 
 
             }
-
             // Hide buttons after action
             btnTake.setVisibility(View.GONE);
             btnSkip.setVisibility(View.GONE);
@@ -170,10 +203,92 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
 
         // Set Delete button click listener
         deleteMedIcon.setOnClickListener(v -> {
-            Log.d(TAG, medication.getName() + " delete icon clicked.");
-            Toast.makeText(context, "Deleted " + medication.getName(), Toast.LENGTH_SHORT).show();
-            // You may implement delete logic here if needed.
+            String key = medication.getKey(); // Get the key for the medication
+            if (key == null) {
+                Toast.makeText(context, "Unable to delete medication. Key is missing.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Show a confirmation dialog
+            new AlertDialog.Builder(context)
+                    .setTitle("Delete Medication")
+                    .setMessage("Are you sure you want to delete this medication?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        DatabaseReference medsRef = FirebaseDatabase.getInstance()
+                                .getReference("medications")
+                                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+                        medsRef.child(key).removeValue()
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(context, "Medication deleted successfully!", Toast.LENGTH_SHORT).show();
+                                    medicationList.remove(position); // Remove from local list
+                                    notifyItemRemoved(position); // Notify adapter
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(context, "Failed to delete medication: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                });
+                    })
+                    .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                    .show();
         });
+
+        refillMedIcon.setOnClickListener(v -> {
+            // Inflate the custom dialog layout
+            View dialogView2 = LayoutInflater.from(context).inflate(R.layout.dialog_update_refill, null);
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context)
+                    .setView(dialogView2);
+
+            AlertDialog dialog = dialogBuilder.create();
+
+            // Bind views
+            EditText etRefillAmount = dialogView2.findViewById(R.id.etRefillAmount);
+            EditText etRefillThreshold = dialogView2.findViewById(R.id.etRefillThreshold);
+            Button btnUpdateRefill = dialogView2.findViewById(R.id.btnUpdateRefill);
+
+            // Set button click listener
+            btnUpdateRefill.setOnClickListener(updateView -> {
+                String refillAmountStr = etRefillAmount.getText().toString().trim();
+                String refillThresholdStr = etRefillThreshold.getText().toString().trim();
+
+                if (refillAmountStr.isEmpty() || refillThresholdStr.isEmpty()) {
+                    Toast.makeText(context, "Please enter both values", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                int newRefillAmount = Integer.parseInt(refillAmountStr);
+                int newRefillThreshold = Integer.parseInt(refillThresholdStr);
+
+                String key = medication.getKey();
+                if (key == null) {
+                    Toast.makeText(context, "Unable to update medication. Key is missing.", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                    return;
+                }
+
+                // Update Firebase
+                DatabaseReference medsRef = FirebaseDatabase.getInstance()
+                        .getReference("medications")
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+                medsRef.child(key).child("refillAmount").setValue(newRefillAmount);
+                medsRef.child(key).child("refillThreshold").setValue(newRefillThreshold)
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(context, "Refill details updated!", Toast.LENGTH_SHORT).show();
+                            medication.setRefillAmount(newRefillAmount);
+                            medication.setRefillThreshold(newRefillThreshold);
+                            notifyItemChanged(position);
+                            dialog.dismiss();
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(context, "Failed to update refill details.", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                        });
+            });
+
+            dialog.show();
+        });
+
+
 
         AlertDialog dialog = builder.create();
         dialog.show();
@@ -197,15 +312,23 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
     private String extractDoseInfo(Medication medication) {
         try {
             if ("Interval".equalsIgnoreCase(medication.getFrequency())) {
-                return "Dose: " + medication.getReminderTime().split("Dose:")[1].trim();
+                // Extract dose info for interval medications
+                String reminderTime = medication.getReminderTime();
+                if (reminderTime.contains("Dose:")) {
+                    // Extract the part after "Dose:"
+                    return reminderTime.substring(reminderTime.indexOf("Dose:") + 5).trim();
+                }
             } else if (medication.getReminderTime() != null && medication.getReminderTime().contains("Dosage:")) {
-                return "Dosage: " + medication.getReminderTime().split("Dosage:")[1].trim();
+                // Extract dose info for non-interval medications
+                return medication.getReminderTime().split("Dosage:")[1].trim();
             }
         } catch (Exception e) {
             Log.e(TAG, "Error extracting dose info: " + e.getMessage());
         }
         return "Dose Info: Unavailable";
     }
+
+
 
     private int extractDosageAmount(Medication medication) {
         try {

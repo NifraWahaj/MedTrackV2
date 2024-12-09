@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
+
+
 public class NotificationPagerAdapter extends FragmentStateAdapter {
 
     public NotificationPagerAdapter(@NonNull Fragment fragment) {
@@ -22,7 +24,7 @@ public class NotificationPagerAdapter extends FragmentStateAdapter {
             case 0: // Community Tab
                 return new NotificationCommunityFragment();
             case 1: // Medication Tab
-                return new NotificationMedicationFragment();
+                return new MedicationNotificationFragment();
             default:
                 return new NotificationCommunityFragment();
         }

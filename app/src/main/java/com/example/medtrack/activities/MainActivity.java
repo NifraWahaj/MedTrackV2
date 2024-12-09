@@ -1,7 +1,13 @@
 package com.example.medtrack.activities;
 
+import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
@@ -17,6 +23,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.medtrack.R;
 import com.example.medtrack.adapters.ViewPagerAdapter;
+import com.example.medtrack.utils.ReminderReceiver;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.badge.BadgeDrawable;
@@ -30,6 +37,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+        createNotificationChannel();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -138,10 +149,9 @@ public class MainActivity extends AppCompatActivity {
 
         vp2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
+
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
-
-
                 TabLayout.Tab selectedTab = tabLayout.getTabAt(position);
                 BadgeDrawable badgeDrawable = selectedTab.getBadge();
                 if (badgeDrawable != null) {
@@ -154,8 +164,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-
     }
 
     private void fetchUserFromDatabase(String userId) {
@@ -199,5 +207,21 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("email", email);
         editor.apply();
     }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    "med_track_channel",
+                    "Medication Alerts",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            channel.setDescription("Notifications for low refill alerts");
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
+            }
+        }
+    }
+
 
 }
