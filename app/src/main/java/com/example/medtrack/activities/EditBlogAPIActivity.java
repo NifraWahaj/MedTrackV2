@@ -282,6 +282,8 @@ public class EditBlogAPIActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == PICK_IMAGE_REQUEST && data != null) {
             Uri selectedImageUri = data.getData();
             try {
+               // /Converts the image URI into a Bitmap object using the MediaStore API.
+                //The ContentResolver is used to access the image data from the URI.
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
                 uploadImageToImgBB(bitmap); // Upload the image to ImgBB
             } catch (IOException e) {
@@ -294,13 +296,14 @@ public class EditBlogAPIActivity extends AppCompatActivity {
     private void uploadImageToImgBB(Bitmap bitmap) {
         String url = "https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY;
 
-        // Convert Bitmap to Base64
+        // Convert Bitmap to Base64 required by ImgBB's API.
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
         byte[] imageBytes = baos.toByteArray();
         String base64Image = Base64.encodeToString(imageBytes, Base64.DEFAULT);
 
         // Build the request body
+        //multipart request allows sending multiple pieces of data (e.g., files, strings) in a single HTTP request, often used for file uploads.
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("image", base64Image)
@@ -313,6 +316,7 @@ public class EditBlogAPIActivity extends AppCompatActivity {
         progressDialog.show();
 
         // Make the HTTP request
+        //Uses OkHttpClient to create a POST request with the API URL and request body.
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(url)
@@ -405,7 +409,7 @@ public class EditBlogAPIActivity extends AppCompatActivity {
         builder.show();
     }
 
-
+// insert image with prompted dimensions
     private void insertImageInHtml(String imageUrl, int width, int height) {
         String imageHtml = "<img src='" + imageUrl + "' width='" + width + "' height='" + height + "' />";
         String currentHtmlContent = mEditor.getHtml();

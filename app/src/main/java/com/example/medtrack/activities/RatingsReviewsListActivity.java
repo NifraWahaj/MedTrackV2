@@ -53,7 +53,6 @@ public class RatingsReviewsListActivity extends AppCompatActivity {
         reviewRatingBar = findViewById(R.id.reviewRatingBar);
         backButton = findViewById(R.id.backButton);
         Intent i = getIntent();
-        Toast.makeText(this, "inside  reviews clicked", Toast.LENGTH_SHORT).show();
 
         blogId = i.getStringExtra("blogId");
         // Set up RecyclerView
@@ -110,11 +109,14 @@ public class RatingsReviewsListActivity extends AppCompatActivity {
                                 }
                             }
                             calculateRatingsAverage();
+                            tvReviews.setText(reviewList.size()+" reviews");
+
                             // Update the RecyclerView
                             adapter.notifyDataSetChanged();
                         }
                     });
                 } else {
+                    tvReviews.setText(reviewList.size()+" reviews");
                     Log.d("BlogContent", "No reviews found for this blog.");
                     adapter.notifyDataSetChanged(); // Notify for empty list
                 }
@@ -168,8 +170,7 @@ public class RatingsReviewsListActivity extends AppCompatActivity {
 
             return; // Return if there are no reviews
         }
-        Toast.makeText(this, " ratign avaregr " + reviewList.size(), Toast.LENGTH_SHORT).show();
-        float sum = 0.0f;
+         float sum = 0.0f;
         for (Review review : reviewList) {
             sum += review.getRating();
         }

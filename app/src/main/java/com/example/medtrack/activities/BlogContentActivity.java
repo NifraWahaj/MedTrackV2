@@ -2,9 +2,11 @@ package com.example.medtrack.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
@@ -51,8 +53,8 @@ public class BlogContentActivity extends AppCompatActivity {
         // Initialize Views
         etTitle = findViewById(R.id.etTitle);
         webViewContent = findViewById(R.id.webViewContent);
-        webViewContent.getSettings().setJavaScriptEnabled(true);  // If you need JavaScript support
-        webViewContent.getSettings().setLoadsImagesAutomatically(true);  // Ensure images load automatically
+        webViewContent.getSettings().setJavaScriptEnabled(true);
+        webViewContent.getSettings().setLoadsImagesAutomatically(true);
 
         ivProfilePic = findViewById(R.id.ivProfilePic);
         ratingBar = findViewById(R.id.rating);
@@ -69,6 +71,7 @@ public class BlogContentActivity extends AppCompatActivity {
 
         // Customize RatingBar Colors
         LayerDrawable stars = (LayerDrawable) ratingBar.getProgressDrawable();
+        // ContextCompact ensures compatibility for resource access.
         stars.getDrawable(2).setColorFilter(ContextCompat.getColor(this, R.color.ratingColor), PorterDuff.Mode.SRC_ATOP);
 
         // Retrieve Intent Data
@@ -119,7 +122,7 @@ public class BlogContentActivity extends AppCompatActivity {
                 }
 
                 startActivity(intent);
-
+               // rating bar is triggered only once
                 ratingBar.postDelayed(() -> ratingBar.setOnRatingBarChangeListener(ratingBarChangeListener), 500); // Re-enable
             }
         };
@@ -140,7 +143,7 @@ public class BlogContentActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Back Button
+        // Back Button to go back to previous activity
         backButton.setOnClickListener(v -> onBackPressed());
 
         // Review List Button
@@ -254,7 +257,7 @@ public class BlogContentActivity extends AppCompatActivity {
                 String base64Image = task.getResult().getValue(String.class);
 
                 if (base64Image != null) {
-                    Bitmap decodedBitmap = ProfileFragment.decodeBase64ToBitmap(base64Image);
+                    Bitmap decodedBitmap = decodeBase64ToBitmap(base64Image);
 
                     if (decodedBitmap != null) {
                         // Set the decoded Bitmap to the ImageView
@@ -277,6 +280,24 @@ public class BlogContentActivity extends AppCompatActivity {
     private void setDefaultImage() {
         ivProfilePic.setImageResource(R.drawable.user_profile); // Replace `default_image` with your drawable resource name
      }
+     //bitmap 2D array of pixels
+    //base64 binary-to-text encoding scheme.
+    public static Bitmap decodeBase64ToBitmap(String base64Image) {
+        try {
+            // Decode the Base64 string into a byte array
+            byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
 
+            // Decode the byte array into a Bitmap
+            return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        } catch (IllegalArgumentException e) {
+            // Handle the error if Base64 string is invalid
+            e.printStackTrace();
+            return null;
+        } catch (OutOfMemoryError e) {
+            // Handle the error if the image is too large
+            e.printStackTrace();
+            return null;
+        }
+    }
 
 }

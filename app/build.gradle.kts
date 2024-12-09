@@ -63,6 +63,7 @@ dependencies {
     implementation ("androidx.cardview:cardview:1.0.0")
 // image retrieval in Firebase
     implementation ("com.github.bumptech.glide:glide:4.16.0")
+    // rich text editor API
     implementation( "jp.wasabeef:richeditor-android:2.0.0")
     implementation ("com.squareup.okhttp3:okhttp:4.9.3")
 

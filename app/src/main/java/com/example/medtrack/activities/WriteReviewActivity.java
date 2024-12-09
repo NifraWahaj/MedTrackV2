@@ -114,6 +114,7 @@ public class WriteReviewActivity extends AppCompatActivity {
             // Show failure message
             Toast.makeText(this, "Failed to delete review and rating", Toast.LENGTH_SHORT).show();
         });
+
     }
 
 
@@ -143,7 +144,7 @@ public class WriteReviewActivity extends AppCompatActivity {
                 storeNotificationInCommunity(blogId, userId, "New Review", " reviewed your blog");
             }
 
-            Toast.makeText(this, "Review and Rating added to Firebase!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Your Review and Rating have been submitted!", Toast.LENGTH_SHORT).show();
         }).addOnFailureListener(e -> Toast.makeText(this, "Failed to add review and rating", Toast.LENGTH_SHORT).show());
     }
 
@@ -186,7 +187,7 @@ public class WriteReviewActivity extends AppCompatActivity {
                 if (isEditMode) {
                     Log.d("notifyBlogAuthor", "Edit mode is true");
                     sendNotificationToAuthor(fcmToken, "New Review", " edited their review on your blog ");
-                } else {
+                 } else {
                     sendNotificationToAuthor(fcmToken, "New Review", User.getCurrentUserName(WriteReviewActivity.this) + " reviewed your blog ");
                 }
 

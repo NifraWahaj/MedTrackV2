@@ -3,7 +3,6 @@ package com.example.medtrack.adapters;
 
 import android.content.Context;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,19 +39,23 @@ public class MedicationListAdapter extends RecyclerView.Adapter<MedicationListAd
     @Override
     public void onBindViewHolder(@NonNull MedicationViewHolder holder, int position) {
         Medication medication = medicationList.get(position);
-        Log.d("MedicationListAdapter", "Name: " + medication.getName() + ", Key: " + medication.getKey());
-
         holder.textViewDetails.setMovementMethod(new ScrollingMovementMethod());
         holder.textViewName.setText(medication.getName());
+
+
         holder.textViewDetails.setText(
                 Html.fromHtml(
-                        medication.getFrequency() +
-                                "<br> <b>Start: </b> " + medication.getStartDate() + "<br>" +
+                         medication.getFrequency() +
+                                "<b>Start: </b> " + medication.getStartDate() + "<br>" +
                                 "<b>End: </b> " + medication.getEndDate() + "<br>" +
-                                (medication.getReminderTime() != null ? "<b>Reminder:</b> " + medication.getReminderTime() : "")
+                                (medication.getReminderTime() != null ? "<b>Reminder:</b> " + medication.getReminderTime() + "<br>" : "") +
+                                (medication.getFirstIntakeDetails() != null ? "<b>First Intake:</b> " + medication.getFirstIntakeDetails() + "<br>" : "") +
+                                (medication.getSecondIntakeDetails() != null ? "<b>Second Intake:</b> " + medication.getSecondIntakeDetails() + "<br>" : "") +
+                                (medication.getSelectedDays() != null && !medication.getSelectedDays().isEmpty()
+                                        ? "<b>Specific Days:</b> " + medication.getSelectedDays() + "<br>"
+                                        : "")
                 )
         );
-
     }
 
     @Override

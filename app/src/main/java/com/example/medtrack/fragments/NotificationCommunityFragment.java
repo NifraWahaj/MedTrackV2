@@ -106,6 +106,7 @@ public class NotificationCommunityFragment extends Fragment implements Community
                 progressBar.setVisibility(View.GONE);  // Hide ProgressBar if failed
             }
         });
+        progressBar.setVisibility(View.GONE);
     }
 
     private void fetchBlogNotifications(String blogId) {
@@ -154,9 +155,12 @@ public class NotificationCommunityFragment extends Fragment implements Community
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+             progressBar.setVisibility(View.GONE);
                 Toast.makeText(requireContext(), "Failed to load notifications", Toast.LENGTH_SHORT).show();
             }
         });
+        progressBar.setVisibility(View.GONE);
+
     }
 
     @Override
